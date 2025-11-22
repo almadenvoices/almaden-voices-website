@@ -1,5 +1,5 @@
 # Build stage for React app
-FROM node:18-alpine AS client-build
+FROM node:20-alpine AS client-build
 
 WORKDIR /app/client
 
@@ -7,7 +7,7 @@ WORKDIR /app/client
 COPY client/package*.json ./
 
 # Install client dependencies
-RUN npm ci --only=production
+RUN npm ci --omit=dev
 
 # Copy client source
 COPY client/ ./
@@ -16,7 +16,7 @@ COPY client/ ./
 RUN npm run build
 
 # Production stage
-FROM node:18-alpine
+FROM node:20-alpine
 
 WORKDIR /app
 
@@ -24,7 +24,7 @@ WORKDIR /app
 COPY package*.json ./
 
 # Install server dependencies only
-RUN npm ci --only=production
+RUN npm ci --omit=dev
 
 # Copy server code
 COPY server.js ./
