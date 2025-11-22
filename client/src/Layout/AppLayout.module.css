@@ -1,0 +1,15 @@
+/* src/layouts/AppLayout.module.css */
+.pageWrap{
+    min-height: 100vh;
+    padding: 24px 0;
+    background: var(--bg);
+    color: var(--text);
+}
+.switchDesktop{ display:none; }
+.switchMobile{ display:block; margin: 8px 0; }
+
+/* show the desktop switcher inside Navbar's rightSlot at ≥600px */
+@media (min-width:600px){
+    .switchDesktop{ display:block; }
+    .switchMobile{ display:none; }
+}

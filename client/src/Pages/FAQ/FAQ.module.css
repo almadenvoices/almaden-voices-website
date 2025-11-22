@@ -1,0 +1,94 @@
+/* Section shell */
+.section{ padding-bottom: clamp(40px, 6vw, 96px); }
+
+/* ---------- HERO BAND ---------- */
+.hero{
+    background: color-mix(in oklab, var(--brand) 10%, transparent);
+    padding: clamp(32px, 5vw, 72px) 0;
+    border-bottom: 1px solid var(--line);
+}
+.hTitle{
+    margin:0 0 14px; font-weight:900;
+    font-size: clamp(30px, 3.2vw, 44px); letter-spacing:-.01em;
+    text-align: center;
+}
+.searchWrap{ position:relative; max-width: 800px; margin: 0 auto;}
+.search{
+    width:100%; height: clamp(48px, 3.2vw, 56px);
+    border:1px solid var(--line); background: var(--card); color: var(--text);
+    border-radius: 14px; padding: 0 16px 0 50px; font-size: clamp(16px, 1.05vw, 18px);
+}
+.searchIcon{ position:absolute; left:16px; top:50%; transform:translateY(-50%); opacity:.75 }
+
+/* ---------- CATEGORY GRID ---------- */
+.grid{
+    margin-top: clamp(18px, 3vw, 30px);
+    display:grid; gap: clamp(14px, 2vw, 22px);
+    grid-template-columns: 1fr;
+}
+@media (min-width: 900px){
+    .grid{ grid-template-columns: repeat(3, 1fr); }
+}
+
+.card{
+    border:1px solid var(--line); background: var(--card); color: var(--text);
+    border-radius: 16px; overflow:hidden; text-align:left; cursor:pointer;
+    display:grid; grid-template-rows: auto 1fr; box-shadow: 0 8px 24px rgba(0,0,0,.03);
+    transition: transform .15s, box-shadow .15s, border-color .15s;
+}
+.card:hover{ transform: translateY(-3px); box-shadow: 0 16px 36px rgba(0,0,0,.08); border-color: color-mix(in oklab, var(--brand) 30%, var(--line)); }
+.cardActive{ outline: 3px solid color-mix(in oklab, var(--brand) 24%, transparent) }
+
+/* Top image with icon badge */
+.thumbWrap{ position:relative; aspect-ratio: 16 / 9; background: #ddd; }
+.thumb{ width:100%; height:100%; object-fit: cover; display:block; }
+.iconBadge{
+    position:absolute; left:12px; top:12px; font-size: 24px; line-height:1;
+    background: rgba(255,255,255,.85); backdrop-filter: blur(4px);
+    border:1px solid var(--line); padding: 6px 10px; border-radius: 999px;
+}
+
+.cardBody{ padding: 14px 16px 16px; display:grid; gap:8px }
+.cardTitle{ margin:0; font-weight:900; font-size: clamp(18px, 1.2vw, 20px) }
+.blurb{ margin:0; color: var(--muted); line-height:1.7 }
+.more{ justify-self:end; color: var(--brand); font-weight:800; display:inline-flex; align-items:center; gap:6px }
+
+/* ---------- LIST (ACCORDION) ---------- */
+.listHead{ display:flex; justify-content:space-between; align-items:center; margin: clamp(22px, 3vw, 32px) 0 10px; }
+.meta{ color: var(--muted); font-size: clamp(15px, 1vw, 17px) }
+.clear{ border:0; background:none; color: var(--brand); font-weight:800; cursor:pointer }
+
+.list{ display:grid; gap: 12px; max-width: 1100px; }
+.item{ border:1px solid var(--line); border-radius: 14px; background: var(--card); overflow:hidden }
+.summary{
+    width:100%; text-align:left; display:flex; align-items:center; justify-content:space-between; gap:12px;
+    padding: 16px; border:0; background:transparent; cursor:pointer; font: inherit;
+}
+.q{ font-weight: 900; font-size: clamp(16px, 1.1vw, 18px) }
+.chev{ transition: transform .25s } .rot{ transform: rotate(180deg) }
+.panel{ border-top:1px solid var(--line); transition:max-height .28s ease; overflow:hidden }
+.a{ margin:0; padding: 12px 16px 16px; color: var(--muted); line-height:1.8 }
+.empty{ text-align:center; color: var(--muted); padding: 22px; }
+.link{ color: var(--brand); font-weight: 800; text-decoration: none; }
+.link:hover{ text-decoration: underline; }
+
+/* ---------- CTA BAND ---------- */
+.ctaBand{
+    margin-top: clamp(26px, 4vw, 48px);
+    background: color-mix(in oklab, var(--brand) 12%, transparent);
+    border-top: 1px solid var(--line);
+    padding: clamp(18px, 4vw, 28px) 0;
+}
+.cta{
+    display:flex; align-items:center; justify-content:space-between; gap:16px;
+    border:1px solid var(--line); background: var(--card); border-radius: 16px;
+    padding: clamp(12px, 2vw, 18px);
+}
+.ctaTitle{ margin:0; font-weight:900; font-size: clamp(18px, 1.2vw, 20px) }
+.ctaText{ margin:2px 0 0; color: var(--muted) }
+.ctaBtn{
+    display:inline-flex; align-items:center; justify-content:center; gap:10px;
+    height: 48px; padding: 0 20px; border-radius: 12px; font-weight: 900;
+    color: #fff; background: #7C3AED; text-decoration: none;
+}
+.ctaBtn:hover{ background:#6D28D9 }
