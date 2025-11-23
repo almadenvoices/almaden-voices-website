@@ -75,15 +75,51 @@ import React, { useState } from 'react';
 const Footer = () => {
     const [email, setEmail] = useState('');
     const [subscribed, setSubscribed] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const [message, setMessage] = useState('');
+    const [error, setError] = useState('');
 
+    const handleSubscribe = async () => {
+        // Validate email
+        if (!email || !email.includes('@')) {
+            setError('Please enter a valid email address');
+            setTimeout(() => setError(''), 3000);
+            return;
+        }
 
-    const handleSubscribe = () => {
-        if (email && email.includes('@')) {
-            setSubscribed(true);
-            setTimeout(() => {
-                setSubscribed(false);
+        setLoading(true);
+        setError('');
+        setMessage('');
+
+        try {
+            const response = await fetch('/api/subscribe', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ email }),
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                setSubscribed(true);
+                setMessage(data.message || 'Thank you for subscribing!');
                 setEmail('');
-            }, 3000);
+                setTimeout(() => {
+                    setSubscribed(false);
+                    setMessage('');
+                }, 5000);
+            } else {
+                setError(data.error || 'Failed to subscribe. Please try again.');
+                setTimeout(() => setError(''), 3000);
+            }
+        } catch (err) {
+            console.error('Subscribe error:', err);
+            setError('Network error. Please try again.');
+            setTimeout(() => setError(''), 3000);
+        } finally {
+            setLoading(false);
         }
     };
     const rightColumnLinks = {
@@ -162,7 +198,8 @@ const Footer = () => {
                                 placeholder="Enter your email address"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
-                                onKeyPress={(e) => e.key === 'Enter' && handleSubscribe()}
+                                onKeyPress={(e) => e.key === 'Enter' && !loading && handleSubscribe()}
+                                disabled={loading}
                                 style={{
                                     flex: '1',
                                     minWidth: '280px',
@@ -173,13 +210,15 @@ const Footer = () => {
                                     backgroundColor: '#1a1a2e',
                                     color: 'white',
                                     outline: 'none',
-                                    transition: 'all 0.3s ease'
+                                    transition: 'all 0.3s ease',
+                                    opacity: loading ? 0.6 : 1
                                 }}
                                 onFocus={(e) => e.currentTarget.style.borderColor = '#9c27b0'}
                                 onBlur={(e) => e.currentTarget.style.borderColor = '#3d3d5c'}
                             />
                             <button
                                 onClick={handleSubscribe}
+                                disabled={loading}
                                 style={{
                                     padding: '14px 32px',
                                     backgroundColor: subscribed ? '#4caf50' : '#9c27b0',
@@ -188,20 +227,37 @@ const Footer = () => {
                                     borderRadius: '8px',
                                     fontSize: '1rem',
                                     fontWeight: 600,
-                                    cursor: 'pointer',
+                                    cursor: loading ? 'not-allowed' : 'pointer',
                                     transition: 'all 0.3s ease',
-                                    whiteSpace: 'nowrap'
+                                    whiteSpace: 'nowrap',
+                                    opacity: loading ? 0.6 : 1
                                 }}
                                 onMouseEnter={(e) => {
-                                    if (!subscribed) e.currentTarget.style.backgroundColor = '#7b1fa2';
+                                    if (!subscribed && !loading) e.currentTarget.style.backgroundColor = '#7b1fa2';
                                 }}
                                 onMouseLeave={(e) => {
-                                    if (!subscribed) e.currentTarget.style.backgroundColor = '#9c27b0';
+                                    if (!subscribed && !loading) e.currentTarget.style.backgroundColor = '#9c27b0';
                                 }}
                             >
-                                {subscribed ? '✓ Subscribed!' : 'Subscribe'}
+                                {loading ? 'Subscribing...' : subscribed ? '✓ Subscribed!' : 'Subscribe'}
                             </button>
                         </div>
+
+                        {/* Success/Error Messages */}
+                        {(message || error) && (
+                            <div style={{
+                                marginTop: '15px',
+                                padding: '12px 20px',
+                                borderRadius: '8px',
+                                backgroundColor: error ? '#ff5252' : '#4caf50',
+                                color: 'white',
+                                textAlign: 'center',
+                                fontSize: '0.95rem',
+                                fontWeight: 500
+                            }}>
+                                {message || error}
+                            </div>
+                        )}
                     </div>
                 </div>
 

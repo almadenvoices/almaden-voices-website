@@ -16,9 +16,15 @@
 # environment variables (NEVER commit these!)
 .env
 .env.local
+.env.dev
+.env.development
 .env.development.local
+.env.production
 .env.test.local
 .env.production.local
+
+# subscriber data (contains user emails - sensitive)
+subscribers.csv
 
 # IDE
 .idea/

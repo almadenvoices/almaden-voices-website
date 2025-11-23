@@ -340,7 +340,7 @@ function DonatePage1() {
  */
 
 // For local dev (backend on port 4000):
-const API_BASE_URL = "http://localhost:4000";
+const API_BASE_URL = "http://localhost:5000";
 
 // Use your real PayPal CLIENT ID (same as backend env)
 const PAYPAL_CLIENT_ID = "Ae6F40G7NNDTFDTJt57-bGBewNA_Gc9eBYUQVDlgeBHjY14q8HyCBVe7739I2zZ9STIykDc6NSctXudt";
