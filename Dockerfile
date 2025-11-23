@@ -26,8 +26,10 @@ COPY package*.json ./
 # Install server dependencies only
 RUN npm ci --omit=dev
 
-# Copy server code
+# Copy server code and configuration
 COPY server.js ./
+COPY config.js ./
+COPY GCP-SECRETS-SETUP.md ./
 
 # Copy built React app from build stage
 COPY --from=client-build /app/client/build ./client/build
