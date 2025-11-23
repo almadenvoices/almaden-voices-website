@@ -10,11 +10,51 @@ import SmsIcon from "@mui/icons-material/Sms";
 export default function ContactPage() {
     const [agreed, setAgreed] = useState(false);
     const [showToast, setShowToast] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [confirmationNumber, setConfirmationNumber] = useState("");
+    const [error, setError] = useState("");
 
-    function onSubmit(e){
+    async function onSubmit(e){
         e.preventDefault();
-        setShowToast(true);
-        document.getElementById("contact-success")?.scrollIntoView({ behavior: "smooth" });
+        setError("");
+        setIsSubmitting(true);
+
+        const formData = new FormData(e.target);
+        const data = {
+            firstName: formData.get("firstName"),
+            lastName: formData.get("lastName"),
+            email: formData.get("email"),
+            phone: formData.get("phone"),
+            country: formData.get("country"),
+            message: formData.get("message")
+        };
+
+        try {
+            const response = await fetch("/api/contact", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(data)
+            });
+
+            const result = await response.json();
+
+            if (response.ok) {
+                setConfirmationNumber(result.confirmationNumber);
+                setShowToast(true);
+                e.target.reset();
+                setAgreed(false);
+                document.getElementById("contact-success")?.scrollIntoView({ behavior: "smooth" });
+            } else {
+                setError(result.error || "Failed to send message. Please try again.");
+            }
+        } catch (err) {
+            console.error("Contact form error:", err);
+            setError("Network error. Please check your connection and try again.");
+        } finally {
+            setIsSubmitting(false);
+        }
     }
 
     return (
@@ -68,20 +108,33 @@ export default function ContactPage() {
 
                     {/* RIGHT FORM */}
                     <form className={s.form} onSubmit={onSubmit}>
+                        {error && (
+                            <div style={{
+                                backgroundColor: "#fee",
+                                border: "1px solid #fcc",
+                                color: "#c00",
+                                padding: "12px",
+                                borderRadius: "6px",
+                                marginBottom: "16px"
+                            }}>
+                                {error}
+                            </div>
+                        )}
+
                         <div className={`${s.grid} ${s.grid3}`}>
                             <div className={s.field}>
                                 <label>First name <span className={s.req}>*</span></label>
-                                <input placeholder="First name" required />
+                                <input name="firstName" placeholder="First name" required disabled={isSubmitting} />
                             </div>
 
                             <div className={s.field}>
                                 <label>Last name <span className={s.req}>*</span></label>
-                                <input placeholder="Last name" required />
+                                <input name="lastName" placeholder="Last name" required disabled={isSubmitting} />
                             </div>
 
                             <div className={`${s.field} ${s.fullWidth}`}>
                                 <label>Email <span className={s.req}>*</span></label>
-                                <input type="email" placeholder="you@company.com" required />
+                                <input name="email" type="email" placeholder="you@company.com" required disabled={isSubmitting} />
                             </div>
                         </div>
 
@@ -90,13 +143,13 @@ export default function ContactPage() {
                             <div className={s.field}>
                                 <label>Phone number</label>
                                 <div className={s.phoneRow}>
-                                    <select defaultValue="US" aria-label="Country" className={s.select}>
+                                    <select name="country" defaultValue="US" aria-label="Country" className={s.select} disabled={isSubmitting}>
                                         <option value="US">US</option>
                                         <option value="CA">CA</option>
                                         <option value="IN">IN</option>
                                         <option value="UK">UK</option>
                                     </select>
-                                    <input type="tel" placeholder="+1 (000) 000-0000" />
+                                    <input name="phone" type="tel" placeholder="+1 (000) 000-0000" disabled={isSubmitting} />
                                 </div>
                             </div>
                         </div>
@@ -104,19 +157,19 @@ export default function ContactPage() {
                         <div className={`${s.grid} ${s.grid1}`}>
                             <div className={s.field}>
                                 <label>Message <span className={s.req}>*</span></label>
-                                <textarea rows="6" placeholder="Leave us a message..." required />
+                                <textarea name="message" rows="6" placeholder="Leave us a message..." required disabled={isSubmitting} />
                             </div>
                         </div>
 
                         <div className={`${s.grid} ${s.actions}`}>
                             <label className={s.check}>
-                                <input type="checkbox" checked={agreed} onChange={(e)=>setAgreed(e.target.checked)} />
+                                <input type="checkbox" checked={agreed} onChange={(e)=>setAgreed(e.target.checked)} disabled={isSubmitting} />
                                 <span>
                   You agree to our friendly <a className={s.link} href="/privacy">privacy policy</a>.
                 </span>
                             </label>
-                            <button className={`${s.btn} ${s.btnPrimary}`} disabled={!agreed}>
-                                <span>Send message</span>
+                            <button className={`${s.btn} ${s.btnPrimary}`} disabled={!agreed || isSubmitting}>
+                                <span>{isSubmitting ? "Sending..." : "Send message"}</span>
                                 <SendIcon fontSize="small" />
                             </button>
                         </div>
@@ -124,10 +177,35 @@ export default function ContactPage() {
                 </section>
 
                 {/* Success message (below card) */}
-                {/*<section id="contact-success" className={s.success}>*/}
-                {/*    <h2>Thanks for reaching out</h2>*/}
-                {/*    <p>We typically reply within 24–48 hours with dates and next steps.</p>*/}
-                {/*</section>*/}
+                {confirmationNumber && (
+                    <section id="contact-success" className={s.success} style={{
+                        backgroundColor: "#f0f9ff",
+                        border: "2px solid #0ea5e9",
+                        padding: "24px",
+                        borderRadius: "12px",
+                        marginTop: "24px",
+                        textAlign: "center"
+                    }}>
+                        <h2 style={{ color: "#0369a1", marginBottom: "16px" }}>✓ Message Sent Successfully!</h2>
+                        <p style={{ marginBottom: "16px" }}>Thank you for reaching out. We&apos;ve received your message and will get back to you within 24–48 hours.</p>
+                        <div style={{
+                            backgroundColor: "white",
+                            padding: "16px",
+                            borderRadius: "8px",
+                            display: "inline-block"
+                        }}>
+                            <p style={{ marginBottom: "8px", fontWeight: "600", color: "#333" }}>Your Confirmation Number:</p>
+                            <p style={{
+                                fontSize: "24px",
+                                fontFamily: "monospace",
+                                color: "#0369a1",
+                                fontWeight: "bold",
+                                letterSpacing: "2px"
+                            }}>{confirmationNumber}</p>
+                            <p style={{ fontSize: "14px", color: "#666", marginTop: "8px" }}>Please save this number for your records</p>
+                        </div>
+                    </section>
+                )}
 
                 {/* Map (optional copy) */}
                 {/*<section className={s.mapCard}>*/}
@@ -154,7 +232,7 @@ export default function ContactPage() {
 
             {/* Toast */}
             <div className={`${s.toast} ${showToast ? s.toastShow : ""}`} onAnimationEnd={()=>setShowToast(false)}>
-                Thanks! Your message has been sent.
+                ✓ Message sent! Confirmation: {confirmationNumber}
             </div>
         </div>
     );
