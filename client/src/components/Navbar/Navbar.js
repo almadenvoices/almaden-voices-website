@@ -1,52 +1,22 @@
 import React from "react";
 import {
     AppBar, Toolbar, IconButton, Button, Box, Container, Stack, Typography,
-    Drawer, List, ListItemButton, Divider, Link as MLink,
-    Tooltip, Slider
+    Drawer, List, ListItemButton, ListItemText, Divider, Link as MLink
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import CloseIcon from "@mui/icons-material/Close";
-import LightModeIcon from "@mui/icons-material/LightMode";
-import DarkModeIcon from "@mui/icons-material/DarkMode";
-import BrightnessAutoIcon from "@mui/icons-material/BrightnessAuto";
 import VolunteerActivismIcon from "@mui/icons-material/VolunteerActivism";
 import { Link as RouterLink, useLocation } from "react-router-dom";
-import { ColorModeContext } from "../../Theme/ColorModeContext";
-import { Menu, MenuItem, ListItemIcon, ListItemText } from '@mui/material';
-import SettingsBrightnessIcon from '@mui/icons-material/SettingsBrightness';
 
 const LINKS = [
     { label: "Home", to: "/home" },
     { label: "About", to: "/about" },
-    { label: "Courses", to: "/courses" },
-    { label: "Courses1", to: "/courses1" },
+    { label: "Impact", to: "/impact" },
+    { label: "Courses", to: "/courses1" },
     { label: "FAQ", to: "/faq" },
-    { label: "Contact", to: "/contact" }
+    { label: "Contact", to: "/contact" },
+    { label: "Register", to: "/register" }
 ];
-
-function ThemeSlider({ size = "small" }) {
-    const { mode, setMode } = React.useContext(ColorModeContext);
-    const value = mode === "dark" ? 2 : mode === "system" ? 1 : 0;
-    const marks = [
-        { value: 0, label: <LightModeIcon fontSize={size} /> },
-        { value: 1, label: <BrightnessAutoIcon fontSize={size} /> },
-        { value: 2, label: <DarkModeIcon fontSize={size} /> }
-    ];
-    return (
-        <Box sx={{ width: 120, px: 1 }}>
-            <Slider
-                size={size}
-                value={value}
-                onChange={(_, v)=> setMode(v===0?"light": v===1?"system":"dark")}
-                min={0}
-                max={2}
-                step={1}
-                marks={marks}
-                valueLabelDisplay="off"
-            />
-        </Box>
-    );
-}
 
 function MobileDrawer({ open, onClose, logo="Almaden Voices" }) {
     const location = useLocation();
@@ -68,38 +38,8 @@ function MobileDrawer({ open, onClose, logo="Almaden Voices" }) {
                 <Button fullWidth variant="contained" color="secondary" startIcon={<VolunteerActivismIcon />} component={RouterLink} to="/donate">
                     Donate
                 </Button>
-                <Box sx={{ mt: 2 }}>
-                    <ThemeSlider />
-                </Box>
             </Box>
         </Drawer>
-    );
-}
-
-// ---- Theme menu (icon → menu) ----
-function ThemeMenu() {
-    const { mode, setMode } = React.useContext(ColorModeContext);
-    const [anchorEl, setAnchorEl] = React.useState(null);
-    const open = Boolean(anchorEl);
-    const handleOpen = (e) => setAnchorEl(e.currentTarget);
-    const handleClose = () => setAnchorEl(null);
-    const Item = ({ value, icon, label }) => (
-        <MenuItem selected={mode===value} onClick={()=>{ setMode(value); handleClose(); }}>
-            <ListItemIcon>{icon}</ListItemIcon>
-            <ListItemText>{label}</ListItemText>
-        </MenuItem>
-    );
-    return (
-        <>
-            <Tooltip title={`Theme: ${mode}`}>
-                <IconButton onClick={handleOpen}><SettingsBrightnessIcon /></IconButton>
-            </Tooltip>
-            <Menu anchorEl={anchorEl} open={open} onClose={handleClose} keepMounted>
-                <Item value="light" icon={<LightModeIcon fontSize="small" />} label="Light" />
-                <Item value="system" icon={<BrightnessAutoIcon fontSize="small" />} label="System" />
-                <Item value="dark" icon={<DarkModeIcon fontSize="small" />} label="Dark" />
-            </Menu>
-        </>
     );
 }
 
@@ -157,10 +97,9 @@ export default function Navbar({ logo = "Almaden Voices" }) {
                                 {logo}
                             </Typography>
 
-                            {/* Theme menu + Donate */}
+                            {/* Links + Donate */}
                             <Stack direction="row" spacing={2.25} alignItems="center" sx={{ ml: 'auto' }}>
                                 <DesktopLinksBig underline />
-                                <ThemeMenu />
                                 <Button
                                     variant="contained"
                                     color="secondary"

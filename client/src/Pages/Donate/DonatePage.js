@@ -15,7 +15,7 @@ function DonatePage1() {
     // amount + frequency
     const [amount, setAmount] = useState(50);
     const [custom, setCustom] = useState("");
-    const [freq, setFreq] = useState("once"); // 'once' | 'monthly'
+    const [freq, setFreq] = useState("monthly"); // 'once' | 'monthly'
     // payment method
     const METHODS = [
         { id: "card", label: "Credit/Debit Card", icon: <CreditCardIcon /> },
@@ -79,7 +79,7 @@ function DonatePage1() {
                 break;
             case "zelle":
                 alert(
-                    `[Demo] Show Zelle QR/handle info (e.g., donations@almadenvoices.org).\nAmount: $${displayAmount} (${freq}).`
+                    `[Demo] Show Zelle QR/handle info (e.g., almadenvoices@gmail.com).\nAmount: $${displayAmount} (${freq}).`
                 );
                 break;
             case "check":
@@ -109,7 +109,7 @@ function DonatePage1() {
                             </p>
                             <ul className={s.bullets}>
                                 <li>
-                                    <VerifiedIcon /> Tax-deductible · CA 501(c)(3) nonprofit
+                                    <VerifiedIcon /> Tax-deductible · CA nonprofit
                                 </li>
                                 <li>
                                     <ShieldIcon /> Secure payments (SSL & industry-standard
@@ -221,8 +221,8 @@ function DonatePage1() {
                             </button>
 
                             <p className={s.legal}>
-                                Almaden Voices is a California 501(c)(3) nonprofit. Contributions
-                                are tax-deductible to the extent allowed by law. You’ll receive
+                                Almaden Voices is a California nonprofit. Contributions
+                                are tax-deductible to the extent allowed by law. You'll receive
                                 an email receipt for your records.
                             </p>
                         </form>
@@ -380,7 +380,7 @@ export default function DonatePage() {
     // amount + frequency
     const [amount, setAmount] = useState(50);
     const [custom, setCustom] = useState("");
-    const [freq, setFreq] = useState("once"); // 'once' | 'monthly'
+    const [freq, setFreq] = useState("monthly"); // 'once' | 'monthly'
 
     // UI: how donor *thinks* they’ll pay; PayPal handles wallet vs card internally
     const METHODS = [
@@ -562,7 +562,7 @@ export default function DonatePage() {
             alert(
                 `To donate via Zelle:\n\n1. Open your bank's Zelle app.\n2. Send $${displayAmount.toFixed(
                     2
-                )} to: donations@almadenvoices.org\n3. Add a note: "Almaden Voices donation".\n\nThank you for your support!`
+                )} to: almadenvoices@gmail.com\n3. Add a note: "Almaden Voices donation".\n\nThank you for your support!`
             );
         } else if (method === "check") {
             alert(
@@ -615,7 +615,7 @@ export default function DonatePage() {
                             </p>
                             <ul className={s.bullets}>
                                 <li>
-                                    <VerifiedIcon /> Tax-deductible · CA 501(c)(3) nonprofit
+                                    <VerifiedIcon /> Tax-deductible · CA nonprofit
                                 </li>
                                 <li>
                                     <ShieldIcon /> All online payments are processed securely by
@@ -775,7 +775,7 @@ export default function DonatePage() {
                             )}
 
                             <p className={s.legal}>
-                                Almaden Voices is a California 501(c)(3) nonprofit.
+                                Almaden Voices is a California nonprofit.
                                 Contributions are tax-deductible to the extent allowed by law.
                                 You’ll receive an email receipt for your records when you pay
                                 online via PayPal.

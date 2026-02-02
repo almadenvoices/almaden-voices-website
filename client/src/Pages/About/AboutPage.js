@@ -4,307 +4,319 @@ import {
     Typography,
     Container,
     Grid,
-    Card,
-    CardContent,
-    CardMedia,
     Button,
-    Avatar,
 } from "@mui/material";
 import { motion } from "framer-motion";
 
-const teamMembers = [
-    {
-        name: "Anjika Bansal",
-        role: "Founder & CEO",
-        intro:
-            "Hi! I’m Anjika Bansal — Founder of Almaden Voices, with a passion for helping students grow into confident speakers.\n" +
-            "\n" +
-            "I’ve dedicated over 1,500 hours to public speaking through Leland Speech and Debate, ranked #1 in California and #5 in the nation. I’ve competed at 32 tournaments, traveled to Arizona and Berkeley representing Leland, and qualified to elimination rounds at four nationally competitive tournaments, including Stanford, where I earned a bid to the Tournament of Champions. Along the way, I’ve trained at elite programs like UCLA, GSA, and others, and I’m proud to have been recognized with NSDA’s Special Distinction Award and ranked #1 among Leland’s sophomore speakers.\n" +
-            "\n" +
-            "But none of that matters as much as the smile on a student’s face when they give their very first speech.\n" +
-            "\n" +
-            "Growing up, I was lucky to feel confident speaking in front of others — and I know that’s not always the case for everyone. I started Almaden Voices to create a space where every student could build that same confidence, discover their voice, and feel proud to use it.\n" +
-            "\n" +
-            "My goal is simple: to help students become powerful communicators by building skills that go beyond the stage — skills they can use to step into the world with courage.",
+const founder = {
+    name: "Anjika Bansal",
+    role: "Founder & CEO",
+    intro:
+        "Hi! I'm Anjika Bansal — Founder of Almaden Voices, with a passion for helping students grow into confident speakers.\n" +
+        "\n" +
+        "I've dedicated over 1,500 hours to public speaking through Leland Speech and Debate, ranked #1 in California and #5 in the nation. I've competed at 32 tournaments, traveled to Arizona and Berkeley representing Leland, and qualified to elimination rounds at four nationally competitive tournaments, including Stanford, where I earned a bid to the Tournament of Champions. Along the way, I've trained at elite programs like UCLA, GSA, and others, and I'm proud to have been recognized with NSDA's Special Distinction Award and ranked #1 among Leland's sophomore speakers.\n" +
+        "\n" +
+        "But none of that matters as much as the smile on a student's face when they give their very first speech.\n" +
+        "\n" +
+        "Growing up, I was lucky to feel confident speaking in front of others — and I know that's not always the case for everyone. I started Almaden Voices to create a space where every student could build that same confidence, discover their voice, and feel proud to use it.\n" +
+        "\n" +
+        "My goal is simple: to help students become powerful communicators by building skills that go beyond the stage — skills they can use to step into the world with courage.",
+    photo: "/images/anjika-bansal.png",
+};
 
-        photo: "https://randomuser.me/api/portraits/women/44.jpg",
+const boardMembers = [
+    {
+        name: "Sarah Johnson",
+        role: "Board Chair",
+        intro: "Sarah brings over 15 years of experience in nonprofit leadership and community development. She is passionate about empowering youth through communication skills.",
+        photo: "https://randomuser.me/api/portraits/women/32.jpg",
     },
     {
-        name: "Parth Bansal",
-        role: "Assistant Manager",
-        intro: "Hi! I’m Parth Bansal — Assistant Manager for Almaden Voices and a 5th grader with a big passion for speaking and helping others find their voice.\n" +
-            "\n" +
-            "I won 1st place in my school’s 5th grade speech competition, and ever since then, I’ve loved getting on stage and sharing my ideas. At Almaden Voices, I help younger students feel confident, cheer them on during activities, and make sure we always have fun while learning. Even though I’m the youngest on the team, I believe anyone can become a great speaker — no matter their age!\n" +
-            "\n" +
-            "When I’m not working on speeches, you’ll probably find me playing basketball, solving Rubik’s cubes, or challenging someone to a chess match.\n" +
-            "\n",
-        photo: "https://randomuser.me/api/portraits/men/46.jpg",
+        name: "Michael Chen",
+        role: "Board Treasurer",
+        intro: "Michael is a CPA with expertise in nonprofit financial management. He ensures Almaden Voices maintains strong fiscal responsibility and transparency.",
+        photo: "https://randomuser.me/api/portraits/men/52.jpg",
+    },
+    {
+        name: "Emily Rodriguez",
+        role: "Board Secretary",
+        intro: "Emily is an educator with a background in speech and debate coaching. She advocates for inclusive programs that help every child find their voice.",
+        photo: "https://randomuser.me/api/portraits/women/68.jpg",
     },
 ];
 
 function MeetTheTeam() {
     return (
         <Box
+            id="team"
             sx={{
-                py: 12,
-                px: { xs: 2, sm: 6, md: 12 },
-                bgcolor: "linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%)",
+                py: 10,
+                px: { xs: 2, sm: 4, md: 8 },
+                bgcolor: "#F9FAFB",
             }}
         >
             <Typography
                 variant="h3"
                 align="center"
-                sx={{ fontWeight: "bold", mb: 10, color: "#111827" }}
+                sx={{ fontWeight: "bold", mb: 2, color: "#111827" }}
             >
                 Meet the Team
             </Typography>
-            <Grid container spacing={10}>
-                {teamMembers.map((member, index) => (
-                    <Grid item xs={12} md={6} key={index}>
-                        <motion.div
-                            initial={{ opacity: 0, y: 40 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            whileHover={{ scale: 1.02 }}
-                            transition={{ duration: 0.5 }}
-                        >
-                            <Card
+            <Box
+                sx={{
+                    width: 80,
+                    height: 4,
+                    bgcolor: "#2563EB",
+                    borderRadius: 2,
+                    mx: "auto",
+                    mb: 8
+                }}
+            />
+
+            {/* Founder Section - Image on left, text on right */}
+            <Container maxWidth="lg" sx={{ mb: 8 }}>
+                <motion.div
+                    initial={{ opacity: 0, y: 40 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5 }}
+                >
+                    <Box
+                        sx={{
+                            display: "flex",
+                            flexDirection: { xs: "column", md: "row" },
+                            gap: { xs: 3, md: 5 },
+                            alignItems: { xs: "center", md: "flex-start" },
+                        }}
+                    >
+                        {/* Image on left - equal width */}
+                        <Box sx={{ flex: 1, width: "100%" }}>
+                            <Box
+                                component="img"
+                                src={founder.photo}
+                                alt={founder.name}
                                 sx={{
-                                    display: "flex",
-                                    flexDirection: { xs: "column", sm: "row" },
-                                    borderRadius: 5,
-                                    overflow: "hidden",
-                                    background: "linear-gradient(135deg, #ffffff 0%, #f9fafb 100%)",
-                                    boxShadow: "0 12px 30px rgba(0,0,0,0.1)",
-                                    position: "relative",
-                                    zIndex: 1,
-                                    ":hover": {
-                                        boxShadow: "0 16px 40px rgba(0,0,0,0.15)",
-                                    },
+                                    width: "100%",
+                                    height: { xs: 350, md: 450 },
+                                    objectFit: "cover",
+                                    boxShadow: "0 4px 16px rgba(0,0,0,0.1)",
+                                }}
+                            />
+                        </Box>
+
+                        {/* Text on right - equal width */}
+                        <Box sx={{ flex: 1 }}>
+                            <Typography
+                                variant="h5"
+                                sx={{ fontWeight: "bold", mb: 0.5, color: "#111827" }}
+                            >
+                                {founder.name}
+                            </Typography>
+                            <Typography
+                                variant="subtitle1"
+                                sx={{ color: "#2563EB", fontWeight: 500, mb: 2 }}
+                            >
+                                {founder.role}
+                            </Typography>
+                            <Typography
+                                variant="body1"
+                                sx={{
+                                    color: "#6B7280",
+                                    lineHeight: 1.8,
+                                    whiteSpace: "pre-line"
                                 }}
                             >
-                                <Box
+                                {founder.intro}
+                            </Typography>
+                        </Box>
+                    </Box>
+                </motion.div>
+            </Container>
+
+            {/* Board of Directors - 3 columns side by side */}
+            <Container id="board" maxWidth="lg">
+                <Typography
+                    variant="h4"
+                    align="center"
+                    sx={{ fontWeight: "bold", mb: 2, color: "#111827" }}
+                >
+                    Board of Directors
+                </Typography>
+                <Box
+                    sx={{
+                        width: 80,
+                        height: 4,
+                        bgcolor: "#2563EB",
+                        borderRadius: 2,
+                        mx: "auto",
+                        mb: 6
+                    }}
+                />
+                <Box
+                    sx={{
+                        display: "flex",
+                        flexDirection: { xs: "column", md: "row" },
+                        gap: 4,
+                        justifyContent: "center",
+                    }}
+                >
+                    {boardMembers.map((member, index) => (
+                        <motion.div
+                            key={index}
+                            initial={{ opacity: 0, y: 40 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.5, delay: index * 0.1 }}
+                            style={{ flex: 1, maxWidth: 300 }}
+                        >
+                            <Box sx={{ textAlign: "center" }}>
+                                {/* Name */}
+                                <Typography
+                                    variant="h6"
+                                    sx={{ fontWeight: "bold", mb: 0.5, color: "#111827" }}
+                                >
+                                    {member.name}
+                                </Typography>
+
+                                {/* Title/Role */}
+                                <Typography
+                                    variant="subtitle2"
+                                    sx={{ color: "#2563EB", fontWeight: 500, mb: 2 }}
+                                >
+                                    {member.role}
+                                </Typography>
+
+                                {/* Image */}
+                                <Box sx={{ display: "flex", justifyContent: "center", mb: 2 }}>
+                                    <Box
+                                        component="img"
+                                        src={member.photo}
+                                        alt={member.name}
+                                        sx={{
+                                            width: 200,
+                                            height: 240,
+                                            objectFit: "cover",
+                                            borderRadius: 2,
+                                            boxShadow: "0 4px 16px rgba(0,0,0,0.1)",
+                                        }}
+                                    />
+                                </Box>
+
+                                {/* Description */}
+                                <Typography
+                                    variant="body2"
                                     sx={{
-                                        flex: "0 0 280px",
-                                        bgcolor: "#f3f4f6",
-                                        display: "flex",
-                                        alignItems: "center",
-                                        justifyContent: "center",
-                                        p: 4,
-                                        position: "relative",
+                                        color: "#6B7280",
+                                        lineHeight: 1.7,
+                                        textAlign: "center",
                                     }}
                                 >
-                                    <motion.div
-                                        whileHover={{ rotate: 3, scale: 1.05 }}
-                                        transition={{ type: "spring", stiffness: 200 }}
-                                    >
-                                        <Avatar
-                                            src={member.photo}
-                                            alt={member.name}
-                                            sx={{
-                                                width: 180,
-                                                height: 180,
-                                                border: "5px solid white",
-                                                boxShadow: "0 6px 20px rgba(0,0,0,0.15)",
-                                            }}
-                                        />
-                                    </motion.div>
-                                </Box>
-                                <CardContent sx={{ flex: 1, p: 5 }}>
-                                    <Typography
-                                        variant="h5"
-                                        sx={{ fontWeight: "bold", mb: 1, color: "#1f2937" }}
-                                    >
-                                        {member.name}
-                                    </Typography>
-                                    <Typography
-                                        variant="subtitle1"
-                                        sx={{ color: "#6366f1", fontWeight: 500, mb: 3 }}
-                                    >
-                                        {member.role}
-                                    </Typography>
-                                    <Typography
-                                        variant="body1"
-                                        sx={{ color: "#374151", lineHeight: 1.8 }}
-                                    >
-                                        {member.intro}
-                                    </Typography>
-                                </CardContent>
-                            </Card>
+                                    {member.intro}
+                                </Typography>
+                            </Box>
                         </motion.div>
-                    </Grid>
-                ))}
-            </Grid>
+                    ))}
+                </Box>
+            </Container>
         </Box>
     );
 }
 
 // Reliable placeholder images
-const heroImg = "https://picsum.photos/1600/900?random=1";
-// const founderImg = "https://picsum.photos/400/400?random=2";
-const missionImg = "https://picsum.photos/600/400?random=3";
-const impactImg = "https://picsum.photos/600/400?random=4";
-const storyImg = "https://picsum.photos/600/400?random=5";
+const aboutImg = "/images/s3-group-picture.jpg";
 
 export default function AboutPage() {
     return (
         <Box>
-            {/* Hero Banner */}
-            <Box
-                sx={{
-                    height: { xs: "60vh", md: "80vh" },
-                    backgroundImage: `linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url(${heroImg})`,
-                    backgroundSize: "cover",
-                    backgroundPosition: "center",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    flexDirection: "column",
-                    color: "#fff",
-                    textAlign: "center",
-                    px: 2,
-                }}
-            >
-                <Typography
-                    variant="h2"
-                    sx={{ fontWeight: "bold", mb: 2, fontSize: { xs: "2rem", md: "3.5rem" } }}
-                >
-                    Empowering Voices, Shaping Futures
-                </Typography>
-                <Typography variant="h6" sx={{ maxWidth: 700, mb: 3 }}>
-                    Our Story
-                    Almaden Voices was founded with a simple but powerful belief: every student deserves the confidence to speak up and be heard. In a world where over 75% of Americans fear public speaking, our mission is to help kids overcome that fear and discover the power of their own voice.
-                    This isn’t about turning kids into professional speakers or winning trophies. It’s about helping them raise their hands a little higher, speak a little louder, and feel a little braver each week. In just four weeks, or eight sessions, we focus on ten key skills — from body language to speech structure — so that by the end, every student can stand up and deliver a speech of their own.
-                    We believe that confidence shouldn't come with a price tag. That’s why Almaden Voices is completely free, with just a one-time $10 registration fee. Because every child deserves the chance to be seen, heard, and celebrated.
-                </Typography>
-                <Button variant="contained" size="large" color="secondary">
-                    Join Us
-                </Button>
-            </Box>
-
-            {/* Founder Section */}
-            <Container sx={{ py: 8 }}>
-                <MeetTheTeam/>
-            </Container>
-
-            {/* Mission & Philosophy */}
-            <Box sx={{ bgcolor: "grey.100", py: 8 }}>
-                <Container>
-                    <Typography
-                        variant="h4"
-                        gutterBottom
-                        align="center"
-                        fontWeight="bold"
-                        sx={{ mb: 6 }}
+            {/* About Us / Mission Section */}
+            <Box id="mission" sx={{ bgcolor: "#FFFFFF", py: { xs: 6, md: 10 } }}>
+                <Container maxWidth="lg">
+                    <Box
+                        sx={{
+                            display: "flex",
+                            flexDirection: { xs: "column", md: "row" },
+                            gap: { xs: 4, md: 8 },
+                            alignItems: "center",
+                        }}
                     >
-                        Our Philosophy & Mission
-                    </Typography>
-                    <Grid container spacing={4}>
-                        <Grid item xs={12} md={6}>
-                            <Card sx={{ height: "100%", boxShadow: 3 }}>
-                                <CardMedia component="img" height="200" image={missionImg} />
-                                <CardContent>
-                                    <Typography variant="h6" gutterBottom fontWeight="bold">
-                                        Philosophy
-                                    </Typography>
-                                    <Typography>
-                                        We believe every student has a voice worth sharing. Debate
-                                        is not just about competition, it’s about empowerment,
-                                        confidence, and lifelong communication skills.
-                                    </Typography>
-                                </CardContent>
-                            </Card>
-                        </Grid>
-                        <Grid item xs={12} md={6}>
-                            <Card sx={{ height: "100%", boxShadow: 3 }}>
-                                <CardMedia component="img" height="200" image={missionImg} />
-                                <CardContent>
-                                    <Typography variant="h6" gutterBottom fontWeight="bold">
-                                        Mission
-                                    </Typography>
-                                    <Typography>
-                                        Our mission is to create an inclusive platform for students
-                                        to learn, practice, and thrive as speakers and leaders —
-                                        equipping them with skills that extend beyond debate halls.
-                                    </Typography>
-                                </CardContent>
-                            </Card>
-                        </Grid>
-                    </Grid>
+                        {/* Left Side - Text */}
+                        <Box sx={{ flex: 1 }}>
+                            <Typography
+                                variant="h3"
+                                sx={{
+                                    fontWeight: "bold",
+                                    color: "#111827",
+                                    mb: 2,
+                                    fontSize: { xs: "2rem", md: "2.5rem" }
+                                }}
+                            >
+                                About Us
+                            </Typography>
+                            <Box
+                                sx={{
+                                    width: 80,
+                                    height: 4,
+                                    bgcolor: "#2563EB",
+                                    borderRadius: 2,
+                                    mb: 4
+                                }}
+                            />
+                            <Typography
+                                variant="body1"
+                                sx={{
+                                    color: "#6B7280",
+                                    lineHeight: 1.8,
+                                    fontSize: "1.1rem",
+                                    mb: 3
+                                }}
+                            >
+                                Almaden Voices is a non-profit organization dedicated to empowering young voices in our community. We believe that every child deserves the confidence to speak up and be heard.
+                            </Typography>
+                            <Typography
+                                variant="body1"
+                                sx={{
+                                    color: "#6B7280",
+                                    lineHeight: 1.8,
+                                    fontSize: "1.1rem",
+                                    mb: 3
+                                }}
+                            >
+                                In a world where over 75% of Americans fear public speaking, our mission is to help kids overcome that fear and discover the power of their own voice. Through our free speech and debate programs, we focus on building confidence, clarity, and leadership skills that last a lifetime.
+                            </Typography>
+                            <Typography
+                                variant="body1"
+                                sx={{
+                                    color: "#6B7280",
+                                    lineHeight: 1.8,
+                                    fontSize: "1.1rem"
+                                }}
+                            >
+                                We believe that confidence shouldn't come with a price tag. That's why Almaden Voices programs are <strong>completely free</strong>, because every child deserves the chance to be seen, heard, and celebrated.
+                            </Typography>
+                        </Box>
+
+                        {/* Right Side - Image */}
+                        <Box sx={{ flex: 1, width: "100%" }}>
+                            <Box
+                                component="img"
+                                src={aboutImg}
+                                alt="About Almaden Voices"
+                                sx={{
+                                    width: "100%",
+                                    height: "auto",
+                                    borderRadius: 4,
+                                    boxShadow: "0 20px 40px rgba(0,0,0,0.1)",
+                                }}
+                            />
+                        </Box>
+                    </Box>
                 </Container>
             </Box>
 
-            {/* Impact Section */}
-            <Container sx={{ py: 8 }}>
-                <Typography
-                    variant="h4"
-                    align="center"
-                    fontWeight="bold"
-                    gutterBottom
-                    sx={{ mb: 6 }}
-                >
-                    Our Impact
-                </Typography>
-                <Grid container spacing={4} justifyContent="center">
-                    {[
-                        { number: "500+", label: "Students Trained" },
-                        { number: "1,500+", label: "Hours of Coaching" },
-                        { number: "32+", label: "Tournaments Competed" },
-                    ].map((item, idx) => (
-                        <Grid item xs={12} sm={6} md={4} key={idx}>
-                            <Box textAlign="center" p={3} boxShadow={3} borderRadius={2}>
-                                <Typography variant="h3" color="secondary" fontWeight="bold">
-                                    {item.number}
-                                </Typography>
-                                <Typography variant="h6">{item.label}</Typography>
-                            </Box>
-                        </Grid>
-                    ))}
-                </Grid>
-            </Container>
+            {/* Meet the Team Section */}
+            <MeetTheTeam/>
 
-            {/* Our Story */}
-            <Box sx={{ bgcolor: "grey.100", py: 8 }}>
-                <Container>
-                    <Typography
-                        variant="h4"
-                        align="center"
-                        fontWeight="bold"
-                        gutterBottom
-                        sx={{ mb: 6 }}
-                    >
-                        Our Story
-                    </Typography>
-                    <Grid container spacing={4}>
-                        <Grid item xs={12} md={6}>
-                            <Card sx={{ boxShadow: 3 }}>
-                                <CardMedia component="img" height="200" image={storyImg} />
-                                <CardContent>
-                                    <Typography variant="h6" fontWeight="bold">
-                                        2019 – The Beginning
-                                    </Typography>
-                                    <Typography>
-                                        Almaden Voices was founded with a simple goal: to help
-                                        students gain confidence in public speaking.
-                                    </Typography>
-                                </CardContent>
-                            </Card>
-                        </Grid>
-                        <Grid item xs={12} md={6}>
-                            <Card sx={{ boxShadow: 3 }}>
-                                <CardMedia component="img" height="200" image={impactImg} />
-                                <CardContent>
-                                    <Typography variant="h6" fontWeight="bold">
-                                        2023 – Growing Together
-                                    </Typography>
-                                    <Typography>
-                                        We expanded our programs, trained hundreds of students, and
-                                        built a vibrant community of confident young leaders.
-                                    </Typography>
-                                </CardContent>
-                            </Card>
-                        </Grid>
-                    </Grid>
-                </Container>
+            {/* Divider */}
+            <Box sx={{ bgcolor: "#F9FAFB", px: 4 }}>
+                <Box sx={{ maxWidth: 800, mx: "auto", borderTop: "1px solid #E5E7EB" }} />
             </Box>
 
             {/* Call to Action */}
@@ -312,8 +324,7 @@ export default function AboutPage() {
                 sx={{
                     py: 8,
                     textAlign: "center",
-                    background: "linear-gradient(135deg, #6a11cb 0%, #2575fc 100%)",
-                    color: "#fff",
+                    bgcolor: "#F9FAFB",
                 }}
             >
                 <Container>
@@ -321,14 +332,25 @@ export default function AboutPage() {
                         variant="h4"
                         gutterBottom
                         fontWeight="bold"
-                        sx={{ mb: 3 }}
+                        sx={{ mb: 3, color: "#111827" }}
                     >
                         Ready to Discover Your Voice?
                     </Typography>
                     <Button
                         variant="contained"
                         size="large"
-                        sx={{ bgcolor: "yellow", color: "#000", fontWeight: "bold" }}
+                        href="/register"
+                        sx={{
+                            bgcolor: "#2563EB",
+                            color: "#fff",
+                            fontWeight: 700,
+                            borderRadius: "999px",
+                            px: 4,
+                            py: 1.5,
+                            textTransform: "none",
+                            fontSize: "1rem",
+                            "&:hover": { bgcolor: "#1d4ed8" },
+                        }}
                     >
                         Get Started
                     </Button>

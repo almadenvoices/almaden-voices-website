@@ -1,7 +1,6 @@
 import React, { useMemo, useRef, useState, useEffect } from "react";
 import s from "./FAQ.module.css";
 import SearchIcon from "@mui/icons-material/Search";
-import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { CATEGORIES, FAQS } from "./faqData";
 
@@ -45,69 +44,101 @@ export default function FAQPage(){
                 </div>
             </div>
 
-            {/* Category cards with images */}
-            <div className="container">
-                <div className={s.grid}>
+            {/* Category filter pills */}
+            <div className="container" style={{ paddingTop: 'clamp(18px, 3vw, 30px)' }}>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', justifyContent: 'center' }}>
+                    <button
+                        className={`${s.catPill} ${activeCat==="all" ? s.catPillActive : ""}`}
+                        onClick={()=> setActiveCat("all")}
+                    >
+                        All
+                    </button>
                     {CATEGORIES.map(c => (
                         <button
                             key={c.id}
-                            className={`${s.card} ${activeCat===c.id ? s.cardActive : ""}`}
+                            className={`${s.catPill} ${activeCat===c.id ? s.catPillActive : ""}`}
                             onClick={()=>{ setActiveCat(c.id); scrollToList(); }}
                         >
-                            <div className={s.thumbWrap}>
-                                <img className={s.thumb} src={c.image} alt={`${c.title} illustration`} />
-                                <span className={s.iconBadge}>{c.icon}</span>
-                            </div>
-                            <div className={s.cardBody}>
-                                <h3 className={s.cardTitle}>{c.title}</h3>
-                                <p className={s.blurb}>{c.blurb}</p>
-                                <span className={s.more}>
-                  Explore <ArrowForwardIcon fontSize="small" />
-                </span>
-                            </div>
+                            {c.icon} {c.title}
                         </button>
                     ))}
                 </div>
             </div>
 
-            {/* Accordion list */}
-            <div className="container" ref={listRef}>
-                <div className={s.listHead}>
-                    <div className={s.meta}>
-                        {activeCat==="all" ? "All categories" : CATEGORIES.find(x=>x.id===activeCat)?.title}
-                        {" · "}
-                        {filteredFaqs.length} answer{filteredFaqs.length!==1?"s":""}
-                    </div>
-                    {activeCat!=="all" && (
-                        <button className={s.clear} onClick={()=>setActiveCat("all")}>Show all</button>
-                    )}
-                </div>
-
-                <div className={s.list}>
-                    {filteredFaqs.map(i => (
-                        <article key={i.id} id={`faq-${i.id}`} className={s.item}>
-                            <button
-                                className={s.summary}
-                                onClick={()=>{
-                                    setOpenId(prev=> prev===i.id ? null : i.id);
-                                    window.history.replaceState(null, "", `#faq-${i.id}`);
-                                }}
-                                aria-expanded={openId===i.id}
-                            >
-                                <span className={s.q}>{i.q}</span>
-                                <ExpandMoreIcon className={`${s.chev} ${openId===i.id ? s.rot : ""}`} />
-                            </button>
-                            <div className={s.panel} style={{ maxHeight: openId===i.id ? "2000px" : 0 }}>
-                                <p className={s.a}>{i.a}</p>
+            {/* Grouped FAQ list */}
+            <div className="container" ref={listRef} style={{ paddingTop: 'clamp(18px, 3vw, 30px)' }}>
+                {activeCat === "all" ? (
+                    CATEGORIES.map(cat => {
+                        const catFaqs = filteredFaqs.filter(f => f.cat === cat.id);
+                        if (!catFaqs.length) return null;
+                        return (
+                            <div key={cat.id} style={{ marginBottom: '32px' }}>
+                                <h2 style={{
+                                    fontSize: 'clamp(18px, 1.4vw, 22px)', fontWeight: 800, color: '#111827',
+                                    margin: '0 0 12px', paddingBottom: '8px', borderBottom: '2px solid #E5E7EB',
+                                    display: 'flex', alignItems: 'center', gap: '8px',
+                                }}>
+                                    <span>{cat.icon}</span> {cat.title}
+                                </h2>
+                                <div className={s.list}>
+                                    {catFaqs.map(i => (
+                                        <article key={i.id} id={`faq-${i.id}`} className={s.item}>
+                                            <button
+                                                className={s.summary}
+                                                onClick={()=>{
+                                                    setOpenId(prev=> prev===i.id ? null : i.id);
+                                                    window.history.replaceState(null, "", `#faq-${i.id}`);
+                                                }}
+                                                aria-expanded={openId===i.id}
+                                            >
+                                                <span className={s.q}>{i.q}</span>
+                                                <ExpandMoreIcon className={`${s.chev} ${openId===i.id ? s.rot : ""}`} />
+                                            </button>
+                                            <div className={s.panel} style={{ maxHeight: openId===i.id ? "2000px" : 0 }}>
+                                                <p className={s.a}>{i.a}</p>
+                                            </div>
+                                        </article>
+                                    ))}
+                                </div>
                             </div>
-                        </article>
-                    ))}
-                    {!filteredFaqs.length && (
-                        <div className={s.empty}>
-                            No results. Try different keywords or <a className={s.link} href="/contact">contact us</a>.
+                        );
+                    })
+                ) : (
+                    <>
+                        <div className={s.listHead}>
+                            <div className={s.meta}>
+                                {CATEGORIES.find(x=>x.id===activeCat)?.title}
+                                {" · "}
+                                {filteredFaqs.length} answer{filteredFaqs.length!==1?"s":""}
+                            </div>
                         </div>
-                    )}
-                </div>
+                        <div className={s.list}>
+                            {filteredFaqs.map(i => (
+                                <article key={i.id} id={`faq-${i.id}`} className={s.item}>
+                                    <button
+                                        className={s.summary}
+                                        onClick={()=>{
+                                            setOpenId(prev=> prev===i.id ? null : i.id);
+                                            window.history.replaceState(null, "", `#faq-${i.id}`);
+                                        }}
+                                        aria-expanded={openId===i.id}
+                                    >
+                                        <span className={s.q}>{i.q}</span>
+                                        <ExpandMoreIcon className={`${s.chev} ${openId===i.id ? s.rot : ""}`} />
+                                    </button>
+                                    <div className={s.panel} style={{ maxHeight: openId===i.id ? "2000px" : 0 }}>
+                                        <p className={s.a}>{i.a}</p>
+                                    </div>
+                                </article>
+                            ))}
+                            {!filteredFaqs.length && (
+                                <div className={s.empty}>
+                                    No results. Try different keywords or <a className={s.link} href="/contact">contact us</a>.
+                                </div>
+                            )}
+                        </div>
+                    </>
+                )}
             </div>
 
             {/* Friendly CTA */}

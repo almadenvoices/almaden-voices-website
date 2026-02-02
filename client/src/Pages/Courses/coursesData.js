@@ -85,7 +85,7 @@ export const courses = [
         title: "Winter Weekend Workshop",
         status: "past",
         level: "Mixed",
-        grades: "5–9",
+        grades: "5–8",
         format: "Online",
         location: "Zoom",
         startDate: "2024-12-14",
