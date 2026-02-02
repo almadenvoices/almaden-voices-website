@@ -579,7 +579,8 @@ export default function ImpactPage() {
                                         alt={selectedSession.images[0].caption}
                                         sx={{
                                             width: "100%",
-                                            height: "auto",
+                                            aspectRatio: "16/9",
+                                            objectFit: "cover",
                                             display: "block",
                                             transition: "transform 0.3s",
                                             "&:hover": { transform: "scale(1.03)" },
@@ -622,7 +623,8 @@ export default function ImpactPage() {
                                             alt={img.caption}
                                             sx={{
                                                 width: "100%",
-                                                height: "auto",
+                                                aspectRatio: "4/3",
+                                                objectFit: "cover",
                                                 display: "block",
                                                 transition: "transform 0.3s",
                                                 "&:hover": { transform: "scale(1.03)" },
