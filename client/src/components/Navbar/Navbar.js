@@ -13,6 +13,7 @@ const LINKS = [
     { label: "About", to: "/about" },
     { label: "Impact", to: "/impact" },
     { label: "Courses", to: "/courses1" },
+    { label: "Events", to: "/events" },
     { label: "FAQ", to: "/faq" },
     { label: "Contact", to: "/contact" },
     { label: "Register", to: "/register" }
