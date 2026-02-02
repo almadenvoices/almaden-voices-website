@@ -117,8 +117,8 @@ export default function TestimonialsGridSlider({
         <section className={s.section}>
             <div className="container">
                 <div className={s.head} >
-                    <Typography variant="h4">{title}</Typography>
-                    <Typography variant="h6">{subTitle}</Typography>
+                    <Typography variant="h4" sx={{ fontWeight: "bold", color: "#111827" }}>{title}</Typography>
+                    <Typography variant="body1" sx={{ color: "#6B7280", lineHeight: 1.8, mt: 2 }}>{subTitle}</Typography>
                 </div>
 
                 <div className={s.slider} ref={wrapRef}>
@@ -155,12 +155,12 @@ export default function TestimonialsGridSlider({
                                     {pageItems.map((t, i) => (
                                         <article className={`card ${s.card} ${variant === "compact" ? s.compact : ""}`} key={`${pageIndex}-${i}`}>
                                             <div className={s.headerRow}>
-                                                <Box component="img" src={t.avatar} alt={t.name} className={s.avatar} />
+                                                {t.avatar && <Box component="img" src={t.avatar} alt={t.name} className={s.avatar} />}
                                                 <div className={s.meta}>
                                                     <div className={s.name}>
                                                         <Typography variant="h6" sx={{ fontWeight: 'bold' }}>{t.name}</Typography>
                                                     </div>
-                                                    {t.role && <div className={s.role}>{t.role}</div>}
+                                                    {t.sessionType && <div className={s.role}>{t.sessionType}</div>}
                                                     {typeof t.rating === "number" && <Stars value={t.rating} />}
                                                 </div>
                                             </div>

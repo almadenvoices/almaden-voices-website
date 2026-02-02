@@ -1,3 +1,4 @@
+
 // server.js
 const express = require("express");
 const cors = require("cors");
@@ -10,7 +11,7 @@ const { initConfig } = require("./config");
 
 const app = express();
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5001;
 const PAYPAL_CLIENT_ID = process.env.PAYPAL_CLIENT_ID;
 const PAYPAL_CLIENT_SECRET = process.env.PAYPAL_CLIENT_SECRET;
 const PAYPAL_ENV = process.env.PAYPAL_ENV || "sandbox"; // "live" in production
@@ -19,7 +20,7 @@ const PAYPAL_ENV = process.env.PAYPAL_ENV || "sandbox"; // "live" in production
 const EMAIL_USER = process.env.EMAIL_USER;
 const EMAIL_PASS = process.env.EMAIL_PASS;
 const EMAIL_TO = process.env.EMAIL_TO || "almadenvoices@gmail.com";
-const BASE_URL = process.env.BASE_URL || `http://localhost:${process.env.PORT || 5000}`;
+const BASE_URL = process.env.BASE_URL || `http://localhost:${process.env.PORT || 5001}`;
 
 if (!PAYPAL_CLIENT_ID || !PAYPAL_CLIENT_SECRET) {
     console.warn(
@@ -369,6 +370,167 @@ app.post("/api/subscribe", async (req, res) => {
     } catch (err) {
         console.error("Subscribe error:", err);
         res.status(500).json({ error: "Error processing subscription. Please try again." });
+    }
+});
+
+// Session registration endpoint
+app.post("/api/register", async (req, res) => {
+    try {
+        const {
+            studentFirstName,
+            studentLastName,
+            gradeLevel,
+            parentName,
+            email,
+            phone,
+            sessionType,
+            additionalInfo
+        } = req.body;
+
+        // Validate required fields
+        if (!studentFirstName || !studentLastName || !gradeLevel || !parentName || !email || !phone || !sessionType) {
+            return res.status(400).json({ error: "Missing required fields" });
+        }
+
+        // Generate confirmation number
+        const confirmationNumber = generateConfirmationNumber();
+        const timestamp = new Date().toISOString();
+
+        // Session type labels
+        const sessionLabels = {
+            'public-speaking': 'Public Speaking',
+            'debate': 'Debate',
+            'leadership': 'Leadership Workshop',
+            'storytelling': 'Storytelling',
+            'communication': 'Communication Skills'
+        };
+
+        const sessionLabel = sessionLabels[sessionType] || sessionType;
+
+        // Path to registrations file
+        const registrationsFile = path.join(__dirname, 'registrations.csv');
+
+        // Create CSV header if file doesn't exist
+        if (!fs.existsSync(registrationsFile)) {
+            const header = 'Confirmation,Student First Name,Student Last Name,Grade,Parent Name,Email,Phone,Session Type,Additional Info,Registered At\n';
+            fs.writeFileSync(registrationsFile, header);
+        }
+
+        // Sanitize CSV fields (escape commas and quotes)
+        const sanitize = (str) => {
+            if (!str) return '';
+            str = str.toString().replace(/"/g, '""');
+            if (str.includes(',') || str.includes('"') || str.includes('\n')) {
+                return `"${str}"`;
+            }
+            return str;
+        };
+
+        // Add registration to CSV
+        const newRegistration = [
+            sanitize(confirmationNumber),
+            sanitize(studentFirstName),
+            sanitize(studentLastName),
+            sanitize(gradeLevel),
+            sanitize(parentName),
+            sanitize(email),
+            sanitize(phone),
+            sanitize(sessionType),
+            sanitize(additionalInfo || ''),
+            sanitize(timestamp)
+        ].join(',') + '\n';
+
+        fs.appendFileSync(registrationsFile, newRegistration);
+
+        // Send notification email to admin
+        if (emailTransporter) {
+            const adminEmailHtml = `
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                    <h2 style="color: #2563EB;">New Session Registration</h2>
+                    <p><strong>Confirmation Number:</strong> ${confirmationNumber}</p>
+                    <hr style="border: 1px solid #eee;" />
+
+                    <h3 style="color: #333;">Student Information</h3>
+                    <p><strong>Name:</strong> ${studentFirstName} ${studentLastName}</p>
+                    <p><strong>Grade Level:</strong> ${gradeLevel}th Grade</p>
+                    <p><strong>Session:</strong> ${sessionLabel}</p>
+
+                    <h3 style="color: #333;">Parent/Guardian Information</h3>
+                    <p><strong>Name:</strong> ${parentName}</p>
+                    <p><strong>Email:</strong> ${email}</p>
+                    <p><strong>Phone:</strong> ${phone}</p>
+
+                    ${additionalInfo ? `
+                    <h3 style="color: #333;">Additional Information</h3>
+                    <p style="background: #f5f5f5; padding: 15px; border-radius: 5px;">${additionalInfo}</p>
+                    ` : ''}
+
+                    <hr style="border: 1px solid #eee;" />
+                    <p style="color: #666; font-size: 12px;">Registered: ${new Date().toLocaleString()}</p>
+                </div>
+            `;
+
+            await emailTransporter.sendMail({
+                from: `"Almaden Voices Registrations" <${EMAIL_USER}>`,
+                replyTo: `"${parentName}" <${email}>`,
+                to: EMAIL_TO,
+                subject: `New Registration: ${studentFirstName} ${studentLastName} - ${sessionLabel} - ${confirmationNumber}`,
+                html: adminEmailHtml
+            });
+        }
+
+        // Send confirmation email to parent
+        if (emailTransporter) {
+            const parentEmailHtml = `
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                    <h2 style="color: #2563EB;">Registration Confirmed!</h2>
+                    <p>Dear ${parentName},</p>
+                    <p>Thank you for registering ${studentFirstName} for our <strong>${sessionLabel}</strong> program!</p>
+
+                    <div style="background: #f0f9ff; padding: 20px; border-radius: 10px; margin: 20px 0;">
+                        <p style="margin: 0 0 10px;"><strong>Confirmation Number:</strong></p>
+                        <p style="font-size: 24px; font-family: monospace; color: #2563EB; font-weight: bold; letter-spacing: 2px; margin: 0;">${confirmationNumber}</p>
+                    </div>
+
+                    <h3 style="color: #333;">Registration Details</h3>
+                    <ul style="line-height: 1.8; color: #333;">
+                        <li><strong>Student:</strong> ${studentFirstName} ${studentLastName}</li>
+                        <li><strong>Grade:</strong> ${gradeLevel}th Grade</li>
+                        <li><strong>Program:</strong> ${sessionLabel}</li>
+                    </ul>
+
+                    <h3 style="color: #333;">What's Next?</h3>
+                    <p>Our team will review your registration and contact you within 2-3 business days with:</p>
+                    <ul style="line-height: 1.8; color: #333;">
+                        <li>Session schedule and location details</li>
+                        <li>Materials needed for the program</li>
+                        <li>Any additional forms required</li>
+                    </ul>
+
+                    <p>If you have any questions, feel free to reply to this email or contact us at <a href="mailto:info@almadenvoices.org" style="color: #2563EB;">info@almadenvoices.org</a>.</p>
+
+                    <hr style="border: 1px solid #eee;" />
+                    <p style="color: #666;">Best regards,<br/>Almaden Voices Team</p>
+                </div>
+            `;
+
+            await emailTransporter.sendMail({
+                from: `"Almaden Voices" <${EMAIL_USER}>`,
+                to: email,
+                subject: `Registration Confirmed: ${sessionLabel} - ${confirmationNumber}`,
+                html: parentEmailHtml
+            });
+        }
+
+        res.json({
+            success: true,
+            confirmationNumber,
+            message: "Registration submitted successfully!"
+        });
+
+    } catch (err) {
+        console.error("Registration error:", err);
+        res.status(500).json({ error: "Error processing registration. Please try again." });
     }
 });
 

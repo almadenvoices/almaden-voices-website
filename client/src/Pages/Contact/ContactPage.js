@@ -1,11 +1,7 @@
 import React, { useState } from "react";
 import s from "./Contact.module.css";
 import EmailIcon from "@mui/icons-material/Email";
-import PhoneIcon from "@mui/icons-material/Phone";
-import LocationOnIcon from "@mui/icons-material/LocationOn";
 import SendIcon from "@mui/icons-material/Send";
-import WhatsAppIcon from "@mui/icons-material/WhatsApp";
-import SmsIcon from "@mui/icons-material/Sms";
 
 export default function ContactPage() {
     const [agreed, setAgreed] = useState(false);
@@ -78,30 +74,10 @@ export default function ContactPage() {
                             <p className={s.muted}>Our friendly team is here to help.</p>
                             <div className={s.row}>
                                 <EmailIcon fontSize="small" />
-                                <a href="mailto:info@almadenvoices.org" className={s.link}>info@almadenvoices.org</a>
+                                <a href="mailto:almadenvoices@gmail.com" className={s.link}>almadenvoices@gmail.com</a>
                             </div>
                         </div>
 
-                        <div className={s.block}>
-                            <h3>Office</h3>
-                            <p className={s.muted}>Come say hello at our office HQ.</p>
-                            <div className={s.row}>
-                                <LocationOnIcon fontSize="small" />
-                                <div>
-                                    <div className={s.link} style={{ textDecoration: "none" }}>100 Smith Street</div>
-                                    <div className={s.link} style={{ textDecoration: "none" }}>Almaden Valley, San Jose CA</div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className={s.block}>
-                            <h3>Phone</h3>
-                            <p className={s.muted}>Mon–Fri from 8am to 5pm.</p>
-                            <div className={s.row}>
-                                <PhoneIcon fontSize="small" />
-                                <span className={s.strong}>+1 (555) 000-0000</span>
-                            </div>
-                        </div>
                     </aside>
 
                     <div className={s.divider} aria-hidden="true" />
@@ -165,7 +141,7 @@ export default function ContactPage() {
                             <label className={s.check}>
                                 <input type="checkbox" checked={agreed} onChange={(e)=>setAgreed(e.target.checked)} disabled={isSubmitting} />
                                 <span>
-                  You agree to our friendly <a className={s.link} href="/privacy">privacy policy</a>.
+                  You agree to our friendly <a className={s.link} href="/docs/privacy-policy.html" target="_blank" rel="noopener noreferrer">privacy policy</a>.
                 </span>
                             </label>
                             <button className={`${s.btn} ${s.btnPrimary}`} disabled={!agreed || isSubmitting}>
@@ -222,12 +198,6 @@ export default function ContactPage() {
                 {/*        <p className={`${s.muted} ${s.small}`}>Parking and accessibility details are provided with each session reminder.</p>*/}
                 {/*    </div>*/}
                 {/*</section>*/}
-            </div>
-
-            {/* Floating actions (unchanged) */}
-            <div className={s.float}>
-                <a className={`${s.fab} ${s.whatsapp}`} href="https://wa.me/14080000000" target="_blank" rel="noopener noreferrer"><WhatsAppIcon /></a>
-                <a className={`${s.fab} ${s.sms}`} href="sms:+14080000000"><SmsIcon /></a>
             </div>
 
             {/* Toast */}

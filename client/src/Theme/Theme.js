@@ -1,28 +1,45 @@
 import { createTheme } from '@mui/material/styles';
 
-export const getAppTheme = (mode = 'light') =>
+const headingFont = "'Playfair Display', Georgia, 'Times New Roman', serif";
+const bodyFont = "'DM Sans', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif";
+
+export const getAppTheme = () =>
     createTheme({
         palette: {
-            mode,
-            ...(mode === 'dark'
-                ? { background: { default: '#171826', paper: '#24263a' } }
-                : { background: { default: '#ffffff', paper: '#fafafa' } }),
-            secondary: { main: '#9c27b0' },
+            mode: 'light',
+            background: { default: '#FFFFFF', paper: '#F9FAFB' },
+            primary: { main: '#2563EB' },
+            secondary: { main: '#2563EB' },
+            text: {
+                primary: '#111827',
+                secondary: '#6B7280',
+            },
+            action: {
+                active: '#9CA3AF',
+            },
+        },
+        typography: {
+            fontFamily: bodyFont,
+            h1: { fontFamily: headingFont },
+            h2: { fontFamily: headingFont },
+            h3: { fontFamily: headingFont },
+            h4: { fontFamily: headingFont },
+            h5: { fontFamily: headingFont },
+            h6: { fontFamily: headingFont },
         },
         shape: { borderRadius: 12 },
         components: {
             MuiCssBaseline: {
                 styleOverrides: {
-                    body: { fontFamily: 'Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial' }
+                    body: { fontFamily: bodyFont }
                 }
             },
             MuiContainer: {
                 defaultProps: {
-                    maxWidth: 'xl',        // 🔥 all Containers become xl by default
+                    maxWidth: 'xl',
                 },
                 styleOverrides: {
                     root: {
-                        // optional padding tuning
                         paddingLeft: '24px',
                         paddingRight: '24px',
                         '@media (min-width:1536px)': {

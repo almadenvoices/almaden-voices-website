@@ -43,7 +43,7 @@ export default function HeroSlider() {
                         <Typography variant="h6" sx={{ fontSize: { xs: '1rem', sm: '1.2rem', md: '1.5rem' } }} my={2}>
                             {slide.description}
                         </Typography>
-                        <Button variant="contained" color="secondary">Learn More</Button>
+                        <Button variant="contained" color="secondary" href="/register">Register Now</Button>
                     </Box>
                 </Box>
             ))}

@@ -124,10 +124,10 @@ const Footer = () => {
     };
     const rightColumnLinks = {
         about: [
-            { label: 'Our Mission', href: '#mission' },
-            { label: 'Our Team', href: '#team' },
-            { label: 'Success Stories', href: '#stories' },
-            { label: 'Board of Directors', href: '#board' }
+            { label: 'Our Mission', href: '/about#mission' },
+            { label: 'Our Team', href: '/about#team' },
+            { label: 'Success Stories', href: '/about#stories' },
+            { label: 'Board of Directors', href: '/about#board' }
         ],
         programs: [
             { label: 'Upcoming Events', href: '#events' },
@@ -143,33 +143,18 @@ const Footer = () => {
             { label: 'Corporate Partnerships', href: '#corporate' },
             { label: 'Fundraising Events', href: '#fundraising' }
         ],
-        News: [
-            { label: 'Blog & Articles', href: '#blog' },
-            { label: 'Speech Tips', href: '#tips' },
-            { label: 'Media Kit', href: '#media' }
-        ],
         legal: [
-            { label: 'Article of Incorporation', href: '#privacy' },
-            { label: 'Annual Reports', href: '#terms' },
-            { label: 'Disclaimer', href: '#disclaimer' },
+            { label: 'Articles of Incorporation', href: '/docs/articles-of-incorporation.pdf', target: '_blank' }
         ]
     };
 
-    const socialLinks = [
-        { icon: '📘', label: 'Facebook', href: '#', color: '#1877f2' },
-        { icon: '🐦', label: 'Twitter', href: '#', color: '#1da1f2' },
-        { icon: '📷', label: 'Instagram', href: '#', color: '#e4405f' },
-        { icon: '💼', label: 'LinkedIn', href: '#', color: '#0077b5' },
-        { icon: '📺', label: 'YouTube', href: '#', color: '#ff0000' }
-    ];
-
     return (
-        <div style={{ backgroundColor: '#1a1a2e', color: 'white' }}>
+        <div style={{ backgroundColor: '#FFFFFF', color: '#111827' }}>
             {/* Main Footer Content */}
             <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '60px 20px' }}>
 
                 {/* Newsletter Subscription Section */}
-                <div style={{backgroundColor: '#2d2d44', padding: '40px 20px', borderRadius: '12px', borderBottom: '1px solid #3d3d5c', marginBottom: '50px'}}>
+                <div style={{backgroundColor: '#F9FAFB', padding: '40px 20px', borderRadius: '12px', borderBottom: '1px solid #E5E7EB', marginBottom: '50px'}}>
                     <div style={{
                         maxWidth: '1200px',
                         margin: '0 auto',
@@ -179,17 +164,17 @@ const Footer = () => {
                             fontSize: '1.8rem',
                             fontWeight: 700,
                             marginBottom: '12px',
-                            color: '#ffffff'
+                            color: '#111827'
                         }}>
                             Stay Connected
                         </h3>
                         <p style={{
                             fontSize: '1.1rem',
-                            color: '#b8b8b8',
+                            color: '#6B7280',
                             marginBottom: '25px',
                             lineHeight: 1.6,
                         }}>
-                            Subscribe to receive updates on upcoming sessions, success stories, and speech therapy tips.
+                            Subscribe to receive updates on upcoming sessions, success stories, and speech tips!
                         </p>
 
                         <div style={{display: 'flex', gap: '12px', maxWidth: '600px', margin: '0 auto', flexWrap: 'wrap', justifyContent: 'center'}}>
@@ -204,24 +189,24 @@ const Footer = () => {
                                     flex: '1',
                                     minWidth: '280px',
                                     padding: '14px 20px',
-                                    border: '2px solid #3d3d5c',
+                                    border: '2px solid #E5E7EB',
                                     borderRadius: '8px',
                                     fontSize: '1rem',
-                                    backgroundColor: '#1a1a2e',
-                                    color: 'white',
+                                    backgroundColor: '#FFFFFF',
+                                    color: '#111827',
                                     outline: 'none',
                                     transition: 'all 0.3s ease',
                                     opacity: loading ? 0.6 : 1
                                 }}
-                                onFocus={(e) => e.currentTarget.style.borderColor = '#9c27b0'}
-                                onBlur={(e) => e.currentTarget.style.borderColor = '#3d3d5c'}
+                                onFocus={(e) => e.currentTarget.style.borderColor = '#2563EB'}
+                                onBlur={(e) => e.currentTarget.style.borderColor = '#E5E7EB'}
                             />
                             <button
                                 onClick={handleSubscribe}
                                 disabled={loading}
                                 style={{
                                     padding: '14px 32px',
-                                    backgroundColor: subscribed ? '#4caf50' : '#9c27b0',
+                                    backgroundColor: subscribed ? '#4caf50' : '#2563EB',
                                     color: 'white',
                                     border: 'none',
                                     borderRadius: '8px',
@@ -233,10 +218,10 @@ const Footer = () => {
                                     opacity: loading ? 0.6 : 1
                                 }}
                                 onMouseEnter={(e) => {
-                                    if (!subscribed && !loading) e.currentTarget.style.backgroundColor = '#7b1fa2';
+                                    if (!subscribed && !loading) e.currentTarget.style.backgroundColor = '#1d4ed8';
                                 }}
                                 onMouseLeave={(e) => {
-                                    if (!subscribed && !loading) e.currentTarget.style.backgroundColor = '#9c27b0';
+                                    if (!subscribed && !loading) e.currentTarget.style.backgroundColor = '#2563EB';
                                 }}
                             >
                                 {loading ? 'Subscribing...' : subscribed ? '✓ Subscribed!' : 'Subscribe'}
@@ -273,7 +258,7 @@ const Footer = () => {
                             fontSize: '2rem',
                             fontWeight: 700,
                             marginBottom: '20px',
-                            color: '#9c27b0',
+                            color: '#2563EB',
                             textAlign: 'center',
                         }}>
                             Almaden Voices
@@ -282,43 +267,23 @@ const Footer = () => {
                         <p style={{
                             fontSize: '1rem',
                             lineHeight: 1.8,
-                            color: '#b8b8b8',
+                            color: '#6B7280',
                             marginBottom: '20px'
                         }}>
-                            A California registered 501(c)(3) non-profit organization (Tax Id: xx-xxxxxxxx) dedicated to empowering
-                            young voices through free, professional speech therapy sessions for children in our community.
+                            A non-profit organization dedicated to empowering
+                            young voices through free speech and debate programs for children in our community.
                         </p>
 
                         {/* Contact Info */}
                         <div style={{
-                            display: 'grid',
-                            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-                            gap: '30px',
                             marginBottom: '40px',
                             padding: '20px',
-                            backgroundColor: '#2d2d44',
+                            backgroundColor: '#F9FAFB',
                             borderRadius: '12px'
                         }}>
                             <div>
                                 <h4 style={{
-                                    color: '#9c27b0',
-                                    marginBottom: '12px',
-                                    fontSize: '1rem',
-                                    fontWeight: 600,
-                                    textTransform: 'uppercase',
-                                    letterSpacing: '1px'
-                                }}>
-                                    📍 Address
-                                </h4>
-                                <p style={{ color: '#b8b8b8', fontSize: '0.95rem', lineHeight: 1.6, margin: 0 }}>
-                                    Almaden Voices<br />
-                                    123 Community Drive<br />
-                                    San Jose, CA 95120
-                                </p>
-                            </div>
-                            <div>
-                                <h4 style={{
-                                    color: '#9c27b0',
+                                    color: '#2563EB',
                                     marginBottom: '12px',
                                     fontSize: '1rem',
                                     fontWeight: 600,
@@ -327,10 +292,8 @@ const Footer = () => {
                                 }}>
                                     📞 Contact
                                 </h4>
-                                <p style={{ color: '#b8b8b8', fontSize: '0.95rem', lineHeight: 1.6, margin: 0 }}>
-                                    Phone: (408) 555-0123<br />
-                                    Email: info@almadenvoices.org<br />
-                                    Hours: Mon-Fri, 9AM-5PM
+                                <p style={{ color: '#6B7280', fontSize: '0.95rem', lineHeight: 1.6, margin: 0 }}>
+                                    Email: almadenvoices@gmail.com
                                 </p>
                             </div>
                         </div>
@@ -341,96 +304,84 @@ const Footer = () => {
                         {/*    borderRadius: '10px',*/}
                         {/*    marginBottom: '25px'*/}
                         {/*}}>*/}
-                        {/*    <p style={{ fontSize: '0.9rem', color: '#b8b8b8', marginBottom: '8px' }}>*/}
+                        {/*    <p style={{ fontSize: '0.9rem', color: '#6B7280', marginBottom: '8px' }}>*/}
                         {/*        <strong style={{ color: '#9c27b0' }}>Tax ID:</strong> XX-XXXXXXX*/}
                         {/*    </p>*/}
-                        {/*    <p style={{ fontSize: '0.9rem', color: '#b8b8b8', marginBottom: '8px' }}>*/}
+                        {/*    <p style={{ fontSize: '0.9rem', color: '#6B7280', marginBottom: '8px' }}>*/}
                         {/*        <strong style={{ color: '#9c27b0' }}>License:</strong> CA-XXXX-XXXX*/}
                         {/*    </p>*/}
-                        {/*    <p style={{ fontSize: '0.9rem', color: '#b8b8b8', marginBottom: 0 }}>*/}
+                        {/*    <p style={{ fontSize: '0.9rem', color: '#6B7280', marginBottom: 0 }}>*/}
                         {/*        <strong style={{ color: '#9c27b0' }}>Status:</strong> Active Non-Profit*/}
                         {/*    </p>*/}
                         {/*</div>*/}
 
                         {/* Action Buttons */}
                         <div style={{ marginBottom: '30px', textAlign: 'center' }}>
-                            <button
+                            <a
+                                href="/donate"
                                 style={{
+                                    display: 'inline-block',
                                     padding: '16px 24px',
-                                    backgroundColor: '#9c27b0',
-                                    color: 'white',
-                                    border: 'none',
+                                    backgroundColor: 'transparent',
+                                    color: '#2563EB',
+                                    border: '2px solid #2563EB',
                                     borderRadius: '10px',
                                     fontSize: '1.1rem',
-                                    fontWeight: 600,
+                                    fontFamily: "'DM Sans', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif",
+                                    fontWeight: 900,
                                     cursor: 'pointer',
                                     transition: 'all 0.3s ease',
-                                    marginBottom: '12px'
+                                    marginBottom: '12px',
+                                    textDecoration: 'none'
                                 }}
                                 onMouseEnter={(e) => {
-                                    e.currentTarget.style.backgroundColor = '#7b1fa2';
+                                    e.currentTarget.style.backgroundColor = '#2563EB';
+                                    e.currentTarget.style.color = 'white';
                                     e.currentTarget.style.transform = 'translateY(-2px)';
-                                    e.currentTarget.style.boxShadow = '0 6px 20px rgba(156, 39, 176, 0.4)';
+                                    e.currentTarget.style.boxShadow = '0 6px 20px rgba(37, 99, 235, 0.4)';
                                 }}
                                 onMouseLeave={(e) => {
-                                    e.currentTarget.style.backgroundColor = '#9c27b0';
+                                    e.currentTarget.style.backgroundColor = 'transparent';
+                                    e.currentTarget.style.color = '#2563EB';
                                     e.currentTarget.style.transform = 'translateY(0)';
                                     e.currentTarget.style.boxShadow = 'none';
                                 }}
                             >
-                                ❤️ Donate Now
-                            </button>
+                                Donate Now
+                            </a>
 
-                            <button
+                            <a
+                                href="/contact"
                                 style={{
-                                    width: '30%',
-                                    padding: '14px 24px',
+                                    display: 'inline-block',
+                                    padding: '16px 24px',
                                     backgroundColor: 'transparent',
-                                    color: '#9c27b0',
-                                    border: 'none',
-                                    borderRadius: '8px',
-                                    fontSize: '1rem',
-                                    fontWeight: 600,
+                                    color: '#2563EB',
+                                    border: '2px solid #2563EB',
+                                    borderRadius: '10px',
+                                    fontSize: '1.1rem',
+                                    fontFamily: "'DM Sans', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif",
+                                    fontWeight: 900,
                                     cursor: 'pointer',
                                     transition: 'all 0.3s ease',
-                                    marginBottom: '12px'
+                                    textDecoration: 'none',
+                                    marginLeft: '12px'
                                 }}
                                 onMouseEnter={(e) => {
-                                    e.currentTarget.style.backgroundColor = '#9c27b0';
+                                    e.currentTarget.style.backgroundColor = '#2563EB';
                                     e.currentTarget.style.color = 'white';
+                                    e.currentTarget.style.transform = 'translateY(-2px)';
+                                    e.currentTarget.style.boxShadow = '0 6px 20px rgba(37, 99, 235, 0.4)';
                                 }}
                                 onMouseLeave={(e) => {
                                     e.currentTarget.style.backgroundColor = 'transparent';
-                                    e.currentTarget.style.color = '#9c27b0';
+                                    e.currentTarget.style.color = '#2563EB';
+                                    e.currentTarget.style.transform = 'translateY(0)';
+                                    e.currentTarget.style.boxShadow = 'none';
                                 }}
                             >
-                                📝 Apply for Grant
-                            </button>
-
-                            <button
-                                style={{
-                                    width: '35%',
-                                    padding: '14px 24px',
-                                    backgroundColor: 'transparent',
-                                    color: '#9c27b0',
-                                    border: 'none',
-                                    borderRadius: '8px',
-                                    fontSize: '1rem',
-                                    fontWeight: 600,
-                                    cursor: 'pointer',
-                                    transition: 'all 0.3s ease'
-                                }}
-                                onMouseEnter={(e) => {
-                                    e.currentTarget.style.backgroundColor = '#9c27b0';
-                                    e.currentTarget.style.color = 'white';
-                                }}
-                                onMouseLeave={(e) => {
-                                    e.currentTarget.style.backgroundColor = 'transparent';
-                                    e.currentTarget.style.color = '#9c27b0';
-                                }}
-                            >
-                                🤝 Volunteer With Us
-                            </button>
+                                Volunteer With Us
+                            </a>
                         </div>
                         </div>
                     </div>
@@ -450,7 +401,7 @@ const Footer = () => {
                                     fontSize: '1rem',
                                     fontWeight: 600,
                                     marginBottom: '16px',
-                                    color: '#ffffff',
+                                    color: '#111827',
                                     textTransform: 'uppercase',
                                     letterSpacing: '1px'
                                 }}>
@@ -462,18 +413,18 @@ const Footer = () => {
                                             <a
                                                 href={link.href}
                                                 style={{
-                                                    color: '#b8b8b8',
+                                                    color: '#6B7280',
                                                     textDecoration: 'none',
                                                     fontSize: '0.9rem',
                                                     transition: 'all 0.3s ease',
                                                     display: 'inline-block'
                                                 }}
                                                 onMouseEnter={(e) => {
-                                                    e.currentTarget.style.color = '#9c27b0';
+                                                    e.currentTarget.style.color = '#2563EB';
                                                     e.currentTarget.style.paddingLeft = '5px';
                                                 }}
                                                 onMouseLeave={(e) => {
-                                                    e.currentTarget.style.color = '#b8b8b8';
+                                                    e.currentTarget.style.color = '#6B7280';
                                                     e.currentTarget.style.paddingLeft = '0';
                                                 }}
                                             >
@@ -490,7 +441,7 @@ const Footer = () => {
                                     fontSize: '1rem',
                                     fontWeight: 600,
                                     marginBottom: '16px',
-                                    color: '#ffffff',
+                                    color: '#111827',
                                     textTransform: 'uppercase',
                                     letterSpacing: '1px'
                                 }}>
@@ -502,58 +453,18 @@ const Footer = () => {
                                             <a
                                                 href={link.href}
                                                 style={{
-                                                    color: '#b8b8b8',
+                                                    color: '#6B7280',
                                                     textDecoration: 'none',
                                                     fontSize: '0.9rem',
                                                     transition: 'all 0.3s ease',
                                                     display: 'inline-block'
                                                 }}
                                                 onMouseEnter={(e) => {
-                                                    e.currentTarget.style.color = '#9c27b0';
+                                                    e.currentTarget.style.color = '#2563EB';
                                                     e.currentTarget.style.paddingLeft = '5px';
                                                 }}
                                                 onMouseLeave={(e) => {
-                                                    e.currentTarget.style.color = '#b8b8b8';
-                                                    e.currentTarget.style.paddingLeft = '0';
-                                                }}
-                                            >
-                                                {link.label}
-                                            </a>
-                                        </li>
-                                    ))}
-                                </ul>
-                            </div>
-
-                            {/* Resources */}
-                            <div>
-                                <h4 style={{
-                                    fontSize: '1rem',
-                                    fontWeight: 600,
-                                    marginBottom: '16px',
-                                    color: '#ffffff',
-                                    textTransform: 'uppercase',
-                                    letterSpacing: '1px'
-                                }}>
-                                    News & Press Kit
-                                </h4>
-                                <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-                                    {rightColumnLinks.News.map((link, index) => (
-                                        <li key={index} style={{ marginBottom: '10px' }}>
-                                            <a
-                                                href={link.href}
-                                                style={{
-                                                    color: '#b8b8b8',
-                                                    textDecoration: 'none',
-                                                    fontSize: '0.9rem',
-                                                    transition: 'all 0.3s ease',
-                                                    display: 'inline-block'
-                                                }}
-                                                onMouseEnter={(e) => {
-                                                    e.currentTarget.style.color = '#9c27b0';
-                                                    e.currentTarget.style.paddingLeft = '5px';
-                                                }}
-                                                onMouseLeave={(e) => {
-                                                    e.currentTarget.style.color = '#b8b8b8';
+                                                    e.currentTarget.style.color = '#6B7280';
                                                     e.currentTarget.style.paddingLeft = '0';
                                                 }}
                                             >
@@ -570,7 +481,7 @@ const Footer = () => {
                                     fontSize: '1rem',
                                     fontWeight: 600,
                                     marginBottom: '16px',
-                                    color: '#ffffff',
+                                    color: '#111827',
                                     textTransform: 'uppercase',
                                     letterSpacing: '1px'
                                 }}>
@@ -582,18 +493,18 @@ const Footer = () => {
                                             <a
                                                 href={link.href}
                                                 style={{
-                                                    color: '#b8b8b8',
+                                                    color: '#6B7280',
                                                     textDecoration: 'none',
                                                     fontSize: '0.9rem',
                                                     transition: 'all 0.3s ease',
                                                     display: 'inline-block'
                                                 }}
                                                 onMouseEnter={(e) => {
-                                                    e.currentTarget.style.color = '#9c27b0';
+                                                    e.currentTarget.style.color = '#2563EB';
                                                     e.currentTarget.style.paddingLeft = '5px';
                                                 }}
                                                 onMouseLeave={(e) => {
-                                                    e.currentTarget.style.color = '#b8b8b8';
+                                                    e.currentTarget.style.color = '#6B7280';
                                                     e.currentTarget.style.paddingLeft = '0';
                                                 }}
                                             >
@@ -609,7 +520,7 @@ const Footer = () => {
                                     fontSize: '1rem',
                                     fontWeight: 600,
                                     marginBottom: '16px',
-                                    color: '#ffffff',
+                                    color: '#111827',
                                     textTransform: 'uppercase',
                                     letterSpacing: '1px'
                                 }}>
@@ -621,18 +532,18 @@ const Footer = () => {
                                             <a
                                                 href={link.href}
                                                 style={{
-                                                    color: '#b8b8b8',
+                                                    color: '#6B7280',
                                                     textDecoration: 'none',
                                                     fontSize: '0.9rem',
                                                     transition: 'all 0.3s ease',
                                                     display: 'inline-block'
                                                 }}
                                                 onMouseEnter={(e) => {
-                                                    e.currentTarget.style.color = '#9c27b0';
+                                                    e.currentTarget.style.color = '#2563EB';
                                                     e.currentTarget.style.paddingLeft = '5px';
                                                 }}
                                                 onMouseLeave={(e) => {
-                                                    e.currentTarget.style.color = '#b8b8b8';
+                                                    e.currentTarget.style.color = '#6B7280';
                                                     e.currentTarget.style.paddingLeft = '0';
                                                 }}
                                             >
@@ -644,72 +555,12 @@ const Footer = () => {
                             </div>
                         </div>
 
-                        {/* Social Media Section */}
-                        <div style={{backgroundColor: '#2d2d44', padding: '30px', borderRadius: '10px'}}>
-                            <h4 style={{
-                                fontSize: '1.1rem',
-                                fontWeight: 600,
-                                marginBottom: '20px',
-                                color: '#ffffff',
-                                textAlign: 'center'
-                            }}>
-                                Follow Us on Social Media
-                            </h4>
-                            <div style={{
-                                display: 'flex',
-                                gap: '15px',
-                                justifyContent: 'center',
-                                flexWrap: 'wrap'
-                            }}>
-                                {socialLinks.map((social, index) => (
-                                    <a
-                                        key={index}
-                                        href={social.href}
-                                        style={{
-                                            width: '50px',
-                                            height: '50px',
-                                            borderRadius: '50%',
-                                            backgroundColor: '#1a1a2e',
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            justifyContent: 'center',
-                                            fontSize: '1.5rem',
-                                            textDecoration: 'none',
-                                            transition: 'all 0.3s ease'
-                                        }}
-                                        onMouseEnter={(e) => {
-                                            e.currentTarget.style.backgroundColor = social.color;
-                                            e.currentTarget.style.transform = 'translateY(-5px) scale(1.1)';
-                                            e.currentTarget.style.boxShadow = `0 8px 20px ${social.color}50`;
-                                        }}
-                                        onMouseLeave={(e) => {
-                                            e.currentTarget.style.backgroundColor = '#1a1a2e';
-                                            e.currentTarget.style.transform = 'translateY(0) scale(1)';
-                                            e.currentTarget.style.boxShadow = 'none';
-                                        }}
-                                        title={social.label}
-                                    >
-                                        {social.icon}
-                                    </a>
-                                ))}
-                            </div>
-                            <p style={{
-                                textAlign: 'center',
-                                color: '#b8b8b8',
-                                fontSize: '0.85rem',
-                                marginTop: '20px',
-                                marginBottom: 0
-                            }}>
-                                Stay connected and join our community!
-                            </p>
-                        </div>
-
                     </div>
                 </div>
             </div>
 
             {/* Bottom Copyright Bar */}
-            <div style={{borderTop: '1px solid #3d3d5c', backgroundColor: '#0f0f1e', padding: '25px 20px',}}>
+            <div style={{borderTop: '1px solid #E5E7EB', backgroundColor: '#F9FAFB', padding: '25px 20px',}}>
                 <div style={{
                     maxWidth: '1400px',
                     margin: '0 auto',
@@ -720,62 +571,40 @@ const Footer = () => {
                     alignItems: 'center',
                     gap: '20px'
                 }}>
-                    <div style={{ fontSize: '1rem', color: '#888', margin: 0 }}>
-                        © {new Date().getFullYear()} Almaden Voices. All rights reserved. | 501(c)(3) Non-Profit Organization
+                    <div style={{ fontSize: '1rem', color: '#6B7280', margin: 0 }}>
+                        © {new Date().getFullYear()} Almaden Voices. All rights reserved.
                     </div>
 
                     <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap' }}>
                         <a
-                            href="#privacy"
+                            href="/docs/terms-of-service.html"
+                            target="_blank"
+                            rel="noopener noreferrer"
                             style={{
-                                color: '#888',
+                                color: '#6B7280',
                                 textDecoration: 'none',
                                 fontSize: '1rem',
                                 transition: 'color 0.3s ease'
                             }}
-                            onMouseEnter={(e) => e.currentTarget.style.color = '#9c27b0'}
-                            onMouseLeave={(e) => e.currentTarget.style.color = '#888'}
+                            onMouseEnter={(e) => e.currentTarget.style.color = '#2563EB'}
+                            onMouseLeave={(e) => e.currentTarget.style.color = '#6B7280'}
+                        >
+                            Terms of Service
+                        </a>
+                        <a
+                            href="/docs/privacy-policy.html"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            style={{
+                                color: '#6B7280',
+                                textDecoration: 'none',
+                                fontSize: '1rem',
+                                transition: 'color 0.3s ease'
+                            }}
+                            onMouseEnter={(e) => e.currentTarget.style.color = '#2563EB'}
+                            onMouseLeave={(e) => e.currentTarget.style.color = '#6B7280'}
                         >
                             Privacy Policy
-                        </a>
-                        <a
-                            href="#terms"
-                            style={{
-                                color: '#888',
-                                textDecoration: 'none',
-                                fontSize: '1rem',
-                                transition: 'color 0.3s ease'
-                            }}
-                            onMouseEnter={(e) => e.currentTarget.style.color = '#9c27b0'}
-                            onMouseLeave={(e) => e.currentTarget.style.color = '#888'}
-                        >
-                            Terms of Use
-                        </a>
-                        <a
-                            href="#disclaimer"
-                            style={{
-                                color: '#888',
-                                textDecoration: 'none',
-                                fontSize: '1rem',
-                                transition: 'color 0.3s ease'
-                            }}
-                            onMouseEnter={(e) => e.currentTarget.style.color = '#9c27b0'}
-                            onMouseLeave={(e) => e.currentTarget.style.color = '#888'}
-                        >
-                            Disclaimer
-                        </a>
-                        <a
-                            href="#sitemap"
-                            style={{
-                                color: '#888',
-                                textDecoration: 'none',
-                                fontSize: '1rem',
-                                transition: 'color 0.3s ease'
-                            }}
-                            onMouseEnter={(e) => e.currentTarget.style.color = '#9c27b0'}
-                            onMouseLeave={(e) => e.currentTarget.style.color = '#888'}
-                        >
-                            Sitemap
                         </a>
                     </div>
                 </div>
