@@ -10,6 +10,7 @@ import FAQPage from "./Pages/FAQ/FAQPage";
 import DonatePage from './Pages/Donate/DonatePage';
 import RegisterPage from './Pages/Register/RegisterPage';
 import ImpactPage from './Pages/Impact/ImpactPage';
+import EventsPage from './Pages/Events/EventsPage';
 
 export default function App() {
     return (
@@ -26,6 +27,7 @@ export default function App() {
                         <Route path="/faq" element={<FAQPage />} />
                         <Route path="/impact" element={<ImpactPage />} />
                         <Route path="/register" element={<RegisterPage />} />
+                        <Route path="/events" element={<EventsPage />} />
                         <Route path="*" element={<Navigate to="/home" replace />} />
                     </Route>
                 </Routes>
