@@ -3,31 +3,7 @@ import { Box, Typography, Container, Button } from "@mui/material";
 import { motion } from "framer-motion";
 import EventIcon from "@mui/icons-material/Event";
 import NotificationsActiveIcon from "@mui/icons-material/NotificationsActive";
-import CampaignIcon from "@mui/icons-material/Campaign";
-import GroupsIcon from "@mui/icons-material/Groups";
-import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
 import { Link as RouterLink } from "react-router-dom";
-
-const pastHighlights = [
-    {
-        title: "Final Showcase — Session 3",
-        date: "July 2025",
-        description: "Students presented their final speeches in front of an audience of parents and community members.",
-        icon: <EmojiEventsIcon />,
-    },
-    {
-        title: "Debate Booster Workshop",
-        date: "Winter 2025",
-        description: "An intensive workshop focused on debate fundamentals, argumentation, and thinking on your feet.",
-        icon: <CampaignIcon />,
-    },
-    {
-        title: "Community Open House",
-        date: "Fall 2025",
-        description: "Families visited to learn about our programs and meet the team behind Almaden Voices.",
-        icon: <GroupsIcon />,
-    },
-];
 
 export default function EventsPage() {
     return (
@@ -176,102 +152,6 @@ export default function EventsPage() {
                             </Button>
                         </Box>
                     </motion.div>
-                </Container>
-            </Box>
-
-            {/* Past Highlights */}
-            <Box sx={{ py: 10, bgcolor: "#F9FAFB" }}>
-                <Container maxWidth="lg">
-                    <Typography
-                        variant="h4"
-                        align="center"
-                        sx={{ fontWeight: 700, mb: 2, color: "#111827" }}
-                    >
-                        Past Highlights
-                    </Typography>
-                    <Box
-                        sx={{
-                            width: 80,
-                            height: 4,
-                            bgcolor: "#2563EB",
-                            borderRadius: 2,
-                            mx: "auto",
-                            mb: 2,
-                        }}
-                    />
-                    <Typography
-                        variant="body1"
-                        align="center"
-                        sx={{ color: "#6B7280", mb: 6, maxWidth: 500, mx: "auto" }}
-                    >
-                        A look back at some of our favorite moments.
-                    </Typography>
-
-                    <Box
-                        sx={{
-                            display: "grid",
-                            gridTemplateColumns: { xs: "1fr", md: "1fr 1fr 1fr" },
-                            gap: 4,
-                        }}
-                    >
-                        {pastHighlights.map((event, index) => (
-                            <motion.div
-                                key={index}
-                                initial={{ opacity: 0, y: 30 }}
-                                whileInView={{ opacity: 1, y: 0 }}
-                                transition={{ duration: 0.4, delay: index * 0.1 }}
-                            >
-                                <Box
-                                    sx={{
-                                        bgcolor: "#FFFFFF",
-                                        borderRadius: 3,
-                                        p: 4,
-                                        height: "100%",
-                                        border: "1px solid #E5E7EB",
-                                        transition: "all 0.2s",
-                                        "&:hover": {
-                                            transform: "translateY(-4px)",
-                                            boxShadow: "0 8px 24px rgba(37, 99, 235, 0.1)",
-                                        },
-                                    }}
-                                >
-                                    <Box
-                                        sx={{
-                                            width: 48,
-                                            height: 48,
-                                            borderRadius: 2,
-                                            bgcolor: "#EFF6FF",
-                                            display: "flex",
-                                            alignItems: "center",
-                                            justifyContent: "center",
-                                            color: "#2563EB",
-                                            mb: 2,
-                                        }}
-                                    >
-                                        {event.icon}
-                                    </Box>
-                                    <Typography
-                                        variant="caption"
-                                        sx={{ color: "#2563EB", fontWeight: 600, letterSpacing: 0.5 }}
-                                    >
-                                        {event.date}
-                                    </Typography>
-                                    <Typography
-                                        variant="h6"
-                                        sx={{ fontWeight: 700, color: "#111827", mt: 0.5, mb: 1 }}
-                                    >
-                                        {event.title}
-                                    </Typography>
-                                    <Typography
-                                        variant="body2"
-                                        sx={{ color: "#6B7280", lineHeight: 1.7 }}
-                                    >
-                                        {event.description}
-                                    </Typography>
-                                </Box>
-                            </motion.div>
-                        ))}
-                    </Box>
                 </Container>
             </Box>
 
