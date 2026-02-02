@@ -19,7 +19,7 @@
 .hero {
     position: relative;
     padding: clamp(60px, 10vw, 120px) 0;
-    background: #FFFFFF;
+    background: linear-gradient(135deg, #1e3a8a 0%, #2563EB 50%, #3b82f6 100%);
 }
 
 .heroWrap {
@@ -45,18 +45,18 @@
     font-family: 'Playfair Display', Georgia, serif;
     font-size: clamp(36px, 4vw, 56px);
     font-weight: 700;
-    color: var(--text);
+    color: #FFFFFF;
     line-height: 1.2;
     margin-bottom: 20px;
 }
 
 .highlight {
-    color: var(--brand);
+    color: #93c5fd;
 }
 
 .sub {
     font-size: clamp(16px, 1.2vw, 18px);
-    color: #374151;
+    color: rgba(255, 255, 255, 0.85);
     line-height: 1.7;
     margin-bottom: 24px;
 }
@@ -74,13 +74,13 @@
     display: flex;
     gap: 10px;
     align-items: center;
-    color: var(--muted);
+    color: rgba(255, 255, 255, 0.8);
     font-size: 15px;
     font-weight: 500;
 }
 
 .bullets li svg {
-    color: var(--brand);
+    color: rgba(255, 255, 255, 0.9);
     font-size: 20px;
 }
 
@@ -265,12 +265,6 @@
     grid-template-columns: 1fr 1fr;
     gap: 10px;
     margin-bottom: 20px;
-}
-
-@media (min-width: 640px) {
-    .methods {
-        grid-template-columns: repeat(3, 1fr);
-    }
 }
 
 .method {
