@@ -11,43 +11,24 @@ import GroupsIcon from "@mui/icons-material/Groups";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import HomeIcon from "@mui/icons-material/Home";
 
+// ============================================================
+// UPCOMING SESSIONS — Add new sessions here!
+// Copy this template and fill in the details:
+//
+// {
+//     id: "unique-id",
+//     title: "Session Title Here",
+//     date: "Month Day, Year",
+//     time: "Start – End Time",
+//     location: "Location Name",
+//     grades: "Grades X–Y",
+//     capacity: 12,
+//     enrolled: 0,
+//     description: "Short description of the session.",
+//     status: "Open",  // "Open" or "Full"
+// }
+// ============================================================
 const upcomingSessions = [
-    {
-        id: "intro-public-speaking",
-        title: "Introduction to Public Speaking",
-        date: "December 15, 2024",
-        time: "10:00 AM – 11:30 AM",
-        location: "Almaden Community Center",
-        grades: "Grades 2–5",
-        capacity: 12,
-        enrolled: 8,
-        description: "Learn the basics of voice projection, eye contact, and overcoming stage fright through fun activities. Ends with a final showcase for parents.",
-        status: "Open",
-    },
-    {
-        id: "adv-pronunciation",
-        title: "Advanced Pronunciation Workshop",
-        date: "December 22, 2024",
-        time: "2:00 PM – 3:30 PM",
-        location: "Online via Zoom",
-        grades: "Grades 5–8",
-        capacity: 15,
-        enrolled: 12,
-        description: "Build on foundational skills with persuasive speaking, impromptu drills, and audience Q&A practice. Ends with a final showcase for parents.",
-        status: "Open",
-    },
-    {
-        id: "storytime-speech",
-        title: "Story Time & Speech Practice",
-        date: "January 5, 2025",
-        time: "11:00 AM – 12:00 PM",
-        location: "Almaden Library",
-        grades: "Grades 2–4",
-        capacity: 10,
-        enrolled: 10,
-        description: "Interactive storytelling combined with speech exercises to improve language and presentation skills.",
-        status: "Full",
-    },
 ];
 
 export default function RegisterPage() {
@@ -172,27 +153,44 @@ export default function RegisterPage() {
                         {/* Step 1: Choose a session FIRST */}
                         <h2 className={s.formTitle}><EventIcon /> Choose a Session</h2>
 
-                        <div className={s.field}>
-                            <label>Which session are you registering for? <span className={s.req}>*</span></label>
-                            <p style={{ fontSize: "0.85rem", color: "#6B7280", margin: "0 0 8px" }}>
-                                Not sure which session is right? <a href="/courses1" style={{ color: "#2563EB", fontWeight: 600, textDecoration: "none" }}>Browse our upcoming sessions</a> to learn more.
-                            </p>
-                            <select
-                                name="sessionType"
-                                required
-                                disabled={isSubmitting}
-                                className={s.select}
-                                value={selectedSessionId}
-                                onChange={(e) => setSelectedSessionId(e.target.value)}
-                            >
-                                <option value="">Select a session...</option>
-                                {upcomingSessions.map(ses => (
-                                    <option key={ses.id} value={ses.id} disabled={ses.status === "Full"}>
-                                        {ses.title} — {ses.date}{ses.status === "Full" ? " (Full)" : ""}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
+                        {upcomingSessions.length > 0 ? (
+                            <div className={s.field}>
+                                <label>Which session are you registering for? <span className={s.req}>*</span></label>
+                                <p style={{ fontSize: "0.85rem", color: "#6B7280", margin: "0 0 8px" }}>
+                                    Not sure which session is right? <a href="/courses1" style={{ color: "#2563EB", fontWeight: 600, textDecoration: "none" }}>Browse our upcoming sessions</a> to learn more.
+                                </p>
+                                <select
+                                    name="sessionType"
+                                    required
+                                    disabled={isSubmitting}
+                                    className={s.select}
+                                    value={selectedSessionId}
+                                    onChange={(e) => setSelectedSessionId(e.target.value)}
+                                >
+                                    <option value="">Select a session...</option>
+                                    {upcomingSessions.map(ses => (
+                                        <option key={ses.id} value={ses.id} disabled={ses.status === "Full"}>
+                                            {ses.title} — {ses.date}{ses.status === "Full" ? " (Full)" : ""}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                        ) : (
+                            <div style={{
+                                textAlign: "center",
+                                padding: "32px 24px",
+                                backgroundColor: "#F9FAFB",
+                                borderRadius: "12px",
+                                border: "2px dashed #E5E7EB",
+                            }}>
+                                <p style={{ fontWeight: 600, color: "#374151", marginBottom: "8px" }}>
+                                    No sessions are open for registration right now
+                                </p>
+                                <p style={{ color: "#6B7280", fontSize: "0.9rem", lineHeight: 1.7, margin: "0 auto", maxWidth: "380px" }}>
+                                    New sessions are announced regularly. <a href="/contact" style={{ color: "#2563EB", fontWeight: 600, textDecoration: "none" }}>Contact us</a> to be the first to know!
+                                </p>
+                            </div>
+                        )}
 
                         {selectedSession && (
                             <div style={{

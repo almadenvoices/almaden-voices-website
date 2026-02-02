@@ -13,49 +13,26 @@ const CoursesPage = () => {
         setIsVisible(true);
     }, []);
 
+    // ============================================================
+    // UPCOMING SESSIONS — Add new sessions here!
+    // Copy this template and fill in the details:
+    //
+    // {
+    //     id: 1,
+    //     title: "Session Title Here",
+    //     date: "Month Day, Year",
+    //     time: "Start Time - End Time",
+    //     location: "Location Name",
+    //     ageGroup: "Grades X-Y",
+    //     capacity: 12,
+    //     enrolled: 0,
+    //     instructor: "Instructor Name",
+    //     description: "Short description of the session.",
+    //     status: "Open",  // "Open" or "Full"
+    //     cover: "/images/your-image.jpg"
+    // }
+    // ============================================================
     const upcomingSessions = [
-        {
-            id: 1,
-            title: "Introduction to Public Speaking",
-            date: "December 15, 2024",
-            time: "10:00 AM - 11:30 AM",
-            location: "Almaden Community Center",
-            ageGroup: "Ages 4-6",
-            capacity: 12,
-            enrolled: 8,
-            instructor: "Sarah Johnson",
-            description: "Learn basic articulation and sound production techniques through fun games and activities.",
-            status: "Open",
-            cover: "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?q=80&w=1600&auto=format&fit=crop"
-        },
-        {
-            id: 2,
-            title: "Advanced Pronunciation Workshop",
-            date: "December 22, 2024",
-            time: "2:00 PM - 3:30 PM",
-            location: "Online via Zoom",
-            ageGroup: "Ages 7-10",
-            capacity: 15,
-            enrolled: 12,
-            instructor: "Michael Chen",
-            description: "Focus on challenging sounds and build confidence in public speaking.",
-            status: "Open",
-            cover: "https://images.unsplash.com/photo-1503428593586-e225b39bddfe?q=80&w=1600&auto=format&fit=crop"
-        },
-        {
-            id: 3,
-            title: "Story Time & Speech Practice",
-            date: "January 5, 2025",
-            time: "11:00 AM - 12:00 PM",
-            location: "Almaden Library",
-            ageGroup: "Ages 3-5",
-            capacity: 10,
-            enrolled: 10,
-            instructor: "Emily Rodriguez",
-            description: "Interactive storytelling combined with speech exercises to improve language skills.",
-            status: "Full",
-            cover: "https://images.unsplash.com/photo-1531482615713-2afd69097998?q=80&w=1600&auto=format&fit=crop"
-        }
     ];
 
     const features = [
@@ -203,11 +180,48 @@ const CoursesPage = () => {
 
             <section className={s.gridSection} style={{ backgroundColor: '#F9FAFB', border: 'none' }}>
                 <div className="container">
-                    <div className={s.grid}>
-                        {upcomingSessions.map(session => (
-                            <SessionCard key={session.id} session={session} />
-                        ))}
-                    </div>
+                    {upcomingSessions.length > 0 ? (
+                        <div className={s.grid}>
+                            {upcomingSessions.map(session => (
+                                <SessionCard key={session.id} session={session} />
+                            ))}
+                        </div>
+                    ) : (
+                        <div style={{
+                            textAlign: 'center',
+                            padding: '48px 24px',
+                            backgroundColor: '#FFFFFF',
+                            borderRadius: '16px',
+                            border: '2px dashed #E5E7EB',
+                            maxWidth: '500px',
+                            margin: '0 auto',
+                        }}>
+                            <div style={{ fontSize: '48px', marginBottom: '12px', color: '#D1D5DB' }}>
+                                <CalendarMonthIcon style={{ fontSize: 56 }} />
+                            </div>
+                            <h3 style={{ fontWeight: 600, color: '#374151', marginBottom: '8px' }}>
+                                No upcoming sessions right now
+                            </h3>
+                            <p style={{ color: '#6B7280', fontSize: '0.9rem', lineHeight: 1.7, maxWidth: '380px', margin: '0 auto 20px' }}>
+                                New sessions are announced regularly. Contact us to be the first to know!
+                            </p>
+                            <a
+                                href="/contact"
+                                style={{
+                                    display: 'inline-block',
+                                    backgroundColor: '#2563EB',
+                                    color: '#FFFFFF',
+                                    fontWeight: 700,
+                                    padding: '12px 32px',
+                                    borderRadius: '999px',
+                                    textDecoration: 'none',
+                                    fontSize: '0.95rem',
+                                }}
+                            >
+                                Get Notified
+                            </a>
+                        </div>
+                    )}
                 </div>
             </section>
 
