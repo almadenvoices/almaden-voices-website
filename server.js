@@ -341,9 +341,9 @@ app.post("/api/subscribe", async (req, res) => {
                     <p>Thank you for subscribing to our newsletter.</p>
                     <p>You'll receive updates about:</p>
                     <ul style="line-height: 1.8; color: #333;">
-                        <li>Upcoming speech therapy sessions</li>
+                        <li>Upcoming speech and debate sessions</li>
                         <li>Success stories from our community</li>
-                        <li>Helpful speech therapy tips</li>
+                        <li>Helpful public speaking tips</li>
                         <li>Special events and volunteer opportunities</li>
                     </ul>
                     <hr style="border: 1px solid #eee;" />
@@ -384,6 +384,10 @@ app.post("/api/register", async (req, res) => {
             email,
             phone,
             sessionType,
+            streetAddress,
+            city,
+            state,
+            zipCode,
             additionalInfo
         } = req.body;
 
@@ -412,7 +416,7 @@ app.post("/api/register", async (req, res) => {
 
         // Create CSV header if file doesn't exist
         if (!fs.existsSync(registrationsFile)) {
-            const header = 'Confirmation,Student First Name,Student Last Name,Grade,Parent Name,Email,Phone,Session Type,Additional Info,Registered At\n';
+            const header = 'Confirmation,Student First Name,Student Last Name,Grade,Parent Name,Email,Phone,Session Type,Street Address,City,State,ZIP,Additional Info,Registered At\n';
             fs.writeFileSync(registrationsFile, header);
         }
 
@@ -436,6 +440,10 @@ app.post("/api/register", async (req, res) => {
             sanitize(email),
             sanitize(phone),
             sanitize(sessionType),
+            sanitize(streetAddress || ''),
+            sanitize(city || ''),
+            sanitize(state || ''),
+            sanitize(zipCode || ''),
             sanitize(additionalInfo || ''),
             sanitize(timestamp)
         ].join(',') + '\n';
@@ -459,6 +467,11 @@ app.post("/api/register", async (req, res) => {
                     <p><strong>Name:</strong> ${parentName}</p>
                     <p><strong>Email:</strong> ${email}</p>
                     <p><strong>Phone:</strong> ${phone}</p>
+
+                    ${streetAddress ? `
+                    <h3 style="color: #333;">Mailing Address</h3>
+                    <p>${streetAddress}<br/>${city}, ${state} ${zipCode}</p>
+                    ` : ''}
 
                     ${additionalInfo ? `
                     <h3 style="color: #333;">Additional Information</h3>
@@ -507,7 +520,7 @@ app.post("/api/register", async (req, res) => {
                         <li>Any additional forms required</li>
                     </ul>
 
-                    <p>If you have any questions, feel free to reply to this email or contact us at <a href="mailto:info@almadenvoices.org" style="color: #2563EB;">info@almadenvoices.org</a>.</p>
+                    <p>If you have any questions, feel free to reply to this email or contact us at <a href="mailto:almadenvoices@gmail.com" style="color: #2563EB;">almadenvoices@gmail.com</a>.</p>
 
                     <hr style="border: 1px solid #eee;" />
                     <p style="color: #666;">Best regards,<br/>Almaden Voices Team</p>
