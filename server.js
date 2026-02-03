@@ -57,7 +57,7 @@ async function generateAccessToken() {
     if (!response.ok) {
         const text = await response.text();
         console.error("Error fetching PayPal access token:", text);
-        throw new Error("Failed to generate PayPal access token");
+        throw new Error("Failed to generate PayPal access token: " + text);
     }
 
     const data = await response.json();
@@ -95,7 +95,7 @@ async function createOrder({ amount, frequency }) {
     if (!response.ok) {
         const text = await response.text();
         console.error("Error creating PayPal order:", text);
-        throw new Error("Failed to create PayPal order");
+        throw new Error("Failed to create PayPal order: " + text);
     }
 
     return response.json();
@@ -814,7 +814,7 @@ app.post("/api/paypal/orders", async (req, res) => {
         res.json({ id: order.id });
     } catch (err) {
         console.error("Create order error:", err);
-        res.status(500).json({ error: "Error creating order" });
+        res.status(500).json({ error: "Error creating order: " + err.message });
     }
 });
 
