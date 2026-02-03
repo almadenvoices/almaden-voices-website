@@ -56,7 +56,7 @@
 
 .sub {
     font-size: clamp(16px, 1.2vw, 18px);
-    color: rgba(255, 255, 255, 0.85);
+    color: #FFFFFF;
     line-height: 1.7;
     margin-bottom: 24px;
 }
@@ -74,13 +74,13 @@
     display: flex;
     gap: 10px;
     align-items: center;
-    color: rgba(255, 255, 255, 0.8);
+    color: #FFFFFF;
     font-size: 15px;
     font-weight: 500;
 }
 
 .bullets li svg {
-    color: rgba(255, 255, 255, 0.9);
+    color: #FFFFFF;
     font-size: 20px;
 }
 
