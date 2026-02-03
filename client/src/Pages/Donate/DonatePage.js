@@ -201,7 +201,7 @@ export default function DonatePage() {
                             </p>
                             <ul className={s.bullets}>
                                 <li>
-                                    <VerifiedIcon /> Tax-deductible · CA nonprofit
+                                    <VerifiedIcon /> Registered California nonprofit
                                 </li>
                                 <li>
                                     <ShieldIcon /> All online payments are processed securely by
@@ -351,10 +351,10 @@ export default function DonatePage() {
                             )}
 
                             <p className={s.legal}>
-                                Almaden Voices is a California nonprofit.
-                                Contributions are tax-deductible to the extent allowed by law.
-                                You’ll receive an email receipt for your records when you pay
-                                online via PayPal.
+                                Almaden Voices is a registered California nonprofit.
+                                We are currently pursuing 501(c)(3) status — donations are not
+                                tax-deductible at this time. You'll receive a confirmation
+                                receipt via PayPal when you pay online.
                             </p>
                         </div>
                     </div>
