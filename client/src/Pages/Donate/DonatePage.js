@@ -15,7 +15,7 @@ import SendIcon from "@mui/icons-material/Send";
 const API_BASE_URL = "";
 
 // Use your real PayPal CLIENT ID (same as backend env)
-const PAYPAL_CLIENT_ID = "Ae6F40G7NNDTFDTJt57-bGBewNA_Gc9eBYUQVDlgeBHjY14q8HyCBVe7739I2zZ9STIykDc6NSctXudt";
+const PAYPAL_CLIENT_ID = "AXjQeGEP8yRg32Ze14iVZFB24aYw37Gp8M3udPPwRewK3etierQ7tmSGnU3LI8ZNskzhjpgJMgBWERoZ";
 
 /**
  * Dynamically load PayPal JS SDK script
