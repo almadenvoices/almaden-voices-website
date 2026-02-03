@@ -54,6 +54,9 @@ export default function DonatePage() {
     const [custom, setCustom] = useState("");
     const [freq, setFreq] = useState("monthly"); // 'once' | 'monthly'
 
+    // cover processing fee
+    const [coverFee, setCoverFee] = useState(true);
+
     // "online" = PayPal (handles PayPal wallet + Visa/Mastercard/Amex)
     // "check"  = offline check by mail
     const [method, setMethod] = useState("online");
@@ -66,6 +69,15 @@ export default function DonatePage() {
         const v = Number(custom || amount);
         return isFinite(v) && v > 0 ? v : 0;
     }, [amount, custom]);
+
+    // PayPal fee: 2.89% + $0.49. Inverse formula ensures full amount reaches us.
+    const feeAmount = useMemo(() => {
+        if (!displayAmount) return 0;
+        const total = (displayAmount + 0.49) / (1 - 0.0289);
+        return Math.round((total - displayAmount) * 100) / 100;
+    }, [displayAmount]);
+
+    const chargeAmount = coverFee ? Math.round((displayAmount + feeAmount) * 100) / 100 : displayAmount;
 
     const handlePreset = (val) => {
         setCustom("");
@@ -113,7 +125,7 @@ export default function DonatePage() {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify({
-                            amount: displayAmount,
+                            amount: chargeAmount,
                             frequency: freq
                         })
                     })
@@ -169,7 +181,7 @@ export default function DonatePage() {
                 }
             })
             .render("#paypal-buttons-container");
-    }, [paypalLoaded, method, displayAmount, freq]);
+    }, [paypalLoaded, method, displayAmount, chargeAmount, freq]);
 
     function handleCheckSubmit(e) {
         e.preventDefault();
@@ -263,6 +275,35 @@ export default function DonatePage() {
                                     />
                                 </div>
                             </div>
+
+                            {/* cover processing fee */}
+                            {displayAmount > 0 && (
+                                <div
+                                    className={s.coverFee}
+                                    onClick={() => setCoverFee(!coverFee)}
+                                    role="button"
+                                    tabIndex={0}
+                                >
+                                    <input
+                                        type="checkbox"
+                                        checked={coverFee}
+                                        onChange={(e) => setCoverFee(e.target.checked)}
+                                        className={s.coverFeeCheck}
+                                    />
+                                    <div className={s.coverFeeText}>
+                                        <strong>
+                                            I'll cover the ${feeAmount.toFixed(2)} processing fee so 100% of
+                                            my ${displayAmount} donation reaches Almaden Voices.
+                                        </strong>
+                                        <span className={s.coverFeeDetail}>
+                                            {coverFee
+                                                ? `You'll be charged $${chargeAmount.toFixed(2)} — every dollar of your $${displayAmount} donation goes directly to students.`
+                                                : `Without fee coverage, approximately $${(displayAmount - feeAmount).toFixed(2)} of your $${displayAmount} donation will reach us.`
+                                            }
+                                        </span>
+                                    </div>
+                                </div>
+                            )}
 
                             {/* payment method toggle */}
                             <div className={s.methods}>
