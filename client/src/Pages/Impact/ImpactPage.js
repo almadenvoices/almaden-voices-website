@@ -6,11 +6,11 @@ import { motion, AnimatePresence } from "framer-motion";
 const studentVideos = [
     {
         name: "Noah",
-        video: "/images/noah-testimonial.mov",
+        video: "/images/noah-testimonial.mp4",
     },
     {
         name: "Oscar",
-        video: "/images/oscar-testimonial.mov",
+        video: "/images/oscar-testimonial.mp4",
     },
 ];
 
@@ -269,7 +269,6 @@ export default function ImpactPage() {
                                             borderRadius: "12px 12px 0 0",
                                         }}
                                     >
-                                        <source src={video.video} type="video/quicktime" />
                                         <source src={video.video} type="video/mp4" />
                                         Your browser does not support the video tag.
                                     </video>
