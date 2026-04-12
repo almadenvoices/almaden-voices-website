@@ -7,31 +7,56 @@ const fetch = require("node-fetch");
 const nodemailer = require("nodemailer");
 const fs = require("fs");
 const crypto = require("crypto");
+const { Storage } = require("@google-cloud/storage");
 const { initConfig } = require("./config");
+
+// Google Cloud Storage for persistent registration data
+const GCS_BUCKET = "almaden-voices-data";
+const GCS_FILE = "registrations.csv";
+const storage = new Storage();
+
+async function downloadRegistrationsFromGCS() {
+    try {
+        const registrationsFile = path.join(__dirname, 'registrations.csv');
+        await storage.bucket(GCS_BUCKET).file(GCS_FILE).download({ destination: registrationsFile });
+        console.log("Downloaded registrations.csv from GCS");
+    } catch (err) {
+        if (err.code === 404) {
+            console.log("No registrations.csv in GCS yet — starting fresh");
+        } else {
+            console.error("Error downloading registrations from GCS:", err.message);
+        }
+    }
+}
+
+async function uploadRegistrationsToGCS() {
+    try {
+        const registrationsFile = path.join(__dirname, 'registrations.csv');
+        await storage.bucket(GCS_BUCKET).upload(registrationsFile, { destination: GCS_FILE });
+        console.log("Uploaded registrations.csv to GCS");
+    } catch (err) {
+        console.error("Error uploading registrations to GCS:", err.message);
+    }
+}
 
 const app = express();
 
 const PORT = process.env.PORT || 5001;
-const PAYPAL_CLIENT_ID = process.env.PAYPAL_CLIENT_ID;
-const PAYPAL_CLIENT_SECRET = process.env.PAYPAL_CLIENT_SECRET;
-const PAYPAL_ENV = process.env.PAYPAL_ENV || "sandbox"; // "live" in production
 
-// Email configuration
-const EMAIL_USER = process.env.EMAIL_USER;
-const EMAIL_PASS = process.env.EMAIL_PASS;
-const EMAIL_TO = process.env.EMAIL_TO || "almadenvoices@gmail.com";
-const BASE_URL = process.env.BASE_URL || `http://localhost:${process.env.PORT || 5001}`;
-
-if (!PAYPAL_CLIENT_ID || !PAYPAL_CLIENT_SECRET) {
-    console.warn(
-        "⚠️ Missing PAYPAL_CLIENT_ID or PAYPAL_CLIENT_SECRET env vars. PayPal routes will fail until configured."
-    );
+// Read PayPal config dynamically since env vars are loaded asynchronously by initConfig()
+function getPayPalConfig() {
+    const env = process.env.PAYPAL_ENV || "sandbox";
+    return {
+        clientId: process.env.PAYPAL_CLIENT_ID,
+        clientSecret: process.env.PAYPAL_CLIENT_SECRET,
+        env,
+        base: env === "live" ? "https://api-m.paypal.com" : "https://api-m.sandbox.paypal.com"
+    };
 }
 
-const PAYPAL_BASE =
-    PAYPAL_ENV === "live"
-        ? "https://api-m.paypal.com"
-        : "https://api-m.sandbox.paypal.com";
+// Email configuration
+const EMAIL_TO = process.env.EMAIL_TO || "almadenvoices@gmail.com";
+const BASE_URL = process.env.BASE_URL || (process.env.NODE_ENV === 'production' ? 'https://almadenvoices.org' : `http://localhost:${process.env.PORT || 5001}`);
 
 // ---------- middleware ----------
 
@@ -41,11 +66,13 @@ app.use(express.json());
 // ---------- PayPal helpers ----------
 
 async function generateAccessToken() {
-    const auth = Buffer.from(
-        `${PAYPAL_CLIENT_ID}:${PAYPAL_CLIENT_SECRET}`
-    ).toString("base64");
+    const { clientId, clientSecret, base } = getPayPalConfig();
+    if (!clientId || !clientSecret) {
+        throw new Error("PayPal credentials not configured (PAYPAL_CLIENT_ID/PAYPAL_CLIENT_SECRET missing)");
+    }
+    const auth = Buffer.from(`${clientId}:${clientSecret}`).toString("base64");
 
-    const response = await fetch(`${PAYPAL_BASE}/v1/oauth2/token`, {
+    const response = await fetch(`${base}/v1/oauth2/token`, {
         method: "POST",
         headers: {
             Authorization: `Basic ${auth}`,
@@ -83,7 +110,8 @@ async function createOrder({ amount, frequency }) {
         ]
     };
 
-    const response = await fetch(`${PAYPAL_BASE}/v2/checkout/orders`, {
+    const { base } = getPayPalConfig();
+    const response = await fetch(`${base}/v2/checkout/orders`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -103,9 +131,10 @@ async function createOrder({ amount, frequency }) {
 
 async function captureOrder(orderID) {
     const accessToken = await generateAccessToken();
+    const { base } = getPayPalConfig();
 
     const response = await fetch(
-        `${PAYPAL_BASE}/v2/checkout/orders/${orderID}/capture`,
+        `${base}/v2/checkout/orders/${orderID}/capture`,
         {
             method: "POST",
             headers: {
@@ -127,10 +156,12 @@ async function captureOrder(orderID) {
 // ---------- Email transporter ----------
 // Note: This will be initialized after config loads in startServer()
 let emailTransporter = null;
+let EMAIL_USER = null;
+let EMAIL_PASS = null;
 
 function initializeEmailTransporter() {
-    const EMAIL_USER = process.env.EMAIL_USER;
-    const EMAIL_PASS = process.env.EMAIL_PASS;
+    EMAIL_USER = process.env.EMAIL_USER;
+    EMAIL_PASS = process.env.EMAIL_PASS;
 
     if (EMAIL_USER && EMAIL_PASS) {
         emailTransporter = nodemailer.createTransport({
@@ -377,10 +408,9 @@ app.post("/api/subscribe", async (req, res) => {
 app.post("/api/register", async (req, res) => {
     try {
         const {
-            studentFirstName,
-            studentLastName,
-            gradeLevel,
-            parentName,
+            students,
+            parentFirstName,
+            parentLastName,
             email,
             phone,
             sessionType,
@@ -392,8 +422,66 @@ app.post("/api/register", async (req, res) => {
         } = req.body;
 
         // Validate required fields
-        if (!studentFirstName || !studentLastName || !gradeLevel || !parentName || !email || !phone || !sessionType) {
+        if (!students || !Array.isArray(students) || students.length === 0 || !parentFirstName || !parentLastName || !email || !phone || !sessionType) {
             return res.status(400).json({ error: "Missing required fields" });
+        }
+
+        if (students.length > 5) {
+            return res.status(400).json({ error: "Maximum 5 children per registration" });
+        }
+
+        // Validate each student
+        for (const st of students) {
+            if (!st.firstName || !st.lastName || !st.gradeLevel) {
+                return res.status(400).json({ error: "Each child must have a first name, last name, and grade level" });
+            }
+        }
+
+        // Reject if parent name matches any student name (common data-entry mistake)
+        const normalizeName = (s) => (s || "").trim().toLowerCase().replace(/\s+/g, " ");
+        const parentFullName = `${normalizeName(parentFirstName)} ${normalizeName(parentLastName)}`;
+        const conflictingStudent = students.find(st =>
+            `${normalizeName(st.firstName)} ${normalizeName(st.lastName)}` === parentFullName
+        );
+        if (conflictingStudent) {
+            return res.status(400).json({ error: "Parent/guardian name cannot be the same as the child's name. Please enter the parent's actual name." });
+        }
+
+        // Duplicate prevention: reject if this email already registered
+        // the same student(s) for the same session
+        const existingFile = path.join(__dirname, 'registrations.csv');
+        if (fs.existsSync(existingFile)) {
+            const existingContent = fs.readFileSync(existingFile, 'utf-8');
+            const existingLines = existingContent.split('\n').filter(l => l.trim()).slice(1);
+            const normalizedEmail = (email || '').trim().toLowerCase();
+            const parseCSV = (line) => {
+                const fields = [];
+                let cur = '', inQ = false;
+                for (let i = 0; i < line.length; i++) {
+                    const c = line[i];
+                    if (c === '"') inQ = !inQ;
+                    else if (c === ',' && !inQ) { fields.push(cur); cur = ''; }
+                    else cur += c;
+                }
+                fields.push(cur);
+                return fields;
+            };
+            for (const line of existingLines) {
+                const f = parseCSV(line);
+                // columns: Confirmation,FN,LN,Grade,PFN,PLN,Email,Phone,Session...
+                const existingEmail = (f[6] || '').trim().toLowerCase();
+                const existingSession = (f[8] || '').trim();
+                const existingFirst = (f[1] || '').trim().toLowerCase();
+                if (existingEmail === normalizedEmail && existingSession === sessionType) {
+                    for (const st of students) {
+                        if ((st.firstName || '').trim().toLowerCase() === existingFirst) {
+                            return res.status(409).json({
+                                error: `${st.firstName} is already registered for this workshop under this email. If you need to make changes, please contact us at almadenvoices@gmail.com.`
+                            });
+                        }
+                    }
+                }
+            }
         }
 
         // Generate confirmation number
@@ -406,17 +494,28 @@ app.post("/api/register", async (req, res) => {
             'debate': 'Debate',
             'leadership': 'Leadership Workshop',
             'storytelling': 'Storytelling',
-            'communication': 'Communication Skills'
+            'communication': 'Communication Skills',
+            'av-workshop-march24-2026': 'Free Public Speaking Workshop (March 24 & 25, 2026)',
+            'av-workshop-april8-2026': 'Free Public Speaking Workshop (April 8 & 9, 2026)'
         };
 
         const sessionLabel = sessionLabels[sessionType] || sessionType;
+
+        // Grade suffix helper
+        const gradeSuffix = (g) => {
+            const n = parseInt(g);
+            if (n === 1) return '1st';
+            if (n === 2) return '2nd';
+            if (n === 3) return '3rd';
+            return `${n}th`;
+        };
 
         // Path to registrations file
         const registrationsFile = path.join(__dirname, 'registrations.csv');
 
         // Create CSV header if file doesn't exist
         if (!fs.existsSync(registrationsFile)) {
-            const header = 'Confirmation,Student First Name,Student Last Name,Grade,Parent Name,Email,Phone,Session Type,Street Address,City,State,ZIP,Additional Info,Registered At\n';
+            const header = 'Confirmation,Student First Name,Student Last Name,Grade,Parent First Name,Parent Last Name,Email,Phone,Session Type,Street Address,City,State,ZIP,Additional Info,Registered At\n';
             fs.writeFileSync(registrationsFile, header);
         }
 
@@ -430,41 +529,52 @@ app.post("/api/register", async (req, res) => {
             return str;
         };
 
-        // Add registration to CSV
-        const newRegistration = [
-            sanitize(confirmationNumber),
-            sanitize(studentFirstName),
-            sanitize(studentLastName),
-            sanitize(gradeLevel),
-            sanitize(parentName),
-            sanitize(email),
-            sanitize(phone),
-            sanitize(sessionType),
-            sanitize(streetAddress || ''),
-            sanitize(city || ''),
-            sanitize(state || ''),
-            sanitize(zipCode || ''),
-            sanitize(additionalInfo || ''),
-            sanitize(timestamp)
-        ].join(',') + '\n';
+        // Add one CSV row per student (each counts as one seat)
+        for (const st of students) {
+            const row = [
+                sanitize(confirmationNumber),
+                sanitize(st.firstName),
+                sanitize(st.lastName),
+                sanitize(st.gradeLevel),
+                sanitize(parentFirstName),
+                sanitize(parentLastName),
+                sanitize(email),
+                sanitize(phone),
+                sanitize(sessionType),
+                sanitize(streetAddress || ''),
+                sanitize(city || ''),
+                sanitize(state || ''),
+                sanitize(zipCode || ''),
+                sanitize(additionalInfo || ''),
+                sanitize(timestamp)
+            ].join(',') + '\n';
+            fs.appendFileSync(registrationsFile, row);
+        }
 
-        fs.appendFileSync(registrationsFile, newRegistration);
+        // Persist to GCS so counts survive deploys
+        uploadRegistrationsToGCS().catch(err => console.error("GCS upload failed:", err.message));
+
+        // Build student list for emails
+        const studentListHtml = students.map(st =>
+            `<li><strong>${st.firstName} ${st.lastName}</strong> — ${gradeSuffix(st.gradeLevel)} Grade</li>`
+        ).join('');
+        const studentNames = students.map(st => `${st.firstName} ${st.lastName}`).join(', ');
+        const childWord = students.length === 1 ? 'child' : `${students.length} children`;
 
         // Send notification email to admin
         if (emailTransporter) {
             const adminEmailHtml = `
                 <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-                    <h2 style="color: #2563EB;">New Session Registration</h2>
+                    <h2 style="color: #2563EB;">New Session Registration (${childWord})</h2>
                     <p><strong>Confirmation Number:</strong> ${confirmationNumber}</p>
                     <hr style="border: 1px solid #eee;" />
 
-                    <h3 style="color: #333;">Student Information</h3>
-                    <p><strong>Name:</strong> ${studentFirstName} ${studentLastName}</p>
-                    <p><strong>Grade Level:</strong> ${gradeLevel}th Grade</p>
+                    <h3 style="color: #333;">Student${students.length > 1 ? 's' : ''} Registered</h3>
+                    <ul style="line-height: 1.8;">${studentListHtml}</ul>
                     <p><strong>Session:</strong> ${sessionLabel}</p>
 
                     <h3 style="color: #333;">Parent/Guardian Information</h3>
-                    <p><strong>Name:</strong> ${parentName}</p>
+                    <p><strong>Name:</strong> ${parentFirstName} ${parentLastName}</p>
                     <p><strong>Email:</strong> ${email}</p>
                     <p><strong>Phone:</strong> ${phone}</p>
 
@@ -485,9 +595,9 @@ app.post("/api/register", async (req, res) => {
 
             await emailTransporter.sendMail({
                 from: `"Almaden Voices Registrations" <${EMAIL_USER}>`,
-                replyTo: `"${parentName}" <${email}>`,
+                replyTo: `"${parentFirstName} ${parentLastName}" <${email}>`,
                 to: EMAIL_TO,
-                subject: `New Registration: ${studentFirstName} ${studentLastName} - ${sessionLabel} - ${confirmationNumber}`,
+                subject: `New Registration (${childWord}): ${studentNames} - ${sessionLabel} - ${confirmationNumber}`,
                 html: adminEmailHtml
             });
         }
@@ -497,8 +607,8 @@ app.post("/api/register", async (req, res) => {
             const parentEmailHtml = `
                 <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
                     <h2 style="color: #2563EB;">Registration Confirmed!</h2>
-                    <p>Dear ${parentName},</p>
-                    <p>Thank you for registering ${studentFirstName} for our <strong>${sessionLabel}</strong> program!</p>
+                    <p>Dear ${parentFirstName} ${parentLastName},</p>
+                    <p>Thank you for registering ${students.length === 1 ? students[0].firstName : 'your children'} for our <strong>${sessionLabel}</strong>! ${students.length === 1 ? 'Your spot is' : 'Your spots are'} confirmed.</p>
 
                     <div style="background: #f0f9ff; padding: 20px; border-radius: 10px; margin: 20px 0;">
                         <p style="margin: 0 0 10px;"><strong>Confirmation Number:</strong></p>
@@ -507,18 +617,17 @@ app.post("/api/register", async (req, res) => {
 
                     <h3 style="color: #333;">Registration Details</h3>
                     <ul style="line-height: 1.8; color: #333;">
-                        <li><strong>Student:</strong> ${studentFirstName} ${studentLastName}</li>
-                        <li><strong>Grade:</strong> ${gradeLevel}th Grade</li>
-                        <li><strong>Program:</strong> ${sessionLabel}</li>
+                        ${studentListHtml}
                     </ul>
+                    <p style="color: #333;"><strong>Program:</strong> ${sessionLabel}</p>
 
-                    <h3 style="color: #333;">What's Next?</h3>
-                    <p>Our team will review your registration and contact you within 2-3 business days with:</p>
+                    <h3 style="color: #333;">Workshop Details</h3>
                     <ul style="line-height: 1.8; color: #333;">
-                        <li>Session schedule and location details</li>
-                        <li>Materials needed for the program</li>
-                        <li>Any additional forms required</li>
+                        <li><strong>When:</strong> Wednesday, April 8th & Thursday, April 9th, 2026</li>
+                        <li><strong>Time:</strong> 1:00 – 4:00 PM (3 hours each day)</li>
+                        <li><strong>Where:</strong> Almaden Library Community Center, 6445 Camden Ave, San Jose, CA 95120</li>
                     </ul>
+                    <p style="color: #333;">Students are welcome to attend one or both sessions, but attending both is highly recommended for the best experience. At the end, your child will showcase their skills in a final speech!</p>
 
                     <p>If you have any questions, feel free to reply to this email or contact us at <a href="mailto:almadenvoices@gmail.com" style="color: #2563EB;">almadenvoices@gmail.com</a>.</p>
 
@@ -538,6 +647,7 @@ app.post("/api/register", async (req, res) => {
         res.json({
             success: true,
             confirmationNumber,
+            studentCount: students.length,
             message: "Registration submitted successfully!"
         });
 
@@ -800,15 +910,16 @@ app.get("/unsubscribe", async (req, res) => {
 
 // Temporary debug endpoint — remove after fixing PayPal
 app.get("/api/paypal/debug", async (req, res) => {
-    const id = PAYPAL_CLIENT_ID || "(not set)";
-    const secret = PAYPAL_CLIENT_SECRET || "(not set)";
+    const cfg = getPayPalConfig();
+    const id = cfg.clientId || "(not set)";
+    const secret = cfg.clientSecret || "(not set)";
     const info = {
         clientIdFirst10: id.substring(0, 10) + "...",
         secretFirst10: secret.substring(0, 10) + "...",
         clientIdLength: id.length,
         secretLength: secret.length,
-        env: PAYPAL_ENV,
-        base: PAYPAL_BASE
+        env: cfg.env,
+        base: cfg.base
     };
     try {
         const token = await generateAccessToken();
@@ -817,6 +928,70 @@ app.get("/api/paypal/debug", async (req, res) => {
         info.authTest = "FAILED — " + err.message;
     }
     res.json(info);
+});
+
+// Get enrollment counts per session from registrations.csv
+app.get("/api/sessions/enrollment", (req, res) => {
+    try {
+        const registrationsFile = path.join(__dirname, 'registrations.csv');
+
+        if (!fs.existsSync(registrationsFile)) {
+            return res.json({});
+        }
+
+        const fileContent = fs.readFileSync(registrationsFile, 'utf-8');
+        const lines = fileContent.split('\n').filter(line => line.trim());
+
+        if (lines.length < 2) {
+            return res.json({});
+        }
+
+        // Parse CSV fields helper
+        const parseCSVLine = (line) => {
+            const fields = [];
+            let current = '';
+            let inQuotes = false;
+            for (let i = 0; i < line.length; i++) {
+                const ch = line[i];
+                if (ch === '"') {
+                    inQuotes = !inQuotes;
+                } else if (ch === ',' && !inQuotes) {
+                    fields.push(current);
+                    current = '';
+                } else {
+                    current += ch;
+                }
+            }
+            fields.push(current);
+            return fields;
+        };
+
+        // Detect session type column from header
+        const headerFields = parseCSVLine(lines[0]);
+        const sessionColIndex = headerFields.findIndex(h => h.trim().toLowerCase() === 'session type');
+
+        if (sessionColIndex === -1) {
+            return res.json({});
+        }
+
+        // Skip header row
+        const dataLines = lines.slice(1);
+
+        // Count registrations per session
+        const counts = {};
+        for (const line of dataLines) {
+            const fields = parseCSVLine(line);
+            const sessionId = (fields[sessionColIndex] || '').trim();
+            if (sessionId) {
+                counts[sessionId] = (counts[sessionId] || 0) + 1;
+            }
+        }
+
+        res.json(counts);
+    } catch (err) {
+        console.error("Enrollment count error:", err);
+        res.status(500).json({ error: "Error fetching enrollment data" });
+    }
 });
 
 app.post("/api/paypal/orders", async (req, res) => {
@@ -876,6 +1051,9 @@ async function startServer() {
 
         // Initialize email transporter AFTER config is loaded
         initializeEmailTransporter();
+
+        // Download persistent registrations from GCS
+        await downloadRegistrationsFromGCS();
 
         // Start the server
         app.listen(PORT, () => {

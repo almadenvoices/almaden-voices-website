@@ -16,7 +16,7 @@
 }
 
 /* Header above card */
-.hero{ padding: clamp(40px, 6vw, 80px) 0 clamp(24px, 4vw, 48px); }
+.hero{ padding: clamp(20px, 3vw, 36px) 0 clamp(12px, 2vw, 20px); }
 .heroTitle{
     font-family: 'Playfair Display', Georgia, serif;
     font-size: var(--c-h1);
@@ -40,16 +40,16 @@
     border: 1px solid #E5E7EB;
     border-radius: 24px;
     box-shadow: 0 4px 24px rgba(0,0,0,.06);
-    margin: 0 auto clamp(32px, 5vw, 64px);
-    padding: clamp(28px, 4vw, 48px);
+    margin: 0 auto clamp(16px, 2vw, 24px);
+    padding: clamp(20px, 2.5vw, 32px);
     max-width: min(1400px, 1320px);
     display: grid;
-    gap: clamp(24px, 3vw, 40px);
+    gap: clamp(16px, 2vw, 24px);
     grid-template-columns: 1fr;
 }
 
 /* Left rail */
-.info{ display:flex; flex-direction:column; gap: clamp(24px, 3vw, 36px); }
+.info{ display:flex; flex-direction:column; gap: clamp(12px, 1.5vw, 20px); }
 .block h3{
     margin:0 0 8px;
     font-weight:700;
@@ -66,7 +66,7 @@
 
 /* Form side */
 .form{ width:100%; max-width: 600px; margin: 0 auto; }
-.field{ display:flex; flex-direction:column; gap:8px }
+.field{ display:flex; flex-direction:column; gap:4px }
 .req{ color: #2563EB; font-weight:700 }
 .field label{
     font-weight:600;
@@ -76,7 +76,7 @@
 
 /* Inputs / Textarea */
 .field input{
-    height: clamp(48px, 3.1vw, 52px);
+    height: clamp(40px, 2.8vw, 44px);
     border: 2px solid #E5E7EB;
     background: #FFFFFF;
     color: #111827;
@@ -88,7 +88,7 @@
     transition: border-color 0.2s ease;
 }
 .field textarea{
-    min-height: clamp(140px, 12vw, 180px);
+    min-height: clamp(80px, 8vw, 100px);
     border: 2px solid #E5E7EB;
     background: #FFFFFF;
     color: #111827;
@@ -111,7 +111,7 @@
 /* Phone row (country + number) */
 .phoneRow{ display:grid; grid-template-columns: clamp(84px, 8vw, 110px) 1fr; gap: 12px }
 .select{
-    height: clamp(48px, 3.1vw, 52px);
+    height: clamp(40px, 2.8vw, 44px);
     border: 2px solid #E5E7EB;
     border-radius: 12px;
     background: #FFFFFF;
@@ -127,11 +127,11 @@
 }
 
 /* Grids */
-.grid{ display:grid; gap: clamp(16px, 1.6vw, 24px) }
+.grid{ display:grid; gap: clamp(10px, 1.2vw, 16px) }
 .grid3{ grid-template-columns: 1fr }
 .grid1{ grid-template-columns: 1fr }
 .fullWidth{ grid-column: 1 / -1 }
-.actions{ grid-template-columns: 1fr; align-items:center; gap: clamp(16px, 2vw, 24px); margin-top: 8px; }
+.actions{ grid-template-columns: 1fr; align-items:center; gap: clamp(10px, 1.2vw, 16px); margin-top: 4px; }
 
 /* Checkbox + button */
 .check{
@@ -151,7 +151,7 @@
     align-items:center;
     justify-content:center;
     gap:10px;
-    height: clamp(52px, 3.4vw, 56px);
+    height: clamp(42px, 2.8vw, 46px);
     padding: 0 clamp(20px, 2.5vw, 28px);
     border: 0;
     border-radius: 12px;
@@ -219,6 +219,14 @@
 @keyframes toastIn{ to{ bottom:24px; opacity:1; transform:translateX(-50%) translateY(0) } }
 @keyframes toastOut{ to{ bottom:-60px; opacity:0 } }
 
+.successOverlay{
+    animation: successFadeIn .4s ease;
+}
+@keyframes successFadeIn{
+    from{ opacity:0; transform:scale(.96) }
+    to{ opacity:1; transform:scale(1) }
+}
+
 /* ====== Desktop layout ====== */
 @media (min-width: 900px){
     .card{
@@ -233,5 +241,5 @@
 
 /* ====== Very large screens (≥1440px) ====== */
 @media (min-width: 1440px){
-    .card{ padding: 56px; }
+    .card{ padding: 36px; }
 }

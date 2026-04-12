@@ -49,10 +49,14 @@ function usePayPalScript() {
 }
 
 export default function DonatePage() {
+    // Check for pre-filled amount from URL (e.g., /donate?amount=5)
+    const urlParams = new URLSearchParams(window.location.search);
+    const prefilledAmount = Number(urlParams.get("amount"));
+
     // amount + frequency
-    const [amount, setAmount] = useState(50);
-    const [custom, setCustom] = useState("");
-    const [freq, setFreq] = useState("monthly"); // 'once' | 'monthly'
+    const [amount, setAmount] = useState(prefilledAmount > 0 ? prefilledAmount : 50);
+    const [custom, setCustom] = useState(prefilledAmount > 0 && ![10, 25, 50, 100].includes(prefilledAmount) ? String(prefilledAmount) : "");
+    const [freq, setFreq] = useState(prefilledAmount > 0 ? "once" : "monthly"); // 'once' | 'monthly'
 
     // cover processing fee
     const [coverFee, setCoverFee] = useState(true);
@@ -213,13 +217,19 @@ export default function DonatePage() {
                             </p>
                             <ul className={s.bullets}>
                                 <li>
-                                    <VerifiedIcon /> Registered California nonprofit
+                                    <VerifiedIcon /> Registered California nonprofit (EIN: 39-4978818)
                                 </li>
                                 <li>
                                     <ShieldIcon /> All online payments are processed securely by
                                     PayPal.
                                 </li>
                             </ul>
+                            <p className={s.legal} style={{ color: 'rgba(255,255,255,0.7)', textAlign: 'left' }}>
+                                Almaden Voices is a registered California nonprofit (EIN: 39-4978818).
+                                We are currently pursuing 501(c)(3) status — donations are not
+                                tax-deductible at this time. You'll receive a confirmation
+                                receipt via PayPal when you pay online.
+                            </p>
                         </div>
 
                         {/* DONATE CARD */}
@@ -368,35 +378,26 @@ export default function DonatePage() {
 
                             {/* OFFLINE: Check by Mail */}
                             {method === "check" && (
-                                <form onSubmit={handleCheckSubmit}>
-                                    <div className={s.options}>
-                                        <label className={s.chk}>
-                                            <input type="checkbox" /> Give anonymously
-                                        </label>
-                                        <textarea
-                                            className={s.note}
-                                            rows="3"
-                                            placeholder="Add an optional note or dedication…"
-                                        />
-                                    </div>
-
-                                    <button
-                                        type="submit"
-                                        className={s.payBtn}
-                                        disabled={!displayAmount}
-                                    >
-                                        <span>See check mailing instructions</span>
-                                        <SendIcon fontSize="small" />
-                                    </button>
-                                </form>
+                                <div style={{
+                                    backgroundColor: '#F9FAFB',
+                                    borderRadius: 12,
+                                    padding: '14px 18px',
+                                    fontSize: 14,
+                                    color: '#374151',
+                                    lineHeight: 1.7,
+                                }}>
+                                    <p style={{ fontWeight: 700, marginBottom: 8 }}>To donate by check:</p>
+                                    <ol style={{ margin: 0, paddingLeft: 20 }}>
+                                        <li>Make your check payable to: <strong>Almaden Voices</strong></li>
+                                        {displayAmount > 0 && <li>Amount: <strong>${displayAmount.toFixed(2)}</strong></li>}
+                                        <li>Mail to: <strong>PO Box 1234, San Jose, CA 95120</strong></li>
+                                    </ol>
+                                    <p style={{ marginTop: 8, fontSize: 13, color: '#6B7280' }}>
+                                        Include your email if you'd like a digital receipt. Thank you for your support!
+                                    </p>
+                                </div>
                             )}
 
-                            <p className={s.legal}>
-                                Almaden Voices is a registered California nonprofit.
-                                We are currently pursuing 501(c)(3) status — donations are not
-                                tax-deductible at this time. You'll receive a confirmation
-                                receipt via PayPal when you pay online.
-                            </p>
                         </div>
                     </div>
                 </div>
