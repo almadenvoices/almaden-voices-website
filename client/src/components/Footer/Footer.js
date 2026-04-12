@@ -71,6 +71,7 @@
 
 
 import React, { useState } from 'react';
+import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 
 const Footer = () => {
     const [email, setEmail] = useState('');
@@ -270,7 +271,7 @@ const Footer = () => {
                             color: '#6B7280',
                             marginBottom: '20px'
                         }}>
-                            A non-profit organization dedicated to empowering
+                            A non-profit organization (EIN: 39-4978818) dedicated to empowering
                             young voices through free speech and debate programs for children in our community.
                         </p>
 
@@ -589,7 +590,7 @@ const Footer = () => {
                             onMouseEnter={(e) => e.currentTarget.style.color = '#2563EB'}
                             onMouseLeave={(e) => e.currentTarget.style.color = '#6B7280'}
                         >
-                            Terms of Service
+                            Terms of Service <OpenInNewIcon sx={{ fontSize: 14, verticalAlign: 'middle', ml: 0.5 }} />
                         </a>
                         <a
                             href="/docs/privacy-policy.html"
@@ -604,7 +605,7 @@ const Footer = () => {
                             onMouseEnter={(e) => e.currentTarget.style.color = '#2563EB'}
                             onMouseLeave={(e) => e.currentTarget.style.color = '#6B7280'}
                         >
-                            Privacy Policy
+                            Privacy Policy <OpenInNewIcon sx={{ fontSize: 14, verticalAlign: 'middle', ml: 0.5 }} />
                         </a>
                     </div>
                 </div>

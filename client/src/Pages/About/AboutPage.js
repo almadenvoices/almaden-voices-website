@@ -26,22 +26,22 @@ const founder = {
 
 const boardMembers = [
     {
-        name: "Sarah Johnson",
-        role: "Board Chair",
-        intro: "Sarah brings over 15 years of experience in nonprofit leadership and community development. She is passionate about empowering youth through communication skills.",
-        photo: "https://randomuser.me/api/portraits/women/32.jpg",
+        name: "Suchita Shirke",
+        role: "Board Director",
+        intro: "Suchita is a seasoned engineering leader with over 14 years of experience at companies like PayPal and BILL. She specializes in fraud risk management, data security, and building high-performance teams, and is passionate about mentoring women in tech. Her dedication to empowering the next generation through education and leadership drew her to Almaden Voices.",
+        photo: "/images/suchita-shirke.png",
     },
     {
-        name: "Michael Chen",
-        role: "Board Treasurer",
-        intro: "Michael is a CPA with expertise in nonprofit financial management. He ensures Almaden Voices maintains strong fiscal responsibility and transparency.",
-        photo: "https://randomuser.me/api/portraits/men/52.jpg",
+        name: "Amit Bansal",
+        role: "Board Director",
+        intro: "Amit is a Staff Engineer at PayPal specializing in identity and access management. With nearly two decades of experience at companies like eBay, Oracle, and Cisco, he is passionate about crafting exceptional user experiences and frontend architecture. His belief in building confidence in young people through communication skills inspired him to join Almaden Voices.",
+        photo: "/images/amit-bansal.png",
     },
     {
-        name: "Emily Rodriguez",
-        role: "Board Secretary",
-        intro: "Emily is an educator with a background in speech and debate coaching. She advocates for inclusive programs that help every child find their voice.",
-        photo: "https://randomuser.me/api/portraits/women/68.jpg",
+        name: "Aditi Mittal",
+        role: "Board Director",
+        intro: "Aditi Mittal is an expert Web Developer and Engineering Leader based in New York. With a B.Tech in IT and a Master's in Business Management, she blends technical expertise with strategic oversight to deliver scalable, user-centric applications. She also volunteers at her local fire station and is passionate about giving back — which brought her to Almaden Voices.",
+        photo: "/images/aditi-mittal.png",
     },
 ];
 
@@ -192,9 +192,10 @@ function MeetTheTeam() {
                                         alt={member.name}
                                         sx={{
                                             width: 200,
-                                            height: 240,
+                                            height: 200,
                                             objectFit: "cover",
-                                            borderRadius: 2,
+                                            borderRadius: "50%",
+                                            border: "3px solid #111827",
                                             boxShadow: "0 4px 16px rgba(0,0,0,0.1)",
                                         }}
                                     />
@@ -268,7 +269,7 @@ export default function AboutPage() {
                                     mb: 3
                                 }}
                             >
-                                Almaden Voices is a non-profit organization dedicated to empowering young voices in our community. We believe that every child deserves the confidence to speak up and be heard.
+                                Almaden Voices is a non-profit organization (EIN: 39-4978818) dedicated to empowering young voices in our community. We believe that every child deserves the confidence to speak up and be heard.
                             </Typography>
                             <Typography
                                 variant="body1"

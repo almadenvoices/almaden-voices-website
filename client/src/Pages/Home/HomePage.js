@@ -26,7 +26,7 @@ const heroConfig = {
         '/images/s3-group-picture.jpg',
     ],
     autoplayInterval: 5000,
-    overlay: { gradient: true, tint: 'rgba(0,0,0,.25)' },
+    overlay: { gradient: false, tint: 'transparent' },
     height: { xs: '60vh', md: '70vh' },
     align: 'center',
     scrollCta: { targetRefId: 'more-section' } // for the down-arrow CTA

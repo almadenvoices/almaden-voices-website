@@ -8,9 +8,14 @@ import BoltIcon from "@mui/icons-material/Bolt";
 
 const CoursesPage = () => {
     const [isVisible, setIsVisible] = useState(false);
+    const [enrollmentCounts, setEnrollmentCounts] = useState({});
 
     useEffect(() => {
         setIsVisible(true);
+        fetch("/api/sessions/enrollment")
+            .then(res => res.json())
+            .then(data => setEnrollmentCounts(data))
+            .catch(() => {});
     }, []);
 
     // ============================================================
@@ -32,15 +37,12 @@ const CoursesPage = () => {
     //     cover: "/images/your-image.jpg"
     // }
     // ============================================================
-    const upcomingSessions = [
-    ];
+    const upcomingSessions = [];
 
-    const features = [
-        { title: "100% Free", description: "All sessions are completely free for the community" },
-        { title: "Expert Instructors", description: "Experienced speech and debate coaches and educators" },
-        { title: "Small Groups", description: "Limited class sizes for personalized attention" },
-        { title: "Proven Results", description: "95% of parents report improvement in their child's speech" }
-    ];
+    const sessions = upcomingSessions.map(ses => ({
+        ...ses,
+        enrolled: ses.enrolled + (enrollmentCounts[ses.id] || 0),
+    }));
 
     const SessionCard = ({ session, isPast = false }) => (
         <article className={`${s.card} ${isPast ? s.dim : ""}`}>
@@ -180,9 +182,9 @@ const CoursesPage = () => {
 
             <section className={s.gridSection} style={{ backgroundColor: '#F9FAFB', border: 'none' }}>
                 <div className="container">
-                    {upcomingSessions.length > 0 ? (
+                    {sessions.length > 0 ? (
                         <div className={s.grid}>
-                            {upcomingSessions.map(session => (
+                            {sessions.map(session => (
                                 <SessionCard key={session.id} session={session} />
                             ))}
                         </div>
@@ -225,45 +227,6 @@ const CoursesPage = () => {
                 </div>
             </section>
 
-            {/* Features Section */}
-            <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '64px 20px' }}>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '32px' }}>
-                    {features.map((feature, index) => (
-                        <div
-                            key={index}
-                            style={{
-                                textAlign: 'center',
-                                padding: '32px',
-                                backgroundColor: 'white',
-                                borderRadius: '12px',
-                                border: '1px solid #E5E7EB',
-                                transition: 'all 0.3s ease',
-                                opacity: isVisible ? 1 : 0,
-                                transform: isVisible ? 'translateY(0)' : 'translateY(20px)',
-                                transitionDelay: `${index * 100}ms`
-                            }}
-                            onMouseEnter={(e) => {
-                                e.currentTarget.style.transform = 'translateY(-8px)';
-                                e.currentTarget.style.boxShadow = '0 8px 24px rgba(37, 99, 235, 0.15)';
-                            }}
-                            onMouseLeave={(e) => {
-                                e.currentTarget.style.transform = 'translateY(0)';
-                                e.currentTarget.style.boxShadow = 'none';
-                            }}
-                        >
-                            <div style={{ fontSize: '40px', marginBottom: '16px' }}>
-                                {index === 0 && '❤️'}
-                                {index === 1 && '🎤'}
-                                {index === 2 && '👥'}
-                                {index === 3 && '🏆'}
-                            </div>
-                            <h3 style={{ fontWeight: 600, marginBottom: '8px', color: '#111827' }}>{feature.title}</h3>
-                            <p style={{ fontSize: '0.9rem', color: '#6B7280', margin: 0 }}>{feature.description}</p>
-                        </div>
-                    ))}
-                </div>
-            </div>
-
             {/* Our Approach Section */}
             <div style={{ backgroundColor: '#F9FAFB', padding: '64px 20px' }}>
                 <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
@@ -296,7 +259,7 @@ const CoursesPage = () => {
                             style={{ flex: '1 1 300px', height: '300px', objectFit: 'cover', boxShadow: '0 4px 16px rgba(0,0,0,0.1)', borderRadius: '8px' }}
                         />
                         <img
-                            src="/images/teaching-glasses.png"
+                            src="/images/teaching-glasses.jpg"
                             alt="Working one-on-one with a student"
                             style={{ flex: '1 1 300px', height: '300px', objectFit: 'cover', boxShadow: '0 4px 16px rgba(0,0,0,0.1)', borderRadius: '8px' }}
                         />

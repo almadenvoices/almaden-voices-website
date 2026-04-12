@@ -15,8 +15,8 @@ const studentVideos = [
 ];
 
 const metrics = [
-    { number: "5", label: "Sessions Completed", description: "Beginner through advanced" },
-    { number: "45+", label: "Students Served", description: "Across multiple levels" },
+    { number: "7", label: "Sessions Completed", description: "Beginner through advanced" },
+    { number: "75+", label: "Students Served", description: "Across multiple levels" },
     { number: "$800+", label: "Raised", description: "In community donations" },
     { number: "3x", label: "Class Sizes", description: "Tripled through targeted outreach & marketing" },
     { number: "High", label: "Retention Rate", description: "Students return for higher-level sessions" },
@@ -56,7 +56,7 @@ const pastSessions = [
             "Left as confident storytellers",
         ],
         images: [
-            { src: "/images/s2-group-picture.png", caption: "Group photo after the session" },
+            { src: "/images/s2-group-picture.jpg", caption: "Group photo after the session" },
             { src: "/images/s2-picture-with-michael.png", caption: "Students with instructor Michael" },
         ],
     },
@@ -116,9 +116,44 @@ const pastSessions = [
             { src: "/images/s5-teaching-round-structure.jpg", caption: "Learning debate round structure" },
             { src: "/images/s5-peer-activities.jpg", caption: "Peer practice debate activities" },
             { src: "/images/s5-practice-debate.JPG", caption: "Practicing debate with partners" },
-            { src: "/images/s5-fun-kahoot.png", caption: "Fun Kahoot quiz break" },
+            { src: "/images/s5-fun-kahoot.jpg", caption: "Fun Kahoot quiz break" },
             { src: "/images/s5-final-debate.jpg", caption: "Final debate showdown on stage" },
-            { src: "/images/s5-final-winners.png", caption: "Celebrating the debate winners" },
+            { src: "/images/s5-final-winners.jpg", caption: "Celebrating the debate winners" },
+        ],
+    },
+    {
+        title: "March 2026 Library Workshop: Speak Up at the Library",
+        date: "March 2026",
+        duration: "2 days",
+        description: "Our first-ever public library workshop! Hosted at the Almaden Library Community Center, this two-day event introduced 7 young speakers to the fundamentals of public speaking in a welcoming, real-world setting. Students learned voice projection, confident body language, and how to structure a short speech — then put it all together in a mini showcase for parents and library visitors. The energy in the room was electric, and multiple families asked when the next one would be.",
+        journey: [
+            "Walked into the library shy and curious",
+            "Learned projection & body language basics",
+            "Practiced speeches with peer feedback",
+            "Delivered a mini showcase for families",
+            "Left with newfound confidence and pride",
+        ],
+        images: [
+            { src: "/images/s6-day-1.jpg", caption: "Day 1 at the Almaden Library" },
+            { src: "/images/s6-sophia-presenting.jpg", caption: "Sophia delivering her speech" },
+            { src: "/images/s6-raising-hands.jpg", caption: "Students eager to participate" },
+            { src: "/images/s6-aliens-or-zombies?.jpg", caption: "Fun icebreaker: Aliens or Zombies?" },
+        ],
+    },
+    {
+        title: "April 2026 Library Workshop: Speak Up, Stand Out",
+        date: "April 2026",
+        duration: "2 days",
+        description: "A two-day workshop (3 hours each) at the Almaden Library Community Center. Students learned simple techniques to speak clearly and confidently, how to overcome nervousness, and how to speak in front of a crowd — covering all the must-know speech basics. The workshop wrapped up with each student showcasing their skills in a final speech for parents and library visitors.",
+        journey: [
+            "Arrived nervous but excited",
+            "Learned clarity & confidence techniques",
+            "Practiced overcoming nervousness",
+            "Mastered speech basics together",
+            "Delivered a final showcase speech",
+        ],
+        images: [
+            { src: "/images/teaching-beginner.JPG", caption: "Learning the fundamentals" },
         ],
     },
 ];
@@ -265,6 +300,8 @@ export default function ImpactPage() {
                                         preload="metadata"
                                         style={{
                                             width: "100%",
+                                            height: 360,
+                                            objectFit: "cover",
                                             display: "block",
                                             borderRadius: "12px 12px 0 0",
                                         }}
@@ -317,8 +354,8 @@ export default function ImpactPage() {
                         Follow the journey from first session to final showcase — see how students grew at every step.
                     </Typography>
 
-                    {/* Dropdown (left-aligned) + Compact All-Sessions Nav (centered) */}
-                    <Box sx={{ mb: 5 }}>
+                    {/* Dropdown (centered) + Compact All-Sessions Nav (centered) */}
+                    <Box sx={{ mb: 5, display: "flex", flexDirection: "column", alignItems: "center" }}>
                         <FormControl sx={{ minWidth: { xs: "100%", sm: 320 }, mb: 3 }}>
                             <Select
                                 value={selectedIndex}
@@ -422,14 +459,14 @@ export default function ImpactPage() {
                             transition={{ duration: 0.3 }}
                         >
                             {/* Session Title + Date */}
-                            <Box sx={{ mb: 3 }}>
+                            <Box sx={{ mb: 3, textAlign: "center" }}>
                                 <Typography
                                     variant="h4"
                                     sx={{ fontWeight: "bold", color: "#111827", mb: 1 }}
                                 >
                                     {selectedSession.title}
                                 </Typography>
-                                <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap", mb: 1.5 }}>
+                                <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap", mb: 1.5, justifyContent: "center" }}>
                                     <Typography
                                         variant="caption"
                                         sx={{
@@ -461,7 +498,7 @@ export default function ImpactPage() {
                                 </Box>
                                 <Typography
                                     variant="body1"
-                                    sx={{ color: "#6B7280", lineHeight: 1.7, maxWidth: 700 }}
+                                    sx={{ color: "#6B7280", lineHeight: 1.7, maxWidth: 700, mx: "auto" }}
                                 >
                                     {selectedSession.description}
                                 </Typography>

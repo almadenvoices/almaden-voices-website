@@ -18,7 +18,7 @@
 /* ---------- HERO ---------- */
 .hero {
     position: relative;
-    padding: clamp(60px, 10vw, 120px) 0;
+    padding: clamp(24px, 4vw, 48px) 0;
     background: linear-gradient(135deg, #1e3a8a 0%, #2563EB 50%, #3b82f6 100%);
 }
 
@@ -26,7 +26,7 @@
     position: relative;
     z-index: 1;
     display: grid;
-    gap: clamp(30px, 5vw, 80px);
+    gap: clamp(20px, 3vw, 40px);
     grid-template-columns: 1fr;
     align-items: start;
 }
@@ -43,11 +43,11 @@
 
 .title {
     font-family: 'Playfair Display', Georgia, serif;
-    font-size: clamp(36px, 4vw, 56px);
+    font-size: clamp(28px, 3vw, 42px);
     font-weight: 700;
     color: #FFFFFF;
     line-height: 1.2;
-    margin-bottom: 20px;
+    margin-bottom: 12px;
 }
 
 .highlight {
@@ -55,10 +55,10 @@
 }
 
 .sub {
-    font-size: clamp(16px, 1.2vw, 18px);
+    font-size: clamp(14px, 1vw, 16px);
     color: #FFFFFF;
-    line-height: 1.7;
-    margin-bottom: 24px;
+    line-height: 1.6;
+    margin-bottom: 14px;
 }
 
 .bullets {
@@ -67,7 +67,7 @@
     list-style: none;
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 8px;
 }
 
 .bullets li {
@@ -75,7 +75,7 @@
     gap: 10px;
     align-items: center;
     color: #FFFFFF;
-    font-size: 15px;
+    font-size: 13px;
     font-weight: 500;
 }
 
@@ -88,8 +88,8 @@
 .giveCard {
     background: var(--card);
     border: 1px solid var(--line);
-    border-radius: 24px;
-    padding: clamp(28px, 3vw, 40px);
+    border-radius: 20px;
+    padding: clamp(20px, 2.5vw, 28px);
     box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
 }
 
@@ -98,21 +98,21 @@
     align-items: center;
     gap: 12px;
     font-weight: 700;
-    font-size: 22px;
-    margin-bottom: 24px;
+    font-size: 18px;
+    margin-bottom: 14px;
     color: var(--text);
 }
 
 .giveHead svg {
     color: var(--brand);
-    font-size: 28px;
+    font-size: 22px;
 }
 
 /* Frequency toggle */
 .freq {
     display: flex;
-    gap: 12px;
-    margin-bottom: 24px;
+    gap: 8px;
+    margin-bottom: 14px;
 }
 
 .freqBtn {
@@ -120,7 +120,7 @@
     border: 2px solid var(--line);
     background: var(--card);
     color: var(--text);
-    height: 52px;
+    height: 40px;
     padding: 0 20px;
     border-radius: 12px;
     cursor: pointer;
@@ -157,8 +157,8 @@
 .presetWrap {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 12px;
-    margin-bottom: 20px;
+    gap: 8px;
+    margin-bottom: 12px;
 }
 
 @media (min-width: 520px) {
@@ -171,7 +171,7 @@
     border: 2px solid var(--line);
     background: var(--card);
     color: var(--text);
-    height: 52px;
+    height: 40px;
     border-radius: 12px;
     cursor: pointer;
     font-family: inherit;
@@ -198,7 +198,7 @@
     gap: 8px;
     border: 2px solid var(--line);
     background: var(--card);
-    height: 52px;
+    height: 40px;
     border-radius: 12px;
     padding: 0 16px;
     font-weight: 600;
@@ -233,12 +233,12 @@
 .coverFee {
     display: flex;
     align-items: flex-start;
-    gap: 14px;
-    padding: 18px 20px;
+    gap: 10px;
+    padding: 10px 14px;
     border: 2px solid var(--brand);
     background: linear-gradient(135deg, rgba(37, 99, 235, 0.06) 0%, rgba(37, 99, 235, 0.12) 100%);
-    border-radius: 14px;
-    margin-bottom: 20px;
+    border-radius: 12px;
+    margin-bottom: 12px;
     cursor: pointer;
     transition: all 0.2s ease;
 }
@@ -263,14 +263,14 @@
 }
 
 .coverFeeText strong {
-    font-size: 15px;
+    font-size: 13px;
     font-weight: 700;
     color: var(--text);
     line-height: 1.4;
 }
 
 .coverFeeDetail {
-    font-size: 13px;
+    font-size: 12px;
     color: var(--brand);
     font-weight: 600;
     line-height: 1.5;
@@ -310,8 +310,8 @@
 .methods {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 10px;
-    margin-bottom: 20px;
+    gap: 8px;
+    margin-bottom: 12px;
 }
 
 .method {
@@ -319,11 +319,11 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 6px;
+    gap: 4px;
     border: 2px solid var(--line);
     background: var(--card);
     color: var(--muted);
-    padding: 14px 10px;
+    padding: 8px 10px;
     border-radius: 12px;
     cursor: pointer;
     font-family: inherit;
@@ -355,11 +355,11 @@
 
 /* Helper text */
 .helper {
-    font-size: 14px;
+    font-size: 13px;
     color: var(--muted);
-    line-height: 1.6;
-    margin-bottom: 20px;
-    padding: 12px 16px;
+    line-height: 1.5;
+    margin-bottom: 12px;
+    padding: 8px 12px;
     background: #F9FAFB;
     border-radius: 10px;
 }
@@ -483,8 +483,8 @@
 
 /* Legal note */
 .legal {
-    margin-top: 20px;
-    font-size: 13px;
+    margin-top: 12px;
+    font-size: 12px;
     color: var(--muted);
     line-height: 1.6;
     text-align: center;

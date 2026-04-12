@@ -293,6 +293,92 @@
     transform: none;
 }
 
+/* ====== Multi-child controls ====== */
+.counterBtn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border: 2px solid #E5E7EB;
+    border-radius: 10px;
+    background: #FFFFFF;
+    color: #374151;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.counterBtn:hover:not(:disabled) {
+    border-color: #2563EB;
+    color: #2563EB;
+    background: #EFF6FF;
+}
+
+.counterBtn:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+}
+
+.studentBlock {
+    background: #F9FAFB;
+    border: 1px solid #E5E7EB;
+    border-radius: 14px;
+    padding: clamp(16px, 2vw, 24px);
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.studentHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.studentLabel {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #2563EB;
+}
+
+.removeBtn {
+    background: none;
+    border: none;
+    color: #DC2626;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 6px;
+    transition: background 0.2s;
+}
+
+.removeBtn:hover {
+    background: #FEF2F2;
+}
+
+.addChildBtn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 10px 20px;
+    background: #EFF6FF;
+    color: #2563EB;
+    border: 2px dashed #BFDBFE;
+    border-radius: 12px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.addChildBtn:hover:not(:disabled) {
+    background: #DBEAFE;
+    border-color: #93C5FD;
+}
+
 /* ====== Success section ====== */
 .success {
     background: #f0fdf4;
@@ -310,7 +396,7 @@
 }
 
 .success p {
-    color: var(--text);
+    color: #374151;
     margin: 0 0 24px;
 }
 
@@ -324,7 +410,7 @@
 
 .confirmLabel {
     font-weight: 600;
-    color: var(--text);
+    color: #111827;
     margin: 0 0 8px !important;
 }
 
@@ -339,7 +425,7 @@
 
 .confirmNote {
     font-size: 0.85rem;
-    color: var(--muted);
+    color: #6B7280;
     margin: 12px 0 0 !important;
 }
 
