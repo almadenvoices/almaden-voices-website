@@ -217,7 +217,7 @@ export default function DonatePage() {
                             </p>
                             <ul className={s.bullets}>
                                 <li>
-                                    <VerifiedIcon /> Registered California nonprofit (EIN: 39-4978818)
+                                    <VerifiedIcon /> Registered 501(c)(3) nonprofit (EIN: 39-4978818) — donations are tax-deductible
                                 </li>
                                 <li>
                                     <ShieldIcon /> All online payments are processed securely by
@@ -225,10 +225,10 @@ export default function DonatePage() {
                                 </li>
                             </ul>
                             <p className={s.legal} style={{ color: 'rgba(255,255,255,0.7)', textAlign: 'left' }}>
-                                Almaden Voices is a registered California nonprofit (EIN: 39-4978818).
-                                We are currently pursuing 501(c)(3) status — donations are not
-                                tax-deductible at this time. You'll receive a confirmation
-                                receipt via PayPal when you pay online.
+                                Almaden Voices is a registered 501(c)(3) nonprofit organization
+                                (EIN: 39-4978818). Your donation is tax-deductible to the fullest
+                                extent allowed by law. You'll receive a confirmation receipt via
+                                PayPal when you pay online.
                             </p>
                         </div>
 

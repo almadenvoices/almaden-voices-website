@@ -1018,6 +1018,90 @@ app.post("/api/paypal/orders/:orderID/capture", async (req, res) => {
     try {
         const { orderID } = req.params;
         const capture = await captureOrder(orderID);
+
+        // Extract donor + payment info from PayPal capture response
+        try {
+            const payer = capture.payer || {};
+            const donorEmail = payer.email_address || "";
+            const donorFirstName = (payer.name && payer.name.given_name) || "";
+            const donorLastName = (payer.name && payer.name.surname) || "";
+            const donorName = `${donorFirstName} ${donorLastName}`.trim() || "Anonymous Donor";
+
+            const purchaseUnit = (capture.purchase_units && capture.purchase_units[0]) || {};
+            const captureDetails = (purchaseUnit.payments && purchaseUnit.payments.captures && purchaseUnit.payments.captures[0]) || {};
+            const amount = (captureDetails.amount && captureDetails.amount.value) || "0.00";
+            const currency = (captureDetails.amount && captureDetails.amount.currency_code) || "USD";
+            const transactionId = captureDetails.id || orderID;
+            const description = purchaseUnit.description || "Donation to Almaden Voices";
+            const donationDate = new Date().toLocaleDateString("en-US", {
+                year: "numeric", month: "long", day: "numeric"
+            });
+
+            if (emailTransporter) {
+                // Receipt email to donor
+                if (donorEmail) {
+                    const donorEmailHtml = `
+                        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                            <h2 style="color: #9c27b0;">Thank you for your donation!</h2>
+                            <p>Hi ${donorFirstName || "there"},</p>
+                            <p>Thank you for supporting Almaden Voices. Your generosity helps young students build confidence through public speaking. Below is your official donation receipt for your records.</p>
+                            <div style="background: #f5f5f5; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                                <h3 style="margin-top: 0; color: #333;">Donation Receipt</h3>
+                                <p><strong>Donor:</strong> ${donorName}</p>
+                                <p><strong>Date:</strong> ${donationDate}</p>
+                                <p><strong>Amount:</strong> $${Number(amount).toFixed(2)} ${currency}</p>
+                                <p><strong>Description:</strong> ${description}</p>
+                                <p><strong>Transaction ID:</strong> <span style="font-family: monospace;">${transactionId}</span></p>
+                            </div>
+                            <p style="font-size: 13px; color: #555;">
+                                Almaden Voices is a registered 501(c)(3) nonprofit organization
+                                (EIN: 39-4978818). Your donation is tax-deductible to the fullest
+                                extent allowed by law. No goods or services were provided in exchange for this contribution.
+                            </p>
+                            <p>Please keep this receipt for your tax records.</p>
+                            <hr style="border: 1px solid #eee;" />
+                            <p style="color: #666;">With gratitude,<br/>The Almaden Voices Team</p>
+                        </div>
+                    `;
+
+                    await emailTransporter.sendMail({
+                        from: `"Almaden Voices" <${EMAIL_USER}>`,
+                        to: donorEmail,
+                        subject: `Thank you for your donation - Receipt #${transactionId}`,
+                        html: donorEmailHtml
+                    });
+                }
+
+                // Notification email to admin
+                const adminEmailHtml = `
+                    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                        <h2 style="color: #333;">New Donation Received</h2>
+                        <hr style="border: 1px solid #eee;" />
+                        <p><strong>Amount:</strong> $${Number(amount).toFixed(2)} ${currency}</p>
+                        <p><strong>Donor:</strong> ${donorName}</p>
+                        <p><strong>Email:</strong> ${donorEmail || "Not provided"}</p>
+                        <p><strong>Description:</strong> ${description}</p>
+                        <p><strong>Transaction ID:</strong> ${transactionId}</p>
+                        <p><strong>Order ID:</strong> ${orderID}</p>
+                        <p><strong>Received:</strong> ${new Date().toLocaleString()}</p>
+                    </div>
+                `;
+
+                await emailTransporter.sendMail({
+                    from: `"Almaden Voices Donations" <${EMAIL_USER}>`,
+                    replyTo: donorEmail || EMAIL_USER,
+                    to: EMAIL_TO,
+                    subject: `New Donation: $${Number(amount).toFixed(2)} from ${donorName}`,
+                    html: adminEmailHtml
+                });
+            } else {
+                console.warn("Email transporter not configured — donation receipts not sent");
+            }
+        } catch (emailErr) {
+            // Don't fail the payment response if email fails
+            console.error("Donation email error:", emailErr);
+        }
+
         res.json(capture);
     } catch (err) {
         console.error("Capture order error:", err);
