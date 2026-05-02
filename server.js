@@ -1029,13 +1029,19 @@ app.post("/api/paypal/orders/:orderID/capture", async (req, res) => {
 
             const purchaseUnit = (capture.purchase_units && capture.purchase_units[0]) || {};
             const captureDetails = (purchaseUnit.payments && purchaseUnit.payments.captures && purchaseUnit.payments.captures[0]) || {};
-            const amount = (captureDetails.amount && captureDetails.amount.value) || "0.00";
             const currency = (captureDetails.amount && captureDetails.amount.currency_code) || "USD";
             const transactionId = captureDetails.id || orderID;
             const description = purchaseUnit.description || "Donation to Almaden Voices";
             const donationDate = new Date().toLocaleDateString("en-US", {
                 year: "numeric", month: "long", day: "numeric"
             });
+
+            // Pull authoritative breakdown from PayPal: what the donor paid,
+            // PayPal's fee, and what Almaden Voices actually receives.
+            const breakdown = captureDetails.seller_receivable_breakdown || {};
+            const grossPaid = Number((breakdown.gross_amount && breakdown.gross_amount.value) || (captureDetails.amount && captureDetails.amount.value) || 0);
+            const paypalFee = Number((breakdown.paypal_fee && breakdown.paypal_fee.value) || 0);
+            const netReceived = Number((breakdown.net_amount && breakdown.net_amount.value) || (grossPaid - paypalFee));
 
             if (emailTransporter) {
                 // Receipt email to donor
@@ -1056,9 +1062,12 @@ app.post("/api/paypal/orders/:orderID/capture", async (req, res) => {
                                     <table style="width: 100%; border-collapse: collapse; font-size: 14px; color: #374151;">
                                         <tr><td style="padding: 6px 0; color: #6B7280;">Donor</td><td style="padding: 6px 0; text-align: right; font-weight: 600;">${donorName}</td></tr>
                                         <tr><td style="padding: 6px 0; color: #6B7280;">Date</td><td style="padding: 6px 0; text-align: right; font-weight: 600;">${donationDate}</td></tr>
-                                        <tr><td style="padding: 6px 0; color: #6B7280;">Amount</td><td style="padding: 6px 0; text-align: right; font-weight: 700; color: #2563EB; font-size: 16px;">$${Number(amount).toFixed(2)} ${currency}</td></tr>
                                         <tr><td style="padding: 6px 0; color: #6B7280;">Description</td><td style="padding: 6px 0; text-align: right; font-weight: 600;">${description}</td></tr>
                                         <tr><td style="padding: 6px 0; color: #6B7280;">Transaction ID</td><td style="padding: 6px 0; text-align: right; font-family: monospace; font-size: 12px;">${transactionId}</td></tr>
+                                        <tr><td colspan="2" style="padding-top: 12px;"><div style="border-top: 1px solid #C7D2FE;"></div></td></tr>
+                                        <tr><td style="padding: 8px 0 4px 0; color: #6B7280;">Total amount paid</td><td style="padding: 8px 0 4px 0; text-align: right; font-weight: 700; color: #2563EB; font-size: 16px;">$${grossPaid.toFixed(2)} ${currency}</td></tr>
+                                        <tr><td style="padding: 4px 0; color: #6B7280;">PayPal processing fee</td><td style="padding: 4px 0; text-align: right; font-weight: 600;">- $${paypalFee.toFixed(2)} ${currency}</td></tr>
+                                        <tr><td style="padding: 4px 0; color: #1E40AF; font-weight: 700;">Net to Almaden Voices</td><td style="padding: 4px 0; text-align: right; font-weight: 700; color: #1E40AF;">$${netReceived.toFixed(2)} ${currency}</td></tr>
                                     </table>
                                 </div>
                                 <div style="background: #EFF6FF; padding: 16px 18px; border-radius: 8px; margin: 20px 0;">
@@ -1094,9 +1103,15 @@ app.post("/api/paypal/orders/:orderID/capture", async (req, res) => {
                 // Notification email to admin
                 const adminEmailHtml = `
                     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-                        <h2 style="color: #333;">New Donation Received</h2>
+                        <h2 style="color: #1E40AF;">New Donation Received</h2>
                         <hr style="border: 1px solid #eee;" />
-                        <p><strong>Amount:</strong> $${Number(amount).toFixed(2)} ${currency}</p>
+                        <div style="background: #F3F6FF; border-left: 4px solid #2563EB; padding: 18px 22px; border-radius: 8px; margin: 16px 0;">
+                            <table style="width: 100%; border-collapse: collapse; font-size: 14px; color: #374151;">
+                                <tr><td style="padding: 6px 0; color: #6B7280;">Donor charged (gross)</td><td style="padding: 6px 0; text-align: right; font-weight: 600;">$${grossPaid.toFixed(2)} ${currency}</td></tr>
+                                <tr><td style="padding: 6px 0; color: #6B7280;">PayPal fee</td><td style="padding: 6px 0; text-align: right; font-weight: 600; color: #B91C1C;">- $${paypalFee.toFixed(2)} ${currency}</td></tr>
+                                <tr><td style="padding: 8px 0 6px 0; color: #1E40AF; font-weight: 700; border-top: 1px solid #C7D2FE;">Net received by Almaden Voices</td><td style="padding: 8px 0 6px 0; text-align: right; font-weight: 700; color: #1E40AF; font-size: 16px; border-top: 1px solid #C7D2FE;">$${netReceived.toFixed(2)} ${currency}</td></tr>
+                            </table>
+                        </div>
                         <p><strong>Donor:</strong> ${donorName}</p>
                         <p><strong>Email:</strong> ${donorEmail || "Not provided"}</p>
                         <p><strong>Description:</strong> ${description}</p>
@@ -1110,11 +1125,11 @@ app.post("/api/paypal/orders/:orderID/capture", async (req, res) => {
                     from: `"Almaden Voices Donations" <${EMAIL_USER}>`,
                     replyTo: donorEmail || EMAIL_USER,
                     to: EMAIL_TO,
-                    subject: `New Donation: $${Number(amount).toFixed(2)} from ${donorName}`,
+                    subject: `New Donation: $${netReceived.toFixed(2)} net from ${donorName}`,
                     html: adminEmailHtml
                 });
             } else {
-                console.warn("Email transporter not configured — donation receipts not sent");
+                console.warn("Email transporter not configured, donation receipts not sent");
             }
         } catch (emailErr) {
             // Don't fail the payment response if email fails
