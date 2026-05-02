@@ -1041,26 +1041,45 @@ app.post("/api/paypal/orders/:orderID/capture", async (req, res) => {
                 // Receipt email to donor
                 if (donorEmail) {
                     const donorEmailHtml = `
-                        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-                            <h2 style="color: #9c27b0;">Thank you for your donation!</h2>
-                            <p>Hi ${donorFirstName || "there"},</p>
-                            <p>Thank you for supporting Almaden Voices. Your generosity helps young students build confidence through public speaking. Below is your official donation receipt for your records.</p>
-                            <div style="background: #f5f5f5; padding: 20px; border-radius: 8px; margin: 20px 0;">
-                                <h3 style="margin-top: 0; color: #333;">Donation Receipt</h3>
-                                <p><strong>Donor:</strong> ${donorName}</p>
-                                <p><strong>Date:</strong> ${donationDate}</p>
-                                <p><strong>Amount:</strong> $${Number(amount).toFixed(2)} ${currency}</p>
-                                <p><strong>Description:</strong> ${description}</p>
-                                <p><strong>Transaction ID:</strong> <span style="font-family: monospace;">${transactionId}</span></p>
+                        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background-color: #F9FAFB; padding: 0; border-radius: 12px; overflow: hidden;">
+                            <div style="background: linear-gradient(135deg, #2563EB 0%, #1E40AF 100%); padding: 36px 28px; text-align: center;">
+                                <h1 style="color: #ffffff; margin: 0 0 8px 0; font-size: 28px; font-weight: 700;">Thank You for Your Donation!</h1>
+                                <p style="color: #DBEAFE; margin: 0; font-size: 15px;">Your generosity is empowering young voices.</p>
                             </div>
-                            <p style="font-size: 13px; color: #555;">
-                                Almaden Voices is a registered 501(c)(3) nonprofit organization
-                                (EIN: 39-4978818). Your donation is tax-deductible to the fullest
-                                extent allowed by law. No goods or services were provided in exchange for this contribution.
-                            </p>
-                            <p>Please keep this receipt for your tax records.</p>
-                            <hr style="border: 1px solid #eee;" />
-                            <p style="color: #666;">With gratitude,<br/>The Almaden Voices Team</p>
+                            <div style="background-color: #ffffff; padding: 32px 28px;">
+                                <p style="font-size: 16px; color: #111827; margin-top: 0;">Hi ${donorFirstName || "there"},</p>
+                                <p style="font-size: 15px; color: #374151; line-height: 1.6;">
+                                    Thank you for supporting Almaden Voices. Your gift helps students overcome stage fright, learn to speak clearly, and build lifelong confidence through our public speaking program. Below is your official donation receipt for your records.
+                                </p>
+                                <div style="background: #F3F6FF; border-left: 4px solid #2563EB; padding: 22px 24px; border-radius: 8px; margin: 24px 0;">
+                                    <h3 style="margin: 0 0 16px 0; color: #1E40AF; font-size: 18px;">Donation Receipt</h3>
+                                    <table style="width: 100%; border-collapse: collapse; font-size: 14px; color: #374151;">
+                                        <tr><td style="padding: 6px 0; color: #6B7280;">Donor</td><td style="padding: 6px 0; text-align: right; font-weight: 600;">${donorName}</td></tr>
+                                        <tr><td style="padding: 6px 0; color: #6B7280;">Date</td><td style="padding: 6px 0; text-align: right; font-weight: 600;">${donationDate}</td></tr>
+                                        <tr><td style="padding: 6px 0; color: #6B7280;">Amount</td><td style="padding: 6px 0; text-align: right; font-weight: 700; color: #2563EB; font-size: 16px;">$${Number(amount).toFixed(2)} ${currency}</td></tr>
+                                        <tr><td style="padding: 6px 0; color: #6B7280;">Description</td><td style="padding: 6px 0; text-align: right; font-weight: 600;">${description}</td></tr>
+                                        <tr><td style="padding: 6px 0; color: #6B7280;">Transaction ID</td><td style="padding: 6px 0; text-align: right; font-family: monospace; font-size: 12px;">${transactionId}</td></tr>
+                                    </table>
+                                </div>
+                                <div style="background: #EFF6FF; padding: 16px 18px; border-radius: 8px; margin: 20px 0;">
+                                    <p style="font-size: 13px; color: #1E3A8A; margin: 0; line-height: 1.6;">
+                                        <strong>Tax Information:</strong> Almaden Voices is a registered 501(c)(3) nonprofit organization (EIN: 39-4978818). Your donation is tax-deductible to the fullest extent allowed by law. No goods or services were provided in exchange for this contribution. Please keep this receipt for your tax records.
+                                    </p>
+                                </div>
+                                <p style="font-size: 15px; color: #374151; margin-top: 24px;">With gratitude,<br/><strong style="color: #2563EB;">The Almaden Voices Team</strong></p>
+                            </div>
+                            <div style="background-color: #1E3A8A; padding: 28px; text-align: center; color: #ffffff;">
+                                <h3 style="margin: 0 0 12px 0; color: #ffffff; font-size: 16px; letter-spacing: 1px; text-transform: uppercase;">Stay Connected</h3>
+                                <p style="margin: 6px 0; font-size: 14px; color: #DBEAFE;">
+                                    Website: <a href="https://almadenvoices.org" style="color: #93C5FD; text-decoration: none; font-weight: 600;">almadenvoices.org</a>
+                                </p>
+                                <p style="margin: 6px 0; font-size: 14px; color: #DBEAFE;">
+                                    Email: <a href="mailto:almadenvoices@gmail.com" style="color: #93C5FD; text-decoration: none; font-weight: 600;">almadenvoices@gmail.com</a>
+                                </p>
+                                <p style="margin: 16px 0 0 0; font-size: 12px; color: #93C5FD;">
+                                    Almaden Voices is a 501(c)(3) nonprofit (EIN: 39-4978818) based in San Jose, CA.
+                                </p>
+                            </div>
                         </div>
                     `;
 
