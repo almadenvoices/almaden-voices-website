@@ -145,6 +145,7 @@ const Footer = () => {
             { label: 'Fundraising Events', href: '#fundraising' }
         ],
         legal: [
+            { label: 'IRS 501(c)(3) Determination Letter', href: '/docs/irs-letter-947-confirmation-of-501c3-status.pdf', target: '_blank' },
             { label: 'Articles of Incorporation', href: '/docs/articles-of-incorporation.pdf', target: '_blank' }
         ]
     };
@@ -271,8 +272,9 @@ const Footer = () => {
                             color: '#6B7280',
                             marginBottom: '20px'
                         }}>
-                            A non-profit organization (EIN: 39-4978818) dedicated to empowering
+                            A registered 501(c)(3) nonprofit organization (EIN: 39-4978818) dedicated to empowering
                             young voices through free speech and debate programs for children in our community.
+                            All donations are tax-deductible to the fullest extent allowed by law.
                         </p>
 
                         {/* Contact Info */}
@@ -573,7 +575,7 @@ const Footer = () => {
                     gap: '20px'
                 }}>
                     <div style={{ fontSize: '1rem', color: '#6B7280', margin: 0 }}>
-                        © {new Date().getFullYear()} Almaden Voices. All rights reserved.
+                        © {new Date().getFullYear()} Almaden Voices. All rights reserved. &nbsp;|&nbsp; Registered 501(c)(3) Nonprofit &nbsp;|&nbsp; EIN: 39-4978818
                     </div>
 
                     <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap' }}>

@@ -15,7 +15,7 @@ import TestimonialsGridSlider from '../../components/Testimonial/TestimonialsGri
 const heroConfig = {
     title: 'Find your voice. Inspire others.',
     subtitle:
-        'Almaden Voices is a community non-profit helping students build confidence, clarity, and leadership through speech & debate.',
+        'Almaden Voices is a 501(c)(3) nonprofit helping students build confidence, clarity, and leadership through speech & debate.',
     ctas: [
         { label: 'Our Impact', href: '/impact', variant: 'contained', color: 'primary', standout: true },
         { label: 'Our Courses', href: '/courses1', color: 'secondary' },
