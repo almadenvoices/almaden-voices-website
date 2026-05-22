@@ -269,7 +269,7 @@ export default function AboutPage() {
                                     mb: 3
                                 }}
                             >
-                                Almaden Voices is a non-profit organization (EIN: 39-4978818) dedicated to empowering young voices in our community. We believe that every child deserves the confidence to speak up and be heard.
+                                Almaden Voices is a registered 501(c)(3) nonprofit organization (EIN: 39-4978818) dedicated to empowering young voices in our community. We believe that every child deserves the confidence to speak up and be heard. All donations are tax-deductible to the fullest extent allowed by law.
                             </Typography>
                             <Typography
                                 variant="body1"

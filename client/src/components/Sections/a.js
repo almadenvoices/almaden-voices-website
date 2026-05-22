@@ -197,7 +197,7 @@ const CoursesPage = () => {
                         About Our Program
                     </h2>
                     <p style={{ fontSize: '1.1rem', lineHeight: 1.8, color: '#666', marginBottom: '16px' }}>
-                        Almaden Voices is a non-profit initiative dedicated to providing free, high-quality speech therapy
+                        Almaden Voices is a registered 501(c)(3) nonprofit (EIN: 39-4978818) dedicated to providing free, high-quality speech therapy
                         sessions to children in our community. We believe that every child deserves the opportunity to
                         communicate confidently and effectively.
                     </p>
