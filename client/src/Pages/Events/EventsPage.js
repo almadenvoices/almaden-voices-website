@@ -156,7 +156,7 @@ export default function EventsPage() {
             </Box>
 
             {/* CTA */}
-            <Box sx={{ py: 8, textAlign: "center", bgcolor: "#FFFFFF" }}>
+            <Box id="host" sx={{ py: 8, textAlign: "center", bgcolor: "#FFFFFF" }}>
                 <Container>
                     <Typography
                         variant="h4"
