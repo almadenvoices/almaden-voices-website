@@ -127,22 +127,19 @@ const Footer = () => {
         about: [
             { label: 'Our Mission', href: '/about#mission' },
             { label: 'Our Team', href: '/about#team' },
-            { label: 'Success Stories', href: '/about#stories' },
+            { label: 'Success Stories', href: '/impact#testimonials' },
             { label: 'Board of Directors', href: '/about#board' }
         ],
         programs: [
-            { label: 'Upcoming Events', href: '#events' },
-            { label: 'Past Sessions', href: '#past' },
-            { label: 'Parent Support', href: '#support' },
-            { label: 'Volunteer Program', href: '#volunteer' }
+            { label: 'Upcoming Events', href: '/events' },
+            { label: 'Past Sessions', href: '/impact#past-sessions' }
         ],
         getInvolved: [
-            { label: 'Donate', href: '#donate' },
-            { label: 'Volunteer', href: '#volunteer' },
-            { label: 'Partner With Us', href: '#partner' },
-            { label: 'Become a Sponsor', href: '#sponsor' },
-            { label: 'Corporate Partnerships', href: '#corporate' },
-            { label: 'Fundraising Events', href: '#fundraising' }
+            { label: 'Donate', href: '/donate' },
+            { label: 'Partner With Us', href: '/events#host' },
+            { label: 'Become a Sponsor', href: '/events#host' },
+            { label: 'Corporate Partnerships', href: '/events#host' },
+            { label: 'Fundraising Events', href: '/events' }
         ],
         legal: [
             { label: 'IRS 501(c)(3) Determination Letter', href: '/docs/irs-letter-947-confirmation-of-501c3-status.pdf', target: '_blank' },

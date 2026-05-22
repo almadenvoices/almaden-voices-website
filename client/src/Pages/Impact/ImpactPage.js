@@ -326,7 +326,7 @@ export default function ImpactPage() {
             </Box>
 
             {/* Past Sessions Section */}
-            <Box sx={{ py: 10, bgcolor: "#F9FAFB" }}>
+            <Box id="past-sessions" sx={{ py: 10, bgcolor: "#F9FAFB" }}>
                 <Container maxWidth="lg">
                     {/* Centered Header */}
                     <Typography
