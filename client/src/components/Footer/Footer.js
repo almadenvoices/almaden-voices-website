@@ -253,15 +253,15 @@ const Footer = () => {
                         <div style={{
                             marginBottom: '30px'
                         }}>
-                        <h3 style={{
-                            fontSize: '2rem',
-                            fontWeight: 700,
-                            marginBottom: '20px',
-                            color: '#2563EB',
-                            textAlign: 'center',
-                        }}>
-                            Almaden Voices
-                        </h3>
+                        <div style={{ textAlign: 'center', marginBottom: '20px' }}>
+                            <a href="/home" style={{ display: 'inline-block' }}>
+                                <img
+                                    src="/almaden_voices_logo_text.png"
+                                    alt="Almaden Voices"
+                                    style={{ height: '120px', width: 'auto' }}
+                                />
+                            </a>
+                        </div>
 
                         <p style={{
                             fontSize: '1rem',
