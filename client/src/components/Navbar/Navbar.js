@@ -27,14 +27,21 @@ const LINKS = [
     { label: "Register", to: "/register" }
 ];
 
-function MobileDrawer({ open, onClose, logo="Almaden Voices" }) {
+function MobileDrawer({ open, onClose }) {
     const location = useLocation();
     const [aboutOpen, setAboutOpen] = React.useState(false);
     return (
         <Drawer anchor="left" open={open} onClose={onClose}>
             <Box sx={{ width: 280, p: 2 }} role="presentation">
                 <Stack direction="row" alignItems="center" justifyContent="space-between">
-                    <Typography variant="h6" fontWeight={800}>{logo}</Typography>
+                    <RouterLink to="/home" onClick={onClose} style={{ display: 'inline-flex', alignItems: 'center' }}>
+                        <Box
+                            component="img"
+                            src="/almaden_voices_logo_text.png"
+                            alt="Almaden Voices"
+                            sx={{ height: 56, width: 'auto' }}
+                        />
+                    </RouterLink>
                     <IconButton onClick={onClose}><CloseIcon /></IconButton>
                 </Stack>
                 <Divider sx={{ my: 1 }} />
@@ -222,7 +229,7 @@ function DesktopLinksBig({ underline=true }) {
     );
 }
 
-export default function Navbar({ logo = "Almaden Voices" }) {
+export default function Navbar() {
     const [open, setOpen] = React.useState(false);
     return (
         <Box sx={{ my: 2 }}>
@@ -231,12 +238,17 @@ export default function Navbar({ logo = "Almaden Voices" }) {
                         <Toolbar disableGutters sx={{ py: 1.5, gap: 3 }}>
                             {/* Mobile */}
                             <IconButton sx={{ display: { md: 'none' }, mr: 1 }} onClick={()=>setOpen(true)}><MenuIcon /></IconButton>
-                            <MobileDrawer open={open} onClose={()=>setOpen(false)} logo={logo} />
+                            <MobileDrawer open={open} onClose={()=>setOpen(false)} />
 
                             {/* Brand */}
-                            <Typography variant="h5" fontWeight={900} sx={{ mr: 3 }}>
-                                {logo}
-                            </Typography>
+                            <RouterLink to="/home" style={{ display: 'inline-flex', alignItems: 'center', marginRight: 24 }}>
+                                <Box
+                                    component="img"
+                                    src="/almaden_voices_logo_text.png"
+                                    alt="Almaden Voices"
+                                    sx={{ height: { xs: 48, md: 60 }, width: 'auto', display: 'block' }}
+                                />
+                            </RouterLink>
 
                             {/* Links + Donate */}
                             <Stack direction="row" spacing={2.25} alignItems="center" sx={{ ml: 'auto' }}>
