@@ -301,7 +301,7 @@ app.post("/api/contact", async (req, res) => {
 // Newsletter subscription endpoint
 app.post("/api/subscribe", async (req, res) => {
     try {
-        const { email } = req.body;
+        const { email, name, interest } = req.body;
 
         // Validate email
         if (!email || !email.includes('@')) {
@@ -310,6 +310,10 @@ app.post("/api/subscribe", async (req, res) => {
 
         // Normalize email (lowercase and trim)
         const normalizedEmail = email.toLowerCase().trim();
+
+        // Optional fields (sanitize commas so they don't break the CSV)
+        const subscriberName = (name || "").toString().trim().replace(/,/g, " ");
+        const subscriberInterest = (interest || "Newsletter").toString().trim().replace(/,/g, " ");
 
         // Path to subscribers file
         const subscribersFile = path.join(__dirname, 'subscribers.csv');
@@ -334,9 +338,9 @@ app.post("/api/subscribe", async (req, res) => {
             }
         }
 
-        // Add new subscriber to CSV
+        // Add new subscriber to CSV (email,name,interest,timestamp)
         const timestamp = new Date().toISOString();
-        const newSubscriber = `${normalizedEmail},${timestamp}\n`;
+        const newSubscriber = `${normalizedEmail},${subscriberName},${subscriberInterest},${timestamp}\n`;
 
         fs.appendFileSync(subscribersFile, newSubscriber);
 
@@ -346,7 +350,9 @@ app.post("/api/subscribe", async (req, res) => {
                 <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
                     <h2 style="color: #333;">New Newsletter Subscriber</h2>
                     <hr style="border: 1px solid #eee;" />
+                    ${subscriberName ? `<p><strong>Name:</strong> ${subscriberName}</p>` : ''}
                     <p><strong>Email:</strong> ${normalizedEmail}</p>
+                    <p><strong>Interested In:</strong> ${subscriberInterest}</p>
                     <p><strong>Subscribed At:</strong> ${new Date().toLocaleString()}</p>
                     <hr style="border: 1px solid #eee;" />
                     <p style="color: #666; font-size: 12px;">Total subscribers: ${existingSubscribers.length + 1}</p>
@@ -369,7 +375,8 @@ app.post("/api/subscribe", async (req, res) => {
             const welcomeEmailHtml = `
                 <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
                     <h2 style="color: #9c27b0;">Welcome to Almaden Voices!</h2>
-                    <p>Thank you for subscribing to our newsletter.</p>
+                    <p>${subscriberName ? `Hi ${subscriberName}, thank you` : 'Thank you'} for joining our mailing list${subscriberInterest && subscriberInterest !== 'Newsletter' ? ` and your interest in our ${subscriberInterest}` : ''}.</p>
+                    <p>We'll be in touch as soon as we have details to share.</p>
                     <p>You'll receive updates about:</p>
                     <ul style="line-height: 1.8; color: #333;">
                         <li>Upcoming speech and debate sessions</li>
