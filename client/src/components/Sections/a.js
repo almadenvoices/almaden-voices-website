@@ -207,14 +207,28 @@ const WorkshopInterestForm = () => {
                     </BilingualField>
 
                     <BilingualField labelEn="Child's grade" labelEs="Grado escolar de su hijo/a">
-                        <input
-                            type="text"
-                            placeholder="e.g. 4th grade / p. ej. 4º grado"
+                        <select
                             value={childGrade}
                             onChange={(e) => setChildGrade(e.target.value)}
                             disabled={status === 'submitting'}
-                            style={inputStyle}
-                        />
+                            style={{ ...inputStyle, appearance: 'auto', backgroundColor: 'white', color: childGrade ? '#1a1a1a' : '#888' }}
+                        >
+                            <option value="">Select grade / Seleccione el grado</option>
+                            <option value="Pre-K">Pre-K / Preescolar</option>
+                            <option value="Kindergarten">Kindergarten / Kínder</option>
+                            <option value="1st grade">1st grade / 1er grado</option>
+                            <option value="2nd grade">2nd grade / 2º grado</option>
+                            <option value="3rd grade">3rd grade / 3er grado</option>
+                            <option value="4th grade">4th grade / 4º grado</option>
+                            <option value="5th grade">5th grade / 5º grado</option>
+                            <option value="6th grade">6th grade / 6º grado</option>
+                            <option value="7th grade">7th grade / 7º grado</option>
+                            <option value="8th grade">8th grade / 8º grado</option>
+                            <option value="9th grade">9th grade / 9º grado</option>
+                            <option value="10th grade">10th grade / 10º grado</option>
+                            <option value="11th grade">11th grade / 11º grado</option>
+                            <option value="12th grade">12th grade / 12º grado</option>
+                        </select>
                     </BilingualField>
 
                     {status === 'error' && (
