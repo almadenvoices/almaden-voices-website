@@ -32,6 +32,146 @@
 
 import React, { useState, useEffect } from 'react';
 
+// Short "notify me" form for an upcoming public speaking workshop.
+// Adds the person to the mailing list via the existing /api/subscribe endpoint.
+const WorkshopInterestForm = () => {
+    const [name, setName] = useState('');
+    const [email, setEmail] = useState('');
+    const [status, setStatus] = useState('idle'); // idle | submitting | success | error
+    const [message, setMessage] = useState('');
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            setStatus('error');
+            setMessage('Please enter a valid email address.');
+            return;
+        }
+
+        setStatus('submitting');
+        setMessage('');
+
+        try {
+            const response = await fetch('/api/subscribe', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    name,
+                    email,
+                    interest: 'Public Speaking Workshop'
+                })
+            });
+            const result = await response.json();
+
+            if (response.ok) {
+                setStatus('success');
+                setMessage(result.message || "You're on the list! We'll reach out with details soon.");
+                setName('');
+                setEmail('');
+            } else {
+                setStatus('error');
+                setMessage(result.error || 'Something went wrong. Please try again.');
+            }
+        } catch (err) {
+            setStatus('error');
+            setMessage('Network error. Please check your connection and try again.');
+        }
+    };
+
+    const inputStyle = {
+        flex: '1 1 180px',
+        padding: '12px 14px',
+        borderRadius: '8px',
+        border: '1px solid #e0d4e6',
+        fontSize: '0.95rem',
+        outline: 'none'
+    };
+
+    return (
+        <div style={{
+            marginTop: '48px',
+            background: 'linear-gradient(135deg, #f9f4fc 0%, #f3e9f8 100%)',
+            border: '1px solid #eadcf2',
+            borderRadius: '16px',
+            padding: '32px 28px'
+        }}>
+            <h3 style={{ fontSize: '1.5rem', fontWeight: 700, color: '#1a1a1a', margin: '0 0 8px' }}>
+                Interested in our upcoming public speaking workshop?
+            </h3>
+            <p style={{ color: '#666', fontSize: '0.95rem', lineHeight: 1.6, margin: '0 0 20px', maxWidth: '640px' }}>
+                We&apos;re putting together a new public speaking workshop. Nothing&apos;s set in stone yet — leave
+                your contact below and we&apos;ll add you to our list and reach out the moment we have dates and details.
+            </p>
+
+            {status === 'success' ? (
+                <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '10px',
+                    padding: '16px 18px',
+                    backgroundColor: '#e8f5e9',
+                    border: '1px solid #c8e6c9',
+                    borderRadius: '10px',
+                    color: '#2e7d32',
+                    fontWeight: 500
+                }}>
+                    <span style={{ fontSize: '1.2rem' }}>✓</span>
+                    <span>{message}</span>
+                </div>
+            ) : (
+                <form onSubmit={handleSubmit}>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px' }}>
+                        <input
+                            type="text"
+                            placeholder="Your name"
+                            value={name}
+                            onChange={(e) => setName(e.target.value)}
+                            disabled={status === 'submitting'}
+                            style={inputStyle}
+                        />
+                        <input
+                            type="email"
+                            placeholder="you@example.com"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            required
+                            disabled={status === 'submitting'}
+                            style={{ ...inputStyle, borderColor: status === 'error' ? '#e57373' : '#e0d4e6' }}
+                        />
+                        <button
+                            type="submit"
+                            disabled={status === 'submitting'}
+                            style={{
+                                flex: '0 0 auto',
+                                padding: '12px 24px',
+                                backgroundColor: status === 'submitting' ? '#c9a6d6' : '#9c27b0',
+                                color: 'white',
+                                border: 'none',
+                                borderRadius: '8px',
+                                fontWeight: 600,
+                                fontSize: '0.95rem',
+                                cursor: status === 'submitting' ? 'not-allowed' : 'pointer',
+                                transition: 'background-color 0.3s ease'
+                            }}
+                            onMouseEnter={(e) => { if (status !== 'submitting') e.currentTarget.style.backgroundColor = '#7b1fa2'; }}
+                            onMouseLeave={(e) => { if (status !== 'submitting') e.currentTarget.style.backgroundColor = '#9c27b0'; }}
+                        >
+                            {status === 'submitting' ? 'Adding you…' : 'Keep me posted'}
+                        </button>
+                    </div>
+                    {status === 'error' && (
+                        <p style={{ color: '#c62828', fontSize: '0.85rem', margin: '10px 2px 0' }}>{message}</p>
+                    )}
+                    <p style={{ color: '#999', fontSize: '0.8rem', margin: '12px 2px 0' }}>
+                        No spam — just workshop updates. You can unsubscribe anytime.
+                    </p>
+                </form>
+            )}
+        </div>
+    );
+};
+
 const CoursesPage = () => {
     const [isVisible, setIsVisible] = useState(false);
 
@@ -336,6 +476,9 @@ const CoursesPage = () => {
                         </div>
                     ))}
                 </div>
+
+                {/* Short "notify me" form for the upcoming public speaking workshop */}
+                <WorkshopInterestForm />
             </div>
 
             {/* Past Sessions */}
