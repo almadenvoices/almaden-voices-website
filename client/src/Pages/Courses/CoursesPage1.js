@@ -109,12 +109,12 @@ const WorkshopInterestForm = () => {
                 ¿Le interesa un próximo taller de oratoria?
             </p>
             <p style={{ color: '#6B7280', fontSize: '0.95rem', lineHeight: 1.6, margin: '0 0 4px' }}>
-                We&apos;re putting together a new public speaking workshop for families. Nothing&apos;s set in stone
-                yet — leave your contact below and we&apos;ll reach out to schedule a workshop with you.
+                We&apos;re putting together a new public speaking workshop for families. Leave your contact below
+                and we&apos;ll email you for updates on the workshop.
             </p>
             <p style={{ color: '#6B7280', fontStyle: 'italic', fontSize: '0.95rem', lineHeight: 1.6, margin: '0 0 24px' }}>
-                Estamos organizando un nuevo taller de oratoria para familias. Todavía no hay nada definido — deje
-                su información a continuación y nos comunicaremos con usted para programar un taller.
+                Estamos organizando un nuevo taller de oratoria para familias. Deje su información a continuación
+                y le enviaremos información sobre el taller por correo electrónico.
             </p>
 
             {status === 'success' ? (
@@ -417,52 +417,17 @@ const CoursesPage = () => {
                 </p>
             </div>
 
-            <section className={s.gridSection} style={{ backgroundColor: '#F9FAFB', border: 'none' }}>
-                <div className="container">
-                    {sessions.length > 0 ? (
+            {sessions.length > 0 && (
+                <section className={s.gridSection} style={{ backgroundColor: '#F9FAFB', border: 'none' }}>
+                    <div className="container">
                         <div className={s.grid}>
                             {sessions.map(session => (
                                 <SessionCard key={session.id} session={session} />
                             ))}
                         </div>
-                    ) : (
-                        <div style={{
-                            textAlign: 'center',
-                            padding: '48px 24px',
-                            backgroundColor: '#FFFFFF',
-                            borderRadius: '16px',
-                            border: '2px dashed #E5E7EB',
-                            maxWidth: '500px',
-                            margin: '0 auto',
-                        }}>
-                            <div style={{ fontSize: '48px', marginBottom: '12px', color: '#D1D5DB' }}>
-                                <CalendarMonthIcon style={{ fontSize: 56 }} />
-                            </div>
-                            <h3 style={{ fontWeight: 600, color: '#374151', marginBottom: '8px' }}>
-                                No upcoming sessions right now
-                            </h3>
-                            <p style={{ color: '#6B7280', fontSize: '0.9rem', lineHeight: 1.7, maxWidth: '380px', margin: '0 auto 20px' }}>
-                                New sessions are announced regularly. Contact us to be the first to know!
-                            </p>
-                            <a
-                                href="/contact"
-                                style={{
-                                    display: 'inline-block',
-                                    backgroundColor: '#2563EB',
-                                    color: '#FFFFFF',
-                                    fontWeight: 700,
-                                    padding: '12px 32px',
-                                    borderRadius: '999px',
-                                    textDecoration: 'none',
-                                    fontSize: '0.95rem',
-                                }}
-                            >
-                                Get Notified
-                            </a>
-                        </div>
-                    )}
-                </div>
-            </section>
+                    </div>
+                </section>
+            )}
 
             {/* Public speaking workshop interest form (bilingual) */}
             <section style={{ backgroundColor: '#F9FAFB', padding: '32px 20px 64px' }}>
