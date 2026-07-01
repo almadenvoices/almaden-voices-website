@@ -301,7 +301,7 @@ app.post("/api/contact", async (req, res) => {
 // Newsletter subscription endpoint
 app.post("/api/subscribe", async (req, res) => {
     try {
-        const { email, name, interest } = req.body;
+        const { email, name, phone, childName, childGrade, interest } = req.body;
 
         // Validate email
         if (!email || !email.includes('@')) {
@@ -313,6 +313,9 @@ app.post("/api/subscribe", async (req, res) => {
 
         // Optional fields (sanitize commas so they don't break the CSV)
         const subscriberName = (name || "").toString().trim().replace(/,/g, " ");
+        const subscriberPhone = (phone || "").toString().trim().replace(/,/g, " ");
+        const subscriberChildName = (childName || "").toString().trim().replace(/,/g, " ");
+        const subscriberChildGrade = (childGrade || "").toString().trim().replace(/,/g, " ");
         const subscriberInterest = (interest || "Newsletter").toString().trim().replace(/,/g, " ");
 
         // Path to subscribers file
@@ -338,9 +341,9 @@ app.post("/api/subscribe", async (req, res) => {
             }
         }
 
-        // Add new subscriber to CSV (email,name,interest,timestamp)
+        // Add new subscriber to CSV (email,name,phone,childName,childGrade,interest,timestamp)
         const timestamp = new Date().toISOString();
-        const newSubscriber = `${normalizedEmail},${subscriberName},${subscriberInterest},${timestamp}\n`;
+        const newSubscriber = `${normalizedEmail},${subscriberName},${subscriberPhone},${subscriberChildName},${subscriberChildGrade},${subscriberInterest},${timestamp}\n`;
 
         fs.appendFileSync(subscribersFile, newSubscriber);
 
@@ -352,6 +355,9 @@ app.post("/api/subscribe", async (req, res) => {
                     <hr style="border: 1px solid #eee;" />
                     ${subscriberName ? `<p><strong>Name:</strong> ${subscriberName}</p>` : ''}
                     <p><strong>Email:</strong> ${normalizedEmail}</p>
+                    ${subscriberPhone ? `<p><strong>Phone:</strong> ${subscriberPhone}</p>` : ''}
+                    ${subscriberChildName ? `<p><strong>Child's Name:</strong> ${subscriberChildName}</p>` : ''}
+                    ${subscriberChildGrade ? `<p><strong>Child's Grade:</strong> ${subscriberChildGrade}</p>` : ''}
                     <p><strong>Interested In:</strong> ${subscriberInterest}</p>
                     <p><strong>Subscribed At:</strong> ${new Date().toLocaleString()}</p>
                     <hr style="border: 1px solid #eee;" />
@@ -375,19 +381,24 @@ app.post("/api/subscribe", async (req, res) => {
             const welcomeEmailHtml = `
                 <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
                     <h2 style="color: #9c27b0;">Welcome to Almaden Voices!</h2>
+                    <p style="color: #9c27b0; font-size: 0.95rem; margin-top: -8px;"><em>¡Bienvenido a Almaden Voices!</em></p>
                     <p>${subscriberName ? `Hi ${subscriberName}, thank you` : 'Thank you'} for joining our mailing list${subscriberInterest && subscriberInterest !== 'Newsletter' ? ` and your interest in our ${subscriberInterest}` : ''}.</p>
+                    <p style="color: #666;"><em>${subscriberName ? `Hola ${subscriberName}, gracias` : 'Gracias'} por unirse a nuestra lista de contactos${subscriberInterest && subscriberInterest !== 'Newsletter' ? ` y por su interés en nuestro taller de oratoria` : ''}.</em></p>
                     <p>We'll be in touch as soon as we have details to share.</p>
+                    <p style="color: #666;"><em>Nos pondremos en contacto con usted tan pronto como tengamos más información.</em></p>
                     <p>You'll receive updates about:</p>
+                    <p style="color: #666;"><em>Recibirá información sobre:</em></p>
                     <ul style="line-height: 1.8; color: #333;">
-                        <li>Upcoming speech and debate sessions</li>
-                        <li>Success stories from our community</li>
-                        <li>Helpful public speaking tips</li>
-                        <li>Special events and volunteer opportunities</li>
+                        <li>Upcoming speech and debate sessions <span style="color:#888;"><em>/ Próximas sesiones de oratoria y debate</em></span></li>
+                        <li>Success stories from our community <span style="color:#888;"><em>/ Historias de éxito de nuestra comunidad</em></span></li>
+                        <li>Helpful public speaking tips <span style="color:#888;"><em>/ Consejos útiles para hablar en público</em></span></li>
+                        <li>Special events and volunteer opportunities <span style="color:#888;"><em>/ Eventos especiales y oportunidades de voluntariado</em></span></li>
                     </ul>
                     <hr style="border: 1px solid #eee;" />
-                    <p style="color: #666;">Best regards,<br/>Almaden Voices Team</p>
+                    <p style="color: #666;">Best regards, / Atentamente,<br/>Almaden Voices Team</p>
                     <p style="color: #888; font-size: 0.85rem; margin-top: 20px;">
                         You can <a href="${unsubscribeUrl}" style="color: #9c27b0; text-decoration: none;">unsubscribe at any time</a>.
+                        <br/><em>Puede <a href="${unsubscribeUrl}" style="color: #9c27b0; text-decoration: none;">darse de baja en cualquier momento</a>.</em>
                     </p>
                 </div>
             `;
@@ -395,7 +406,7 @@ app.post("/api/subscribe", async (req, res) => {
             await emailTransporter.sendMail({
                 from: `"Almaden Voices" <${EMAIL_USER}>`,
                 to: normalizedEmail,
-                subject: "Welcome to Almaden Voices Newsletter!",
+                subject: "Welcome to Almaden Voices! / ¡Bienvenido a Almaden Voices!",
                 html: welcomeEmailHtml
             });
         }
