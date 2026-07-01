@@ -103,19 +103,35 @@ const WorkshopInterestForm = () => {
             padding: '32px 28px'
         }}>
             <h3 style={{ fontSize: '1.4rem', fontWeight: 700, color: '#111827', margin: '0 0 4px', textAlign: 'center' }}>
-                Interested in an upcoming public speaking workshop?
+                Interested in a free public speaking workshop?
             </h3>
             <p style={{ fontSize: '1.1rem', fontWeight: 600, color: '#2563EB', fontStyle: 'italic', margin: '0 0 16px', textAlign: 'center' }}>
-                ¿Le interesa un próximo taller de oratoria?
+                ¿Le interesa un taller de oratoria gratuito?
             </p>
             <p style={{ color: '#6B7280', fontSize: '0.95rem', lineHeight: 1.6, margin: '0 0 4px' }}>
                 We&apos;re putting together a new public speaking workshop for families. Leave your contact below
                 and we&apos;ll email you for updates on the workshop.
             </p>
-            <p style={{ color: '#6B7280', fontStyle: 'italic', fontSize: '0.95rem', lineHeight: 1.6, margin: '0 0 24px' }}>
+            <p style={{ color: '#6B7280', fontStyle: 'italic', fontSize: '0.95rem', lineHeight: 1.6, margin: '0 0 16px' }}>
                 Estamos organizando un nuevo taller de oratoria para familias. Deje su información a continuación
                 y le enviaremos información sobre el taller por correo electrónico.
             </p>
+            <div style={{
+                backgroundColor: '#ECFDF5',
+                border: '1px solid #A7F3D0',
+                borderRadius: '10px',
+                padding: '14px 16px',
+                margin: '0 0 24px'
+            }}>
+                <p style={{ color: '#065F46', fontSize: '0.92rem', fontWeight: 600, lineHeight: 1.6, margin: 0 }}>
+                    ✓ This workshop is 100% free, and signing up doesn&apos;t commit you to anything — you&apos;re
+                    just letting us know you&apos;re interested.
+                </p>
+                <p style={{ color: '#047857', fontStyle: 'italic', fontSize: '0.92rem', lineHeight: 1.6, margin: '4px 0 0' }}>
+                    ✓ Este taller es 100% gratis, y registrarse no lo compromete a nada — solo nos deja saber
+                    que le interesa.
+                </p>
+            </div>
 
             {status === 'success' ? (
                 <div style={{
@@ -409,11 +425,14 @@ const CoursesPage = () => {
             {/* Upcoming Sessions Header + Grid */}
             <div style={{ backgroundColor: '#F9FAFB', padding: '48px 20px 0' }}>
                 <h2 style={{ fontSize: 'clamp(1.5rem, 3vw, 2rem)', fontWeight: 700, color: '#111827', textAlign: 'center', marginBottom: '8px' }}>
-                    Upcoming Sessions
+                    Free Public Speaking Workshop
                 </h2>
                 <div style={{ width: '80px', height: '4px', backgroundColor: '#2563EB', borderRadius: '2px', margin: '0 auto 8px' }}></div>
-                <p style={{ textAlign: 'center', color: '#6B7280', fontSize: '1rem', marginBottom: '0' }}>
-                    Browse our upcoming sessions and register today.
+                <p style={{ textAlign: 'center', color: '#6B7280', fontSize: '1rem', marginBottom: '4px' }}>
+                    A free workshop for families — leave your contact and we&apos;ll email you the details.
+                </p>
+                <p style={{ textAlign: 'center', color: '#6B7280', fontStyle: 'italic', fontSize: '1rem', marginBottom: '0' }}>
+                    Un taller gratuito para familias — deje su información y le enviaremos los detalles por correo.
                 </p>
             </div>
 
