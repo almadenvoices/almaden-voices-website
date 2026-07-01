@@ -32,20 +32,43 @@
 
 import React, { useState, useEffect } from 'react';
 
-// Short "notify me" form for an upcoming public speaking workshop.
-// Adds the person to the mailing list via the existing /api/subscribe endpoint.
+// Bilingual labeled field: English label bold, Spanish label muted underneath.
+// Defined at module scope so it isn't recreated on every render (which would
+// remount the inputs and make them lose focus while typing).
+const BilingualField = ({ labelEn, labelEs, children }) => (
+    <div style={{ marginBottom: '16px' }}>
+        <label style={{ display: 'block', marginBottom: '6px' }}>
+            <span style={{ display: 'block', fontWeight: 600, color: '#1a1a1a', fontSize: '0.9rem' }}>{labelEn}</span>
+            <span style={{ display: 'block', color: '#8a6d97', fontStyle: 'italic', fontSize: '0.82rem' }}>{labelEs}</span>
+        </label>
+        {children}
+    </div>
+);
+
+// Short bilingual (English / Spanish) interest form for an upcoming public
+// speaking workshop. Collects family contact details and adds them to the
+// mailing list via the existing /api/subscribe endpoint so they can be
+// contacted individually when workshop details are ready.
 const WorkshopInterestForm = () => {
-    const [name, setName] = useState('');
+    const [fullName, setFullName] = useState('');
     const [email, setEmail] = useState('');
+    const [phone, setPhone] = useState('');
+    const [childName, setChildName] = useState('');
+    const [childGrade, setChildGrade] = useState('');
     const [status, setStatus] = useState('idle'); // idle | submitting | success | error
     const [message, setMessage] = useState('');
 
     const handleSubmit = async (e) => {
         e.preventDefault();
 
+        if (!fullName.trim() || !phone.trim() || !childName.trim() || !childGrade.trim()) {
+            setStatus('error');
+            setMessage('Please fill in all fields. / Por favor complete todos los campos.');
+            return;
+        }
         if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
             setStatus('error');
-            setMessage('Please enter a valid email address.');
+            setMessage('Please enter a valid email address. / Por favor ingrese un correo electrónico válido.');
             return;
         }
 
@@ -57,8 +80,11 @@ const WorkshopInterestForm = () => {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    name,
+                    name: fullName,
                     email,
+                    phone,
+                    childName,
+                    childGrade,
                     interest: 'Public Speaking Workshop'
                 })
             });
@@ -66,21 +92,25 @@ const WorkshopInterestForm = () => {
 
             if (response.ok) {
                 setStatus('success');
-                setMessage(result.message || "You're on the list! We'll reach out with details soon.");
-                setName('');
+                setMessage('');
+                setFullName('');
                 setEmail('');
+                setPhone('');
+                setChildName('');
+                setChildGrade('');
             } else {
                 setStatus('error');
-                setMessage(result.error || 'Something went wrong. Please try again.');
+                setMessage(result.error || 'Something went wrong. Please try again. / Algo salió mal. Por favor intente de nuevo.');
             }
         } catch (err) {
             setStatus('error');
-            setMessage('Network error. Please check your connection and try again.');
+            setMessage('Network error. Please check your connection and try again. / Error de conexión. Por favor revise su conexión e intente de nuevo.');
         }
     };
 
     const inputStyle = {
-        flex: '1 1 180px',
+        width: '100%',
+        boxSizing: 'border-box',
         padding: '12px 14px',
         borderRadius: '8px',
         border: '1px solid #e0d4e6',
@@ -96,18 +126,25 @@ const WorkshopInterestForm = () => {
             borderRadius: '16px',
             padding: '32px 28px'
         }}>
-            <h3 style={{ fontSize: '1.5rem', fontWeight: 700, color: '#1a1a1a', margin: '0 0 8px' }}>
+            <h3 style={{ fontSize: '1.5rem', fontWeight: 700, color: '#1a1a1a', margin: '0 0 4px' }}>
                 Interested in our upcoming public speaking workshop?
             </h3>
-            <p style={{ color: '#666', fontSize: '0.95rem', lineHeight: 1.6, margin: '0 0 20px', maxWidth: '640px' }}>
-                We&apos;re putting together a new public speaking workshop. Nothing&apos;s set in stone yet — leave
-                your contact below and we&apos;ll add you to our list and reach out the moment we have dates and details.
+            <p style={{ fontSize: '1.15rem', fontWeight: 600, color: '#7b1fa2', fontStyle: 'italic', margin: '0 0 12px' }}>
+                ¿Le interesa nuestro próximo taller de oratoria?
+            </p>
+            <p style={{ color: '#666', fontSize: '0.95rem', lineHeight: 1.6, margin: '0 0 4px', maxWidth: '640px' }}>
+                We&apos;re putting together a new public speaking workshop for families. Nothing&apos;s set in stone
+                yet — leave your contact below and we&apos;ll reach out to schedule a workshop with you.
+            </p>
+            <p style={{ color: '#8a6d97', fontStyle: 'italic', fontSize: '0.95rem', lineHeight: 1.6, margin: '0 0 24px', maxWidth: '640px' }}>
+                Estamos organizando un nuevo taller de oratoria para familias. Todavía no hay nada definido — deje
+                su información a continuación y nos comunicaremos con usted para programar un taller.
             </p>
 
             {status === 'success' ? (
                 <div style={{
                     display: 'flex',
-                    alignItems: 'center',
+                    alignItems: 'flex-start',
                     gap: '10px',
                     padding: '16px 18px',
                     backgroundColor: '#e8f5e9',
@@ -116,55 +153,98 @@ const WorkshopInterestForm = () => {
                     color: '#2e7d32',
                     fontWeight: 500
                 }}>
-                    <span style={{ fontSize: '1.2rem' }}>✓</span>
-                    <span>{message}</span>
+                    <span style={{ fontSize: '1.2rem', lineHeight: 1.4 }}>✓</span>
+                    <span>
+                        Thank you! You&apos;re on our list and we&apos;ll reach out soon with workshop details.
+                        <br />
+                        <em>¡Gracias! Está en nuestra lista y nos comunicaremos pronto con los detalles del taller.</em>
+                    </span>
                 </div>
             ) : (
-                <form onSubmit={handleSubmit}>
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px' }}>
+                <form onSubmit={handleSubmit} style={{ maxWidth: '520px' }}>
+                    <BilingualField labelEn="Full name" labelEs="Nombre completo">
                         <input
                             type="text"
-                            placeholder="Your name"
-                            value={name}
-                            onChange={(e) => setName(e.target.value)}
+                            placeholder="Full name / Nombre completo"
+                            value={fullName}
+                            onChange={(e) => setFullName(e.target.value)}
                             disabled={status === 'submitting'}
                             style={inputStyle}
                         />
+                    </BilingualField>
+
+                    <BilingualField labelEn="Email" labelEs="Correo electrónico">
                         <input
                             type="email"
                             placeholder="you@example.com"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
-                            required
                             disabled={status === 'submitting'}
-                            style={{ ...inputStyle, borderColor: status === 'error' ? '#e57373' : '#e0d4e6' }}
+                            style={inputStyle}
                         />
-                        <button
-                            type="submit"
+                    </BilingualField>
+
+                    <BilingualField labelEn="Phone number" labelEs="Número de teléfono">
+                        <input
+                            type="tel"
+                            placeholder="(000) 000-0000"
+                            value={phone}
+                            onChange={(e) => setPhone(e.target.value)}
                             disabled={status === 'submitting'}
-                            style={{
-                                flex: '0 0 auto',
-                                padding: '12px 24px',
-                                backgroundColor: status === 'submitting' ? '#c9a6d6' : '#9c27b0',
-                                color: 'white',
-                                border: 'none',
-                                borderRadius: '8px',
-                                fontWeight: 600,
-                                fontSize: '0.95rem',
-                                cursor: status === 'submitting' ? 'not-allowed' : 'pointer',
-                                transition: 'background-color 0.3s ease'
-                            }}
-                            onMouseEnter={(e) => { if (status !== 'submitting') e.currentTarget.style.backgroundColor = '#7b1fa2'; }}
-                            onMouseLeave={(e) => { if (status !== 'submitting') e.currentTarget.style.backgroundColor = '#9c27b0'; }}
-                        >
-                            {status === 'submitting' ? 'Adding you…' : 'Keep me posted'}
-                        </button>
-                    </div>
+                            style={inputStyle}
+                        />
+                    </BilingualField>
+
+                    <BilingualField labelEn="Child's name" labelEs="Nombre de su hijo/a">
+                        <input
+                            type="text"
+                            placeholder="Child's name / Nombre de su hijo/a"
+                            value={childName}
+                            onChange={(e) => setChildName(e.target.value)}
+                            disabled={status === 'submitting'}
+                            style={inputStyle}
+                        />
+                    </BilingualField>
+
+                    <BilingualField labelEn="Child's grade" labelEs="Grado escolar de su hijo/a">
+                        <input
+                            type="text"
+                            placeholder="e.g. 4th grade / p. ej. 4º grado"
+                            value={childGrade}
+                            onChange={(e) => setChildGrade(e.target.value)}
+                            disabled={status === 'submitting'}
+                            style={inputStyle}
+                        />
+                    </BilingualField>
+
                     {status === 'error' && (
-                        <p style={{ color: '#c62828', fontSize: '0.85rem', margin: '10px 2px 0' }}>{message}</p>
+                        <p style={{ color: '#c62828', fontSize: '0.85rem', margin: '0 2px 12px' }}>{message}</p>
                     )}
-                    <p style={{ color: '#999', fontSize: '0.8rem', margin: '12px 2px 0' }}>
+
+                    <button
+                        type="submit"
+                        disabled={status === 'submitting'}
+                        style={{
+                            padding: '13px 28px',
+                            backgroundColor: status === 'submitting' ? '#c9a6d6' : '#9c27b0',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '8px',
+                            fontWeight: 600,
+                            fontSize: '0.95rem',
+                            cursor: status === 'submitting' ? 'not-allowed' : 'pointer',
+                            transition: 'background-color 0.3s ease'
+                        }}
+                        onMouseEnter={(e) => { if (status !== 'submitting') e.currentTarget.style.backgroundColor = '#7b1fa2'; }}
+                        onMouseLeave={(e) => { if (status !== 'submitting') e.currentTarget.style.backgroundColor = '#9c27b0'; }}
+                    >
+                        {status === 'submitting' ? 'Sending… / Enviando…' : 'Keep me posted / Manténganme informado'}
+                    </button>
+
+                    <p style={{ color: '#999', fontSize: '0.8rem', margin: '16px 2px 0', lineHeight: 1.6 }}>
                         No spam — just workshop updates. You can unsubscribe anytime.
+                        <br />
+                        <em>Sin correo no deseado — solo información del taller. Puede darse de baja en cualquier momento.</em>
                     </p>
                 </form>
             )}
