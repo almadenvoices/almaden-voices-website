@@ -271,6 +271,17 @@ const CoursesPage = () => {
             .catch(() => {});
     }, []);
 
+    // Scroll to a section when the page is opened with a #hash (e.g. the
+    // footer's "Upcoming Sessions" link -> /courses1#workshop-signup).
+    useEffect(() => {
+        const hash = window.location.hash;
+        if (hash) {
+            setTimeout(() => {
+                document.querySelector(hash)?.scrollIntoView({ behavior: "smooth" });
+            }, 100);
+        }
+    }, []);
+
     // ============================================================
     // UPCOMING SESSIONS — Add new sessions here!
     // Copy this template and fill in the details:
@@ -449,7 +460,7 @@ const CoursesPage = () => {
             )}
 
             {/* Public speaking workshop interest form (bilingual) */}
-            <section style={{ backgroundColor: '#F9FAFB', padding: '32px 20px 64px' }}>
+            <section id="workshop-signup" style={{ backgroundColor: '#F9FAFB', padding: '32px 20px 64px', scrollMarginTop: '90px' }}>
                 <WorkshopInterestForm />
             </section>
 
