@@ -34,26 +34,29 @@ import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 // ============================================================
 const upcomingSessions = [
     {
-        id: "av-workshop-april8-2026",
-        title: "Free Public Speaking Workshop",
-        date: "April 8 & 9, 2026",
-        time: "1:00 – 4:00 PM",
-        location: "Almaden Library Community Center, 6445 Camden Ave, San Jose, CA 95120",
-        grades: "Grades 1–6",
-        capacity: 30,
+        id: "intl-workshop-jul-2026",
+        title: "Free International Public Speaking Workshop for Kids",
+        date: "July 21 & 23, 2026",
+        time: "10–11 AM IST · 12:30–1:30 PM Singapore · 4:30 AM UTC",
+        location: "Online via Webex",
+        grades: "Kids of all levels welcome",
+        capacity: 500,
         enrolled: 0,
-        description: "A two-day workshop (3 hours each) on Wednesday, April 8th and Thursday, April 9th. Students will learn simple techniques to speak clearly and confidently, how to overcome nervousness, and how to speak in front of a crowd — with all the must-know speech basics! At the end, your child will showcase their skills in a final speech. Students are welcome to attend one or both sessions, but attending both is highly recommended for the best experience.",
+        description: "A free two-day online workshop where kids learn the fundamentals of public speaking — how to speak clearly and confidently, overcome nervousness, and present in front of others. Runs Tuesday, July 21 and Thursday, July 23 (1 hour each day) live on Webex. Join from anywhere in the world! You're welcome to attend one or both days.",
         status: "Open",
-    }
+        online: true,
+    },
 ];
 
 const emptyStudent = () => ({ firstName: "", lastName: "", gradeLevel: "" });
 
 export default function RegisterPage() {
     const [agreed, setAgreed] = useState(false);
+    const [photoConsent, setPhotoConsent] = useState(false);
+    const [futureContact, setFutureContact] = useState(false);
     const [showToast, setShowToast] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [confirmationNumber, setConfirmationNumber] = useState("");
+    const [submitted, setSubmitted] = useState(false);
     const [error, setError] = useState("");
     const [selectedSessionId, setSelectedSessionId] = useState("");
     const [enrollmentCounts, setEnrollmentCounts] = useState({});
@@ -61,6 +64,9 @@ export default function RegisterPage() {
     const [donationAmount, setDonationAmount] = useState(5);
     const [parentFirstName, setParentFirstName] = useState("");
     const [parentLastName, setParentLastName] = useState("");
+
+    // Google Apps Script web app URL — replace with your deployed URL
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxrbVWSjMpAB4Ru1mm_DSywPdfFS3KfMMA07Ie_e1VbXGeW_ILtNQ-vE8rQrIYubjFI/exec";
 
     // Detect when the parent's full name matches any student's full name
     // (a common mistake where parents type their child's name in the parent field, or vice versa)
@@ -110,41 +116,55 @@ export default function RegisterPage() {
             return;
         }
 
+        if (!agreed) {
+            setError("Please agree to the Privacy Policy to continue.");
+            return;
+        }
+
         setIsSubmitting(true);
 
         const formData = new FormData(e.target);
-        const data = {
-            students: students,
-            parentFirstName: parentFirstName,
-            parentLastName: parentLastName,
+        const sessionLabel = selectedSession ? `${selectedSession.title} — ${selectedSession.date}` : "";
+
+        // Google Apps Script payload
+        const appsScriptData = {
+            parentName: `${parentFirstName} ${parentLastName}`.trim(),
             email: formData.get("email"),
             phone: formData.get("phone"),
+            students: students,
             sessionType: formData.get("sessionType"),
+            sessionLabel: sessionLabel,
+            country: formData.get("country"),
             streetAddress: formData.get("streetAddress"),
             city: formData.get("city"),
             state: formData.get("state"),
             zipCode: formData.get("zipCode"),
-            additionalInfo: formData.get("additionalInfo")
+            additionalInfo: formData.get("additionalInfo"),
+            privacyAgreed: agreed,
+            photoConsent: photoConsent,
+            futureContact: futureContact,
         };
 
         try {
-            const response = await fetch("/api/register", {
+            // Submit to Google Apps Script.
+            // Use text/plain to avoid a CORS preflight so we can read the response.
+            const response = await fetch(APPS_SCRIPT_URL, {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(data)
+                headers: { "Content-Type": "text/plain;charset=utf-8" },
+                body: JSON.stringify(appsScriptData),
             });
 
-            const result = await response.json();
+            const result = response.ok ? await response.json() : null;
 
-            if (response.ok) {
-                setConfirmationNumber(result.confirmationNumber);
+            if (result && result.success) {
+                setSubmitted(true);
                 setShowToast(true);
-                const shouldDonate = donationAmount > 0;
+                const shouldDonate = donationAmount > 0 && !selectedSession?.online;
                 const donateAmt = donationAmount;
                 e.target.reset();
                 setAgreed(false);
+                setPhotoConsent(false);
+                setFutureContact(false);
                 setStudents([emptyStudent()]);
                 setDonationAmount(5);
                 setParentFirstName("");
@@ -155,7 +175,6 @@ export default function RegisterPage() {
                     .then(data => setEnrollmentCounts(data))
                     .catch(() => {});
                 if (shouldDonate) {
-                    // Redirect to donate page with pre-filled amount after a short delay
                     setTimeout(() => {
                         window.location.href = `/donate?amount=${donateAmt}`;
                     }, 2500);
@@ -163,7 +182,7 @@ export default function RegisterPage() {
                     document.getElementById("register-success")?.scrollIntoView({ behavior: "smooth" });
                 }
             } else {
-                setError(result.error || "Failed to submit registration. Please try again.");
+                setError((result && result.error) || "Failed to submit registration. Please try again.");
             }
         } catch (err) {
             console.error("Registration form error:", err);
@@ -482,36 +501,47 @@ export default function RegisterPage() {
                                     </div>
                                 </div>
 
-                                <h2 className={s.formTitle}>
-                                    <HomeIcon /> Mailing Address
-                                </h2>
-                                <p style={{ fontSize: "0.85rem", color: "#6B7280", margin: "-4px 0 16px", lineHeight: 1.5 }}>
-                                    <InfoOutlinedIcon style={{ fontSize: 14, color: "#9CA3AF", verticalAlign: "middle", marginRight: "4px" }} />
-                                    We send personalized welcome letters and certificates to our students by mail. Your address is never shared with third parties.
-                                </p>
-
-                                <div className={s.field}>
-                                    <label>Street Address <span className={s.req}>*</span></label>
-                                    <input name="streetAddress" placeholder="123 Main St" required disabled={isSubmitting} />
-                                </div>
-
-                                <div className={s.grid}>
-                                    <div className={s.field}>
-                                        <label>City <span className={s.req}>*</span></label>
-                                        <input name="city" placeholder="San Jose" required disabled={isSubmitting} />
+                                {selectedSession.online ? (
+                                    <div className={s.grid}>
+                                        <div className={s.field}>
+                                            <label>Country <span className={s.req}>*</span></label>
+                                            <input name="country" placeholder="e.g. India, Singapore, United States" required disabled={isSubmitting} />
+                                        </div>
                                     </div>
-                                    <div className={s.field}>
-                                        <label>State <span className={s.req}>*</span></label>
-                                        <input name="state" placeholder="CA" required disabled={isSubmitting} />
-                                    </div>
-                                </div>
+                                ) : (
+                                    <>
+                                        <h2 className={s.formTitle}>
+                                            <HomeIcon /> Mailing Address
+                                        </h2>
+                                        <p style={{ fontSize: "0.85rem", color: "#6B7280", margin: "-4px 0 16px", lineHeight: 1.5 }}>
+                                            <InfoOutlinedIcon style={{ fontSize: 14, color: "#9CA3AF", verticalAlign: "middle", marginRight: "4px" }} />
+                                            We send personalized welcome letters and certificates to our students by mail. Your address is never shared with third parties.
+                                        </p>
 
-                                <div className={s.grid}>
-                                    <div className={s.field}>
-                                        <label>ZIP Code <span className={s.req}>*</span></label>
-                                        <input name="zipCode" placeholder="95120" required disabled={isSubmitting} />
-                                    </div>
-                                </div>
+                                        <div className={s.field}>
+                                            <label>Street Address <span className={s.req}>*</span></label>
+                                            <input name="streetAddress" placeholder="123 Main St" required disabled={isSubmitting} />
+                                        </div>
+
+                                        <div className={s.grid}>
+                                            <div className={s.field}>
+                                                <label>City <span className={s.req}>*</span></label>
+                                                <input name="city" placeholder="San Jose" required disabled={isSubmitting} />
+                                            </div>
+                                            <div className={s.field}>
+                                                <label>State <span className={s.req}>*</span></label>
+                                                <input name="state" placeholder="CA" required disabled={isSubmitting} />
+                                            </div>
+                                        </div>
+
+                                        <div className={s.grid}>
+                                            <div className={s.field}>
+                                                <label>ZIP Code <span className={s.req}>*</span></label>
+                                                <input name="zipCode" placeholder="95120" required disabled={isSubmitting} />
+                                            </div>
+                                        </div>
+                                    </>
+                                )}
 
                                 <div className={s.field}>
                                     <label>Additional Information</label>
@@ -523,7 +553,8 @@ export default function RegisterPage() {
                                     />
                                 </div>
 
-                                {/* Optional Donation */}
+                                {/* Optional Donation — hidden for free online workshops */}
+                                {!selectedSession.online && (
                                 <div style={{
                                     background: "linear-gradient(135deg, #FFF7ED 0%, #FFFBEB 100%)",
                                     border: "1px solid #FDE68A",
@@ -568,8 +599,10 @@ export default function RegisterPage() {
                                             : "No worries at all — your spot is secured either way!"}
                                     </p>
                                 </div>
+                                )}
 
                                 <div className={s.actions}>
+                                    {/* Checkbox 1 (required): Privacy Policy + Terms */}
                                     <label className={s.check}>
                                         <input
                                             type="checkbox"
@@ -578,9 +611,37 @@ export default function RegisterPage() {
                                             disabled={isSubmitting}
                                         />
                                         <span>
-                                            I agree to the <a className={s.link} href="/docs/terms-of-service.html" target="_blank" rel="noopener noreferrer">terms of service <OpenInNewIcon style={{ fontSize: 14, verticalAlign: 'middle' }} /></a> and <a className={s.link} href="/docs/privacy-policy.html" target="_blank" rel="noopener noreferrer">privacy policy <OpenInNewIcon style={{ fontSize: 14, verticalAlign: 'middle' }} /></a>.
+                                            I have read and agree to the Almaden Voices <a className={s.link} href="/docs/privacy-policy.html" target="_blank" rel="noopener noreferrer">Privacy Policy <OpenInNewIcon style={{ fontSize: 14, verticalAlign: 'middle' }} /></a> and <a className={s.link} href="/docs/terms-of-service.html" target="_blank" rel="noopener noreferrer">Terms of Service <OpenInNewIcon style={{ fontSize: 14, verticalAlign: 'middle' }} /></a>. <span className={s.req}>*</span>
                                         </span>
                                     </label>
+
+                                    {/* Checkbox 2 (optional): Photo/video consent */}
+                                    <label className={s.check}>
+                                        <input
+                                            type="checkbox"
+                                            checked={photoConsent}
+                                            onChange={(e) => setPhotoConsent(e.target.checked)}
+                                            disabled={isSubmitting}
+                                        />
+                                        <span>
+                                            I give permission for Almaden Voices to photograph or record my child for promotional use.
+                                        </span>
+                                    </label>
+
+                                    {/* Checkbox 3 (optional): Future contact opt-in */}
+                                    <label className={s.check}>
+                                        <input
+                                            type="checkbox"
+                                            checked={futureContact}
+                                            onChange={(e) => setFutureContact(e.target.checked)}
+                                            disabled={isSubmitting}
+                                        />
+                                        <span>
+                                            I would like to be contacted about future Almaden Voices sessions and events.
+                                        </span>
+                                    </label>
+
+                                    <p style={{ fontSize: 12, color: '#9CA3AF', margin: '4px 0 8px' }}>Photo/video consent and future contact preferences are optional and do not affect your child's enrollment.</p>
                                     <button className={s.btn} disabled={!agreed || isSubmitting || hasNameConflict}>
                                         <span>{isSubmitting ? "Submitting..." : students.length > 1 ? `Register ${students.length} Children` : "Register Now"}</span>
                                         <SendIcon fontSize="small" />
@@ -592,22 +653,17 @@ export default function RegisterPage() {
                 </section>
 
                 {/* Success message */}
-                {confirmationNumber && (
+                {submitted && (
                     <section id="register-success" className={s.success}>
                         <h2>Registration Confirmed!</h2>
                         <p>Thank you for registering! Your spot is confirmed. A confirmation email with workshop details has been sent to your email.</p>
-                        <div className={s.confirmationBox}>
-                            <p className={s.confirmLabel}>Your Confirmation Number:</p>
-                            <p className={s.confirmNumber}>{confirmationNumber}</p>
-                            <p className={s.confirmNote}>Please save this number for your records</p>
-                        </div>
                     </section>
                 )}
             </div>
 
             {/* Toast */}
             <div className={`${s.toast} ${showToast ? s.toastShow : ""}`} onAnimationEnd={() => setShowToast(false)}>
-                Registration submitted! Confirmation: {confirmationNumber}
+                Registration submitted! Check your email for confirmation.
             </div>
         </div>
     );
