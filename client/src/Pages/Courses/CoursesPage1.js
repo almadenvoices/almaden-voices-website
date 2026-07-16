@@ -301,7 +301,22 @@ const CoursesPage = () => {
     //     cover: "/images/your-image.jpg"
     // }
     // ============================================================
-    const upcomingSessions = [];
+    const upcomingSessions = [
+        {
+            id: "intl-workshop-jul-2026",
+            title: "Free International Public Speaking Workshop for Kids",
+            date: "July 21 & 23, 2026",
+            time: "10–11 AM IST · 12:30–1:30 PM Singapore · 4:30 AM UTC",
+            location: "Online via Webex",
+            ageGroup: "Kids of all levels",
+            capacity: 500,
+            enrolled: 0,
+            description: "A free two-day online workshop where kids learn the fundamentals of public speaking — speaking clearly and confidently, overcoming nervousness, and presenting in front of others. Live on Webex; join from anywhere in the world.",
+            status: "Open",
+            online: true,
+            cover: "/images/teaching-beginner.JPG",
+        },
+    ];
 
     const sessions = upcomingSessions.map(ses => ({
         ...ses,
@@ -329,7 +344,7 @@ const CoursesPage = () => {
                     <li><CalendarMonthIcon /> {session.date}</li>
                     <li><AccessTimeIcon /> {session.time}</li>
                     <li><PlaceIcon /> {session.location}</li>
-                    <li><GroupsIcon /> {session.ageGroup} {!isPast && `· ${session.enrolled}/${session.capacity} enrolled`}</li>
+                    <li><GroupsIcon /> {session.ageGroup} {!isPast && !session.online && `· ${session.enrolled}/${session.capacity} enrolled`}</li>
                 </ul>
 
                 <div className={s.row}>
@@ -341,7 +356,7 @@ const CoursesPage = () => {
                     <div className={s.tags}>
                         {!isPast ? (
                             session.status === "Open" ? (
-                                <span className={`${s.tag} ${s.tagOk}`}>{session.capacity - session.enrolled} seats left</span>
+                                <span className={`${s.tag} ${s.tagOk}`}>{session.online ? "Online · Free" : `${session.capacity - session.enrolled} seats left`}</span>
                             ) : (
                                 <span className={`${s.tag} ${s.tagFull}`}>Full</span>
                             )
@@ -440,10 +455,10 @@ const CoursesPage = () => {
                 </h2>
                 <div style={{ width: '80px', height: '4px', backgroundColor: '#2563EB', borderRadius: '2px', margin: '0 auto 8px' }}></div>
                 <p style={{ textAlign: 'center', color: '#6B7280', fontSize: '1rem', marginBottom: '4px' }}>
-                    A free workshop for families — leave your contact and we&apos;ll email you the details.
+                    A free two-day online workshop for kids — July 21 &amp; 23, 2026, live on Webex. Register below and we&apos;ll email your join link and reminders.
                 </p>
                 <p style={{ textAlign: 'center', color: '#6B7280', fontStyle: 'italic', fontSize: '1rem', marginBottom: '0' }}>
-                    Un taller gratuito para familias — deje su información y le enviaremos los detalles por correo.
+                    Un taller gratuito en línea de dos días para niños — 21 y 23 de julio de 2026, en vivo por Webex. Regístrese abajo y le enviaremos su enlace y recordatorios.
                 </p>
             </div>
 
