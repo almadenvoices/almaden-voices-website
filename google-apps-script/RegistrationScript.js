@@ -30,7 +30,7 @@ const REG_HEADERS = [
   "Phone",
   "Student First Name",
   "Student Last Name",
-  "Grade",
+  "Age",
   "Session",
   "Session ID",
   "Country",
@@ -95,7 +95,7 @@ function doPost(e) {
         "Phone": data.phone,
         "Student First Name": student.firstName,
         "Student Last Name": student.lastName,
-        "Grade": student.gradeLevel,
+        "Age": student.age,
         "Session": data.sessionLabel || data.sessionType,
         "Session ID": data.sessionType || "",
         "Country": data.country || "",
@@ -113,7 +113,7 @@ function doPost(e) {
     // Shared email pieces
     const studentListHtml = students.map(function(st) {
       return "<li><strong>" + st.firstName + " " + st.lastName + "</strong>" +
-        (st.gradeLevel ? " — " + gradeLabel(st.gradeLevel) : "") + "</li>";
+        (st.age ? " &mdash; Age " + st.age : "") + "</li>";
     }).join("");
     const studentNames = students.map(function(st) { return st.firstName + " " + st.lastName; }).join(", ");
     const childWord = students.length === 1 ? "child" : students.length + " children";
@@ -428,24 +428,6 @@ function recordSent(logSheet, email, workshopId, reminderKey) {
 // ============================================================
 // UTILITIES
 // ============================================================
-// Turn "1" → "1st", "2" → "2nd", etc.
-function gradeSuffix(grade) {
-  const n = parseInt(grade, 10);
-  if (!n) return grade;
-  if (n === 1) return "1st";
-  if (n === 2) return "2nd";
-  if (n === 3) return "3rd";
-  return n + "th";
-}
-
-// Full grade label for emails, e.g. "K" → "Kindergarten", "7" → "7th Grade"
-function gradeLabel(grade) {
-  if (String(grade).toUpperCase() === "K") return "Kindergarten";
-  const n = parseInt(grade, 10);
-  if (!n) return grade;
-  return gradeSuffix(grade) + " Grade";
-}
-
 function jsonOut(obj) {
   return ContentService.createTextOutput(JSON.stringify(obj)).setMimeType(ContentService.MimeType.JSON);
 }
