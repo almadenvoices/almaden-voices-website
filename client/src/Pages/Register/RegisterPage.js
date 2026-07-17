@@ -218,7 +218,7 @@ export default function RegisterPage() {
                             </div>
                             <h3>Who Can Join?</h3>
                             <p className={s.muted}>
-                                Students in grades 2-8 are welcome. Programs vary by grade level — specific eligibility is listed for each session.
+                                This free workshop is open to kids in Kindergarten through 9th grade, anywhere in the world. No experience needed — all levels welcome!
                             </p>
                         </div>
 
@@ -226,9 +226,9 @@ export default function RegisterPage() {
                             <div className={s.iconCircle}>
                                 <SchoolIcon />
                             </div>
-                            <h3>Session Types</h3>
+                            <h3>What You'll Learn</h3>
                             <p className={s.muted}>
-                                We offer Beginner, Advanced, and Debate sessions. Choose one from the dropdown to see full details.
+                                The fundamentals of public speaking — how to speak clearly and confidently, overcome nervousness, and present in front of others.
                             </p>
                         </div>
 
@@ -238,7 +238,7 @@ export default function RegisterPage() {
                             </div>
                             <h3>What to Expect</h3>
                             <p className={s.muted}>
-                                Sessions run 4–6 weeks and end with a final showcase for parents. You'll receive schedule details after registration.
+                                Two 1-hour live sessions on Webex — Tuesday, July 21 & Thursday, July 23. Come to one or both days. We'll email your join link and reminders after you register.
                             </p>
                         </div>
                     </aside>
