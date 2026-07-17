@@ -159,7 +159,7 @@ export default function RegisterPage() {
             if (result && result.success) {
                 setSubmitted(true);
                 setShowToast(true);
-                const shouldDonate = donationAmount > 0 && !selectedSession?.online;
+                const shouldDonate = donationAmount > 0;
                 const donateAmt = donationAmount;
                 e.target.reset();
                 setAgreed(false);
@@ -553,8 +553,7 @@ export default function RegisterPage() {
                                     />
                                 </div>
 
-                                {/* Optional Donation — hidden for free online workshops */}
-                                {!selectedSession.online && (
+                                {/* Optional Donation */}
                                 <div style={{
                                     background: "linear-gradient(135deg, #FFF7ED 0%, #FFFBEB 100%)",
                                     border: "1px solid #FDE68A",
@@ -566,7 +565,9 @@ export default function RegisterPage() {
                                         <VolunteerActivismIcon style={{ color: "#F59E0B" }} /> Support Our Workshop
                                     </h2>
                                     <p style={{ fontSize: "0.9rem", color: "#6B7280", lineHeight: 1.7, margin: "0 0 16px" }}>
-                                        This workshop is <strong>completely free</strong> — no donation is required to register. However, a small $5–$10 contribution helps us cover the cost of the library room, materials, and supplies. Every bit helps us keep these workshops accessible for all families!
+                                        This workshop is <strong>completely free</strong> — no donation is required to register. {selectedSession.online
+                                            ? "However, a small $5–$10 contribution helps us cover the cost of hosting the workshop online over Webex. Every bit helps us keep these workshops free and accessible for families around the world!"
+                                            : "However, a small $5–$10 contribution helps us cover the cost of the library room, materials, and supplies. Every bit helps us keep these workshops accessible for all families!"}
                                     </p>
                                     <div style={{ display: "flex", flexWrap: "wrap", gap: "10px", marginBottom: "12px" }}>
                                         {[0, 5, 10].map(amt => (
@@ -599,7 +600,6 @@ export default function RegisterPage() {
                                             : "No worries at all — your spot is secured either way!"}
                                     </p>
                                 </div>
-                                )}
 
                                 <div className={s.actions}>
                                     {/* Checkbox 1 (optional): Photo/video consent */}
