@@ -72,11 +72,16 @@
   top: 50%;
   transform: translateY(-50%);
   z-index: 3;
-  color: rgba(255,255,255,.9);
-  background: rgba(0,0,0,.3);
-  padding: 12px;
+  color: #FFFFFF;
+  background: rgba(0,0,0,.45);
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  border: 2px solid rgba(255,255,255,.85);
+  box-shadow: 0 4px 14px rgba(0,0,0,.35);
+  transition: background .2s, transform .2s;
 }
-.navBtn:hover{ background: rgba(0,0,0,.5); }
+.navBtn:hover{ background: rgba(0,0,0,.7); transform: translateY(-50%) scale(1.08); }
 
 .dots{
   position: absolute;
