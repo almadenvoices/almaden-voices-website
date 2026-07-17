@@ -323,11 +323,7 @@ export default function RegisterPage() {
                                         <GroupsIcon style={{ fontSize: 16, color: "#2563EB" }} /> {selectedSession.grades}
                                     </span>
                                 </div>
-                                {selectedSession.status === "Open" ? (
-                                    <p style={{ margin: "12px 0 0", fontSize: "0.85rem", color: "#059669", fontWeight: 600 }}>
-                                        {spotsRemaining} spots remaining
-                                    </p>
-                                ) : (
+                                {selectedSession.status !== "Open" && (
                                     <p style={{ margin: "12px 0 0", fontSize: "0.85rem", color: "#DC2626", fontWeight: 600 }}>
                                         This session is full — submit your form to join the waitlist
                                     </p>
