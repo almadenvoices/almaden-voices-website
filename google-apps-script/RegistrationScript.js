@@ -213,7 +213,7 @@ function buildWorkshopConfirmationHtml(data, workshop, students, studentListHtml
   const childPhrase = students.length === 1 ? firstStudent.firstName : "your children";
   return '' +
     '<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">' +
-      '<h2 style="color:#2563EB;">You\'re Registered! 🎉</h2>' +
+      '<h2 style="color:#2563EB;">You\'re Registered! &#127881;</h2>' +
       '<p>Dear ' + data.parentName + ',</p>' +
       '<p>Thank you for registering ' + childPhrase + ' for our <strong>' + workshop.name + '</strong>! ' +
         (students.length === 1 ? 'Your spot is' : 'Your spots are') + ' confirmed. This is a free two-day online workshop where kids learn the fundamentals of public speaking — how to speak clearly and confidently, overcome nervousness, and present in front of others.</p>' +
@@ -386,7 +386,7 @@ function sendReminderEmail(email, registrant, workshop, session, type) {
 
   const html = '' +
     '<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">' +
-      '<h2 style="color:#2563EB;">' + (type === "2day" ? "See you in 2 days! 👋" : "It\'s almost time! ⏰") + '</h2>' +
+      '<h2 style="color:#2563EB;">' + (type === "2day" ? "See you in 2 days! &#128075;" : "It\'s almost time! &#9200;") + '</h2>' +
       '<p>Dear ' + registrant.parentName + ',</p>' +
       '<p>' + intro + '</p>' +
       scheduleBlockHtml(workshop) +
