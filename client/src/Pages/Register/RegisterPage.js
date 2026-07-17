@@ -48,7 +48,7 @@ const upcomingSessions = [
     },
 ];
 
-const emptyStudent = () => ({ firstName: "", lastName: "", gradeLevel: "" });
+const emptyStudent = () => ({ firstName: "", lastName: "", age: "" });
 
 export default function RegisterPage() {
     const [agreed, setAgreed] = useState(false);
@@ -218,7 +218,7 @@ export default function RegisterPage() {
                             </div>
                             <h3>Who Can Join?</h3>
                             <p className={s.muted}>
-                                This free workshop is open to kids in Kindergarten through 9th grade, anywhere in the world. No experience needed — all levels welcome!
+                                This free workshop is open to kids ages 5 to 15, anywhere in the world. No experience needed — all levels welcome!
                             </p>
                         </div>
 
@@ -408,25 +408,18 @@ export default function RegisterPage() {
                                         </div>
 
                                         <div className={s.field}>
-                                            <label>Grade Level <span className={s.req}>*</span></label>
+                                            <label>Age <span className={s.req}>*</span></label>
                                             <select
                                                 required
                                                 disabled={isSubmitting}
                                                 className={s.select}
-                                                value={student.gradeLevel}
-                                                onChange={(e) => updateStudent(index, "gradeLevel", e.target.value)}
+                                                value={student.age}
+                                                onChange={(e) => updateStudent(index, "age", e.target.value)}
                                             >
-                                                <option value="">Select grade...</option>
-                                                <option value="K">Kindergarten</option>
-                                                <option value="1">1st Grade</option>
-                                                <option value="2">2nd Grade</option>
-                                                <option value="3">3rd Grade</option>
-                                                <option value="4">4th Grade</option>
-                                                <option value="5">5th Grade</option>
-                                                <option value="6">6th Grade</option>
-                                                <option value="7">7th Grade</option>
-                                                <option value="8">8th Grade</option>
-                                                <option value="9">9th Grade</option>
+                                                <option value="">Select age...</option>
+                                                {[5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15].map(age => (
+                                                    <option key={age} value={String(age)}>{age} years old</option>
+                                                ))}
                                             </select>
                                         </div>
                                     </div>
