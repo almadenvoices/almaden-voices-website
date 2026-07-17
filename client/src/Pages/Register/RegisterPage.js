@@ -602,20 +602,7 @@ export default function RegisterPage() {
                                 )}
 
                                 <div className={s.actions}>
-                                    {/* Checkbox 1 (required): Privacy Policy + Terms */}
-                                    <label className={s.check}>
-                                        <input
-                                            type="checkbox"
-                                            checked={agreed}
-                                            onChange={(e) => setAgreed(e.target.checked)}
-                                            disabled={isSubmitting}
-                                        />
-                                        <span>
-                                            I have read and agree to the Almaden Voices <a className={s.link} href="/docs/privacy-policy.html" target="_blank" rel="noopener noreferrer">Privacy Policy <OpenInNewIcon style={{ fontSize: 14, verticalAlign: 'middle' }} /></a> and <a className={s.link} href="/docs/terms-of-service.html" target="_blank" rel="noopener noreferrer">Terms of Service <OpenInNewIcon style={{ fontSize: 14, verticalAlign: 'middle' }} /></a>. <span className={s.req}>*</span>
-                                        </span>
-                                    </label>
-
-                                    {/* Checkbox 2 (optional): Photo/video consent */}
+                                    {/* Checkbox 1 (optional): Photo/video consent */}
                                     <label className={s.check}>
                                         <input
                                             type="checkbox"
@@ -628,7 +615,7 @@ export default function RegisterPage() {
                                         </span>
                                     </label>
 
-                                    {/* Checkbox 3 (optional): Future contact opt-in */}
+                                    {/* Checkbox 2 (optional): Future contact opt-in */}
                                     <label className={s.check}>
                                         <input
                                             type="checkbox"
@@ -641,7 +628,19 @@ export default function RegisterPage() {
                                         </span>
                                     </label>
 
-                                    <p style={{ fontSize: 12, color: '#9CA3AF', margin: '4px 0 8px' }}>Photo/video consent and future contact preferences are optional and do not affect your child's enrollment.</p>
+                                    {/* Checkbox 3 (required): Privacy Policy + Terms */}
+                                    <label className={s.check}>
+                                        <input
+                                            type="checkbox"
+                                            checked={agreed}
+                                            onChange={(e) => setAgreed(e.target.checked)}
+                                            disabled={isSubmitting}
+                                        />
+                                        <span>
+                                            I have read and agree to the Almaden Voices <a className={s.link} href="/docs/privacy-policy.html" target="_blank" rel="noopener noreferrer">Privacy Policy <OpenInNewIcon style={{ fontSize: 14, verticalAlign: 'middle' }} /></a> and <a className={s.link} href="/docs/terms-of-service.html" target="_blank" rel="noopener noreferrer">Terms of Service <OpenInNewIcon style={{ fontSize: 14, verticalAlign: 'middle' }} /></a>. <span className={s.req}>*</span>
+                                        </span>
+                                    </label>
+
                                     <button className={s.btn} disabled={!agreed || isSubmitting || hasNameConflict}>
                                         <span>{isSubmitting ? "Submitting..." : students.length > 1 ? `Register ${students.length} Children` : "Register Now"}</span>
                                         <SendIcon fontSize="small" />
