@@ -153,7 +153,11 @@ const pastSessions = [
             "Delivered a final showcase speech",
         ],
         images: [
-            { src: "/images/teaching-beginner.JPG", caption: "Learning the fundamentals" },
+            { src: "/images/s7-me-presenting.png", caption: "Kicking off the workshop" },
+            { src: "/images/s7-circle.png", caption: "Warm-up circle to start the day" },
+            { src: "/images/s7-practice-paragraphs.png", caption: "Practicing speech paragraphs" },
+            { src: "/images/s7-working-in-groups.png", caption: "Working together in groups" },
+            { src: "/images/s7-student-speaking.png", caption: "A student delivering their speech" },
         ],
     },
 ];
