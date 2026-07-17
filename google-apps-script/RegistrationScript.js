@@ -113,7 +113,7 @@ function doPost(e) {
     // Shared email pieces
     const studentListHtml = students.map(function(st) {
       return "<li><strong>" + st.firstName + " " + st.lastName + "</strong>" +
-        (st.gradeLevel ? " — " + gradeSuffix(st.gradeLevel) + " Grade" : "") + "</li>";
+        (st.gradeLevel ? " — " + gradeLabel(st.gradeLevel) : "") + "</li>";
     }).join("");
     const studentNames = students.map(function(st) { return st.firstName + " " + st.lastName; }).join(", ");
     const childWord = students.length === 1 ? "child" : students.length + " children";
@@ -436,6 +436,14 @@ function gradeSuffix(grade) {
   if (n === 2) return "2nd";
   if (n === 3) return "3rd";
   return n + "th";
+}
+
+// Full grade label for emails, e.g. "K" → "Kindergarten", "7" → "7th Grade"
+function gradeLabel(grade) {
+  if (String(grade).toUpperCase() === "K") return "Kindergarten";
+  const n = parseInt(grade, 10);
+  if (!n) return grade;
+  return gradeSuffix(grade) + " Grade";
 }
 
 function jsonOut(obj) {
