@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import StarIcon from '@mui/icons-material/Star';
 import HeroVideo from "../../components/HeroVideo/HeroVideo";
 import VisionMission from "../../components/Sections/VisionMission";
 import TestimonialsGridSlider from '../../components/Testimonial/TestimonialsGridSlider';
@@ -320,11 +321,49 @@ export default function HomePage(){
     const [videoPlaying, setVideoPlaying] = useState(false);
     const navigate = useNavigate();
 
+    const reviewCount = testimonials.length;
+    const averageRating = (
+        testimonials.reduce((sum, t) => sum + t.rating, 0) / reviewCount
+    ).toFixed(1);
+
     return (
         <>
             <HeroVideo config={heroConfig} />
             <Box id="more-section" ref={moreRef} />
             <VisionMission />
+
+            {/* Average rating summary */}
+            <Box sx={{ pt: 8, pb: 2, bgcolor: "#FFFFFF", textAlign: "center" }}>
+                <Typography
+                    variant="h2"
+                    sx={{ fontWeight: "bold", color: "#111827", lineHeight: 1 }}
+                >
+                    {averageRating}
+                </Typography>
+                <Box
+                    sx={{
+                        display: "flex",
+                        justifyContent: "center",
+                        gap: 0.5,
+                        mt: 1,
+                        mb: 1,
+                    }}
+                >
+                    {[1, 2, 3, 4, 5].map((star) => (
+                        <StarIcon
+                            key={star}
+                            sx={{
+                                fontSize: 32,
+                                color: star <= Math.round(averageRating) ? "#FBBF24" : "#E5E7EB",
+                            }}
+                        />
+                    ))}
+                </Box>
+                <Typography variant="body1" sx={{ color: "#6B7280", fontWeight: 500 }}>
+                    Average rating from {reviewCount} parent reviews
+                </Typography>
+            </Box>
+
             <TestimonialsGridSlider
                 title="Hear From Our Student's Parents"
                 subTitle=""
