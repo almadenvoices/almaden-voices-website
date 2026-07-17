@@ -73,6 +73,9 @@
     display: flex;
     flex-direction: column;
     gap: clamp(16px, 2vw, 24px);
+    min-width: 0;
+    /* On mobile, show the form (session dropdown first) above these info blocks */
+    order: 2;
 }
 
 .block {
@@ -128,7 +131,10 @@
     gap: 20px;
     width: 100%;
     max-width: 600px;
+    min-width: 0;
     margin: 0 auto;
+    /* On mobile, the form (starting with the session dropdown) comes first */
+    order: 1;
 }
 
 .formTitle {
@@ -152,6 +158,7 @@
     display: grid;
     grid-template-columns: 1fr;
     gap: clamp(16px, 1.6vw, 24px);
+    min-width: 0;
 }
 
 /* ====== Form fields ====== */
@@ -175,6 +182,9 @@
 .field input,
 .field textarea,
 .field select {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
     padding: 12px 16px;
     border: 2px solid #E5E7EB;
     border-radius: 12px;
@@ -217,6 +227,7 @@
 .select {
     height: clamp(48px, 3.1vw, 52px);
     cursor: pointer;
+    text-overflow: ellipsis;
 }
 
 /* ====== Error box ====== */
@@ -480,6 +491,13 @@
     .form {
         width: 100%;
         max-width: none;
+    }
+    /* Desktop: restore the left-rail (info) | divider | form layout */
+    .info {
+        order: 0;
+    }
+    .form {
+        order: 0;
     }
 }
 
