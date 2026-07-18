@@ -53,11 +53,11 @@ const WORKSHOPS = {
   "intl-workshop-jul-2026": {
     name: "Free International Public Speaking Workshop for Kids",
     datesText: "Saturday, July 25 & Sunday, July 26, 2026",
-    timesText: "9:00–10:00 AM IST &middot; 12:00–1:00 PM Singapore",
-    // Each session's start time in UTC (ISO 8601). 9:00 AM IST = 3:30 AM UTC.
+    timesText: "9:30–10:30 AM IST &middot; 12:00–1:00 PM Singapore",
+    // Each session's start time in UTC (ISO 8601). 12:00 PM Singapore = 4:00 AM UTC.
     sessions: [
-      { label: "Day 1 — Saturday, July 25, 2026", startUtc: "2026-07-25T03:30:00Z" },
-      { label: "Day 2 — Sunday, July 26, 2026", startUtc: "2026-07-26T03:30:00Z" }
+      { label: "Day 1 — Saturday, July 25, 2026", startUtc: "2026-07-25T04:00:00Z" },
+      { label: "Day 2 — Sunday, July 26, 2026", startUtc: "2026-07-26T04:00:00Z" }
     ],
     webex: {
       link: "https://anjikabansal-405.my.webex.com/meet/almadenvoices",
