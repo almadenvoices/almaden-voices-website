@@ -595,62 +595,19 @@ export default function ImpactPage() {
                                 ))}
                             </Box>
 
-                            {/* Photo Gallery + Testimonial */}
+                            {/* Photo Gallery — masonry mosaic that keeps each photo's natural shape */}
                             <Box
                                 sx={{
-                                    display: "grid",
-                                    gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr", md: "1fr 1fr 1fr" },
-                                    gap: 2.5,
+                                    columnCount: { xs: 1, sm: 2, md: 3 },
+                                    columnGap: "20px",
                                 }}
                             >
-                                {/* First photo - large, spans 2 columns */}
-                                <Box
-                                    sx={{
-                                        gridColumn: { xs: "auto", md: "1 / 3" },
-                                        position: "relative",
-                                        borderRadius: 3,
-                                        overflow: "hidden",
-                                        boxShadow: "0 2px 12px rgba(0,0,0,0.08)",
-                                    }}
-                                >
-                                    <Box
-                                        component="img"
-                                        src={selectedSession.images[0].src}
-                                        alt={selectedSession.images[0].caption}
-                                        sx={{
-                                            width: "100%",
-                                            aspectRatio: "16/9",
-                                            objectFit: "cover",
-                                            display: "block",
-                                            transition: "transform 0.3s",
-                                            "&:hover": { transform: "scale(1.03)" },
-                                        }}
-                                    />
-                                    <Box
-                                        sx={{
-                                            position: "absolute",
-                                            bottom: 0,
-                                            left: 0,
-                                            right: 0,
-                                            py: 1,
-                                            px: 2,
-                                            background: "linear-gradient(transparent, rgba(0,0,0,0.6))",
-                                        }}
-                                    >
-                                        <Typography
-                                            variant="caption"
-                                            sx={{ color: "#FFFFFF", fontWeight: 600 }}
-                                        >
-                                            {selectedSession.images[0].caption}
-                                        </Typography>
-                                    </Box>
-                                </Box>
-
-                                {/* Remaining photos */}
-                                {selectedSession.images.slice(1).map((img, i) => (
+                                {selectedSession.images.map((img, i) => (
                                     <Box
                                         key={i}
                                         sx={{
+                                            breakInside: "avoid",
+                                            mb: 2.5,
                                             position: "relative",
                                             borderRadius: 3,
                                             overflow: "hidden",
@@ -663,8 +620,7 @@ export default function ImpactPage() {
                                             alt={img.caption}
                                             sx={{
                                                 width: "100%",
-                                                aspectRatio: "4/3",
-                                                objectFit: "cover",
+                                                height: "auto",
                                                 display: "block",
                                                 transition: "transform 0.3s",
                                                 "&:hover": { transform: "scale(1.03)" },
