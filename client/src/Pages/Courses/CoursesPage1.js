@@ -305,13 +305,13 @@ const CoursesPage = () => {
         {
             id: "intl-workshop-jul-2026",
             title: "Free International Public Speaking Workshop for Kids",
-            date: "July 21 & 23, 2026",
-            time: "10–11 AM IST · 12:30–1:30 PM Singapore · 4:30 AM UTC",
-            location: "Online via Webex",
+            date: "July 25 & 26, 2026",
+            time: "9:30–10:30 AM IST · 12–1 PM Singapore",
+            location: "Online",
             ageGroup: "Kids of all levels",
             capacity: 500,
             enrolled: 0,
-            description: "A free two-day online workshop where kids learn the fundamentals of public speaking — speaking clearly and confidently, overcoming nervousness, and presenting in front of others. Live on Webex; join from anywhere in the world.",
+            description: "A free two-day online workshop where kids learn the fundamentals of public speaking: speaking clearly and confidently, overcoming nervousness, and presenting in front of others. Join from anywhere in the world.",
             status: "Open",
             online: true,
             cover: "/images/teaching-beginner.JPG",
@@ -455,10 +455,10 @@ const CoursesPage = () => {
                 </h2>
                 <div style={{ width: '80px', height: '4px', backgroundColor: '#2563EB', borderRadius: '2px', margin: '0 auto 8px' }}></div>
                 <p style={{ textAlign: 'center', color: '#6B7280', fontSize: '1rem', marginBottom: '4px' }}>
-                    A free two-day online workshop for kids — July 21 &amp; 23, 2026, live on Webex. Register below and we&apos;ll email your join link and reminders.
+                    A free two-day online workshop for kids on July 25 &amp; 26, 2026. Register below and we&apos;ll send your join link and reminders before the workshop.
                 </p>
                 <p style={{ textAlign: 'center', color: '#6B7280', fontStyle: 'italic', fontSize: '1rem', marginBottom: '0' }}>
-                    Un taller gratuito en línea de dos días para niños — 21 y 23 de julio de 2026, en vivo por Webex. Regístrese abajo y le enviaremos su enlace y recordatorios.
+                    Un taller gratuito en línea de dos días para niños, el 25 y 26 de julio de 2026. Regístrese abajo y le enviaremos su enlace y recordatorios antes del taller.
                 </p>
             </div>
 
