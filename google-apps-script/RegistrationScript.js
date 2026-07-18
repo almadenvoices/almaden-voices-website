@@ -52,12 +52,12 @@ const REG_HEADERS = [
 const WORKSHOPS = {
   "intl-workshop-jul-2026": {
     name: "Free International Public Speaking Workshop for Kids",
-    datesText: "Tuesday, July 21 & Thursday, July 23, 2026",
-    timesText: "10:00–11:00 AM IST &middot; 12:30–1:30 PM Singapore &middot; 4:30–5:30 AM UTC",
-    // Each session's start time in UTC (ISO 8601). 10:00 AM IST = 4:30 AM UTC.
+    datesText: "Saturday, July 25 & Sunday, July 26, 2026",
+    timesText: "9:00–10:00 AM IST &middot; 12:00–1:00 PM Singapore",
+    // Each session's start time in UTC (ISO 8601). 9:00 AM IST = 3:30 AM UTC.
     sessions: [
-      { label: "Day 1 — Tuesday, July 21, 2026", startUtc: "2026-07-21T04:30:00Z" },
-      { label: "Day 2 — Thursday, July 23, 2026", startUtc: "2026-07-23T04:30:00Z" }
+      { label: "Day 1 — Saturday, July 25, 2026", startUtc: "2026-07-25T03:30:00Z" },
+      { label: "Day 2 — Sunday, July 26, 2026", startUtc: "2026-07-26T03:30:00Z" }
     ],
     webex: {
       link: "https://anjikabansal-405.my.webex.com/meet/almadenvoices",
