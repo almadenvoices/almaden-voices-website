@@ -182,22 +182,6 @@ function headerIndexMap(sheet) {
 // ============================================================
 // EMAIL BUILDERS
 // ============================================================
-function webexBlockHtml(workshop) {
-  const w = workshop.webex;
-  return '' +
-    '<div style="background:#F0F6FF;border:1px solid #BFDBFE;border-radius:12px;padding:20px;margin:18px 0;">' +
-      '<p style="margin:0 0 12px;font-weight:700;color:#111827;font-size:15px;">How to Join (Webex)</p>' +
-      '<a href="' + w.link + '" style="display:inline-block;background:#2563EB;color:#ffffff;text-decoration:none;padding:12px 26px;border-radius:8px;font-weight:700;">Join the Workshop &rarr;</a>' +
-      '<p style="margin:16px 0 6px;color:#374151;font-size:13px;">Or join manually:</p>' +
-      '<ul style="color:#374151;font-size:13px;line-height:1.7;margin:0;padding-left:18px;">' +
-        '<li>Link: <a href="' + w.link + '" style="color:#2563EB;">' + w.link + '</a></li>' +
-        '<li>Meeting number: <strong>' + w.meetingNumber + '</strong></li>' +
-        '<li>By phone: ' + w.phone + ' (access code: ' + w.meetingNumber + ')</li>' +
-        '<li><a href="' + w.globalCallIn + '" style="color:#2563EB;">Global call-in numbers</a></li>' +
-      '</ul>' +
-    '</div>';
-}
-
 function scheduleBlockHtml(workshop) {
   const items = workshop.sessions.map(function(s) { return '<li>' + s.label + '</li>'; }).join('');
   return '' +
@@ -218,7 +202,7 @@ function buildWorkshopConfirmationHtml(data, workshop, students, studentListHtml
       '<h3 style="color:#333;">Registered</h3>' +
       '<ul style="line-height:1.8;color:#333;">' + studentListHtml + '</ul>' +
       scheduleBlockHtml(workshop) +
-      '<p style="color:#374151;">We\'ll email you the Webex join link in a reminder before the workshop begins. Feel free to attend one or both days.</p>' +
+      '<p style="color:#374151;">We\'ll send you the Webex join link separately before the workshop begins. Feel free to attend one or both days.</p>' +
       '<p>If you have any questions, just reply to this email or contact us at ' +
         '<a href="mailto:' + ADMIN_EMAIL + '" style="color:#2563EB;">' + ADMIN_EMAIL + '</a>.</p>' +
       '<hr style="border:1px solid #eee;" />' +
@@ -377,7 +361,7 @@ function sendReminderEmail(email, registrant, workshop, session, type) {
     subject = "Starting soon: your public speaking workshop is today";
     intro = "Your workshop session starts in about <strong>1–2 hours</strong>" +
       (session ? " (<strong>" + session.label + "</strong>)" : "") +
-      ". Here\'s your link so " + childList + " can hop on when it\'s time.";
+      ". Have the Webex join link we sent you handy so " + childList + " can hop on when it\'s time.";
   }
 
   const html = '' +
@@ -386,7 +370,6 @@ function sendReminderEmail(email, registrant, workshop, session, type) {
       '<p>Dear ' + registrant.parentName + ',</p>' +
       '<p>' + intro + '</p>' +
       scheduleBlockHtml(workshop) +
-      webexBlockHtml(workshop) +
       '<p style="color:#374151;">Questions? Just reply to this email.</p>' +
       '<hr style="border:1px solid #eee;" />' +
       '<p style="color:#666;">Best regards,<br/>' + ORG_NAME + ' Team<br/>' +
