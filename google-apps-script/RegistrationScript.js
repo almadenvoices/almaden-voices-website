@@ -55,8 +55,8 @@ const WORKSHOPS = {
     timesText: "9:30–10:30 AM IST &middot; 12:00–1:00 PM Singapore",
     // Each session's start time in UTC (ISO 8601). 12:00 PM Singapore = 4:00 AM UTC.
     sessions: [
-      { label: "Day 1 — Saturday, July 25, 2026", startUtc: "2026-07-25T04:00:00Z" },
-      { label: "Day 2 — Sunday, July 26, 2026", startUtc: "2026-07-26T04:00:00Z" }
+      { label: "Day 1: Saturday, July 25, 2026", startUtc: "2026-07-25T04:00:00Z" },
+      { label: "Day 2: Sunday, July 26, 2026", startUtc: "2026-07-26T04:00:00Z" }
     ],
     webex: {
       link: "https://anjikabansal-405.my.webex.com/meet/almadenvoices",
@@ -111,7 +111,7 @@ function doPost(e) {
     // Shared email pieces
     const studentListHtml = students.map(function(st) {
       return "<li><strong>" + st.firstName + " " + st.lastName + "</strong>" +
-        (st.age ? " &mdash; Age " + st.age : "") + "</li>";
+        (st.age ? " (Age " + st.age + ")" : "") + "</li>";
     }).join("");
     const studentNames = students.map(function(st) { return st.firstName + " " + st.lastName; }).join(", ");
     const childWord = students.length === 1 ? "child" : students.length + " children";
@@ -198,11 +198,12 @@ function buildWorkshopConfirmationHtml(data, workshop, students, studentListHtml
       '<h2 style="color:#2563EB;">You\'re Registered! &#127881;</h2>' +
       '<p>Dear ' + data.parentName + ',</p>' +
       '<p>Thank you for registering ' + childPhrase + ' for our <strong>' + workshop.name + '</strong>! ' +
-        (students.length === 1 ? 'Your spot is' : 'Your spots are') + ' confirmed. This is a free two-day online workshop where kids learn the fundamentals of public speaking — how to speak clearly and confidently, overcome nervousness, and present in front of others.</p>' +
+        (students.length === 1 ? 'Your spot is' : 'Your spots are') + ' confirmed. This is a <strong>free</strong> two-day online workshop where kids learn the fundamentals of public speaking: how to speak clearly and confidently, overcome nervousness, and present in front of others.</p>' +
       '<h3 style="color:#333;">Registered</h3>' +
       '<ul style="line-height:1.8;color:#333;">' + studentListHtml + '</ul>' +
       scheduleBlockHtml(workshop) +
-      '<p style="color:#374151;">We\'ll send you the join link separately before the workshop begins. Feel free to attend one or both days.</p>' +
+      '<p style="color:#374151;">This is a two-day workshop (1 hour each day). Students are welcome to attend one or both sessions, but attending both is highly recommended for the best learning experience.</p>' +
+      '<p style="color:#374151;">We\'ll email you an online link to join the meeting a few days before the workshop, along with a reminder so you\'re all set.</p>' +
       '<p>If you have any questions, just reply to this email or contact us at ' +
         '<a href="mailto:' + ADMIN_EMAIL + '" style="color:#2563EB;">' + ADMIN_EMAIL + '</a>.</p>' +
       '<hr style="border:1px solid #eee;" />' +
