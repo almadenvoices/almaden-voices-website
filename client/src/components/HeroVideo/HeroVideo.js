@@ -9,6 +9,27 @@ import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import s from './HeroVideo.module.css';
 
+// Positioning for the slideshow arrows lives here (via sx) so it always wins
+// over MUI's own IconButton styles — a CSS-module class was being overridden.
+const navBtnSx = (side) => ({
+    position: 'absolute',
+    top: '50%',
+    transform: 'translateY(-50%)',
+    [side]: { xs: 8, md: 20 },
+    zIndex: 3,
+    width: 52,
+    height: 52,
+    color: '#FFFFFF',
+    bgcolor: 'rgba(0,0,0,.45)',
+    border: '2px solid rgba(255,255,255,.85)',
+    boxShadow: '0 4px 14px rgba(0,0,0,.35)',
+    transition: 'background .2s, transform .2s',
+    '&:hover': {
+        bgcolor: 'rgba(0,0,0,.7)',
+        transform: 'translateY(-50%) scale(1.08)',
+    },
+});
+
 export default function HeroVideo({ config = {} }) {
     const {
         title = 'Find your voice.',
@@ -102,17 +123,15 @@ export default function HeroVideo({ config = {} }) {
                 <>
                     <IconButton
                         onClick={prevSlide}
-                        className={s.navBtn}
-                        style={{ left: 20 }}
                         aria-label="Previous slide"
+                        sx={navBtnSx('left')}
                     >
                         <ArrowBackIosNewIcon />
                     </IconButton>
                     <IconButton
                         onClick={nextSlide}
-                        className={s.navBtn}
-                        style={{ right: 20 }}
                         aria-label="Next slide"
+                        sx={navBtnSx('right')}
                     >
                         <ArrowForwardIosIcon />
                     </IconButton>
