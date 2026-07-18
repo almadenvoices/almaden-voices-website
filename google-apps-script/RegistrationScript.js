@@ -5,7 +5,7 @@
  * and sends confirmation + admin notification emails.
  *
  * For workshops listed in the WORKSHOPS config below, the parent confirmation
- * email includes the full schedule and the Webex join link, and the registrant
+ * email includes the full schedule (the join link is shared separately), and the registrant
  * is automatically sent reminder emails (2 days before, and shortly before each
  * session day) by the sendWorkshopReminders() function running on an hourly
  * time-based trigger.
@@ -188,7 +188,7 @@ function scheduleBlockHtml(workshop) {
     '<p style="margin:0 0 6px;color:#111827;"><strong>When</strong></p>' +
     '<ul style="color:#374151;line-height:1.8;margin:0 0 10px;">' + items + '</ul>' +
     '<p style="color:#374151;margin:0 0 4px;"><strong>Time:</strong> ' + workshop.timesText + '</p>' +
-    '<p style="color:#374151;margin:0 0 12px;"><strong>Where:</strong> Online via Webex (same link both days)</p>';
+    '<p style="color:#374151;margin:0 0 12px;"><strong>Where:</strong> Online (same join link for both days)</p>';
 }
 
 function buildWorkshopConfirmationHtml(data, workshop, students, studentListHtml, firstStudent) {
@@ -202,7 +202,7 @@ function buildWorkshopConfirmationHtml(data, workshop, students, studentListHtml
       '<h3 style="color:#333;">Registered</h3>' +
       '<ul style="line-height:1.8;color:#333;">' + studentListHtml + '</ul>' +
       scheduleBlockHtml(workshop) +
-      '<p style="color:#374151;">We\'ll send you the Webex join link separately before the workshop begins. Feel free to attend one or both days.</p>' +
+      '<p style="color:#374151;">We\'ll send you the join link separately before the workshop begins. Feel free to attend one or both days.</p>' +
       '<p>If you have any questions, just reply to this email or contact us at ' +
         '<a href="mailto:' + ADMIN_EMAIL + '" style="color:#2563EB;">' + ADMIN_EMAIL + '</a>.</p>' +
       '<hr style="border:1px solid #eee;" />' +
@@ -361,7 +361,7 @@ function sendReminderEmail(email, registrant, workshop, session, type) {
     subject = "Starting soon: your public speaking workshop is today";
     intro = "Your workshop session starts in about <strong>1–2 hours</strong>" +
       (session ? " (<strong>" + session.label + "</strong>)" : "") +
-      ". Have the Webex join link we sent you handy so " + childList + " can hop on when it\'s time.";
+      ". Have the join link we sent you handy so " + childList + " can hop on when it\'s time.";
   }
 
   const html = '' +
