@@ -52,7 +52,6 @@ const emptyStudent = () => ({ firstName: "", lastName: "", age: "" });
 
 export default function RegisterPage() {
     const [agreed, setAgreed] = useState(false);
-    const [photoConsent, setPhotoConsent] = useState(false);
     const [futureContact, setFutureContact] = useState(false);
     const [showToast, setShowToast] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -141,7 +140,6 @@ export default function RegisterPage() {
             zipCode: formData.get("zipCode"),
             additionalInfo: formData.get("additionalInfo"),
             privacyAgreed: agreed,
-            photoConsent: photoConsent,
             futureContact: futureContact,
         };
 
@@ -163,7 +161,6 @@ export default function RegisterPage() {
                 const donateAmt = donationAmount;
                 e.target.reset();
                 setAgreed(false);
-                setPhotoConsent(false);
                 setFutureContact(false);
                 setStudents([emptyStudent()]);
                 setDonationAmount(5);
@@ -595,20 +592,7 @@ export default function RegisterPage() {
                                 </div>
 
                                 <div className={s.actions}>
-                                    {/* Checkbox 1 (optional): Photo/video consent */}
-                                    <label className={s.check}>
-                                        <input
-                                            type="checkbox"
-                                            checked={photoConsent}
-                                            onChange={(e) => setPhotoConsent(e.target.checked)}
-                                            disabled={isSubmitting}
-                                        />
-                                        <span>
-                                            I give permission for Almaden Voices to photograph or record my child for promotional use.
-                                        </span>
-                                    </label>
-
-                                    {/* Checkbox 2 (optional): Future contact opt-in */}
+                                    {/* Checkbox (optional): Future contact opt-in */}
                                     <label className={s.check}>
                                         <input
                                             type="checkbox"

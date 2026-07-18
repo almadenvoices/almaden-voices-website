@@ -40,7 +40,6 @@ const REG_HEADERS = [
   "ZIP",
   "Additional Info",
   "Privacy Policy Agreed",
-  "Photo Consent",
   "Future Contact Opt-In"
 ];
 
@@ -105,7 +104,6 @@ function doPost(e) {
         "ZIP": data.zipCode || "",
         "Additional Info": data.additionalInfo || "",
         "Privacy Policy Agreed": data.privacyAgreed ? "Yes" : "No",
-        "Photo Consent": data.photoConsent ? "Yes" : "No",
         "Future Contact Opt-In": data.futureContact ? "Yes" : "No"
       });
     });
@@ -136,7 +134,7 @@ function doPost(e) {
 
     GmailApp.sendEmail(data.email, subject,
       "Your registration is confirmed. See the HTML version of this email for details.",
-      { htmlBody: parentHtml, name: ORG_NAME }
+      { htmlBody: parentHtml, name: ORG_NAME, bcc: ADMIN_EMAIL }
     );
 
     return jsonOut({ success: true });
@@ -220,8 +218,7 @@ function buildWorkshopConfirmationHtml(data, workshop, students, studentListHtml
       '<h3 style="color:#333;">Registered</h3>' +
       '<ul style="line-height:1.8;color:#333;">' + studentListHtml + '</ul>' +
       scheduleBlockHtml(workshop) +
-      webexBlockHtml(workshop) +
-      '<p style="color:#374151;">We\'ll email you a reminder before the workshop begins. The same Webex link works for both days — feel free to attend one or both.</p>' +
+      '<p style="color:#374151;">We\'ll email you the Webex join link in a reminder before the workshop begins. Feel free to attend one or both days.</p>' +
       '<p>If you have any questions, just reply to this email or contact us at ' +
         '<a href="mailto:' + ADMIN_EMAIL + '" style="color:#2563EB;">' + ADMIN_EMAIL + '</a>.</p>' +
       '<hr style="border:1px solid #eee;" />' +
@@ -274,7 +271,6 @@ function buildAdminHtml(data, students, studentListHtml, childWord, timestamp) {
       '<h3 style="color: #333;">Preferences</h3>' +
       '<ul style="line-height: 1.8;">' +
         '<li>Privacy Policy Agreed: <strong>' + (data.privacyAgreed ? 'Yes' : 'No') + '</strong></li>' +
-        '<li>Photo/Video Consent: <strong>' + (data.photoConsent ? 'Yes' : 'No') + '</strong></li>' +
         '<li>Future Contact Opt-In: <strong>' + (data.futureContact ? 'Yes' : 'No') + '</strong></li>' +
       '</ul>' +
       '<hr style="border: 1px solid #eee;" />' +
