@@ -37,7 +37,7 @@ const upcomingSessions = [
         id: "intl-workshop-jul-2026",
         title: "Free International Public Speaking Workshop for Kids",
         date: "July 25 & 26, 2026",
-        time: "9–10 AM IST · 12–1 PM Singapore",
+        time: "9:30–10:30 AM IST · 12–1 PM Singapore",
         location: "Online via Webex",
         grades: "Kids of all levels welcome",
         capacity: 500,
