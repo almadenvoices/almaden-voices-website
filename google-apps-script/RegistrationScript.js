@@ -62,14 +62,13 @@ const WORKSHOPS = {
       { label: "Day 1: Saturday, July 25, 2026", startUtc: "2026-07-25T04:00:00Z" },
       { label: "Day 2: Sunday, July 26, 2026", startUtc: "2026-07-26T04:00:00Z" }
     ],
+    // Webex Personal Room — no meeting password required.
     webex: {
-      link: "https://anjikabansal-405.my.webex.com/anjikabansal-405.my/j.php?MTID=maff8bd4cb8821f446277ff56ca42f32a",
-      meetingNumber: "2552 590 1918",
-      password: "freeworkshop",
-      passwordNumeric: "37339675",
+      link: "https://anjikabansal-405.my.webex.com/meet/almadenvoices",
+      meetingNumber: "2554 439 4487",
       phone: "+1-650-479-3208",
-      phoneTapToJoin: "+1-650-479-3208,,25525901918#37339675#",
-      videoDial: "25525901918@webex.com",
+      phoneTapToJoin: "+1-650-479-3208,,25544394487##",
+      videoDial: "almadenvoices.anjikabansal-405.my@webex.com",
       videoIp: "173.243.2.68"
     }
   }
@@ -189,108 +188,212 @@ function headerIndexMap(sheet) {
 
 // ============================================================
 // EMAIL BUILDERS
+//
+// Design matches almadenvoices.org: Playfair Display headings, DM Sans body,
+// #2563EB accent. Email clients that block web fonts fall back to
+// Georgia / Helvetica, which keeps the serif-heading + sans-body pairing.
 // ============================================================
-function scheduleBlockHtml(workshop) {
-  const items = workshop.sessions.map(function(s) { return '<li>' + s.label + '</li>'; }).join('');
+const FONT_HEADING = "'Playfair Display', Georgia, 'Times New Roman', serif";
+const FONT_BODY = "'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif";
+const C_TEXT = "#111827";
+const C_MUTED = "#6B7280";
+const C_BODY = "#374151";
+const C_ACCENT = "#2563EB";
+const C_LINE = "#E5E7EB";
+const C_SOFT = "#F9FAFB";
+
+// Wraps content in the branded card layout (table-based for email clients).
+function emailShell(headline, subhead, innerHtml) {
   return '' +
-    '<p style="margin:0 0 6px;color:#111827;"><strong>When</strong></p>' +
-    '<ul style="color:#374151;line-height:1.8;margin:0 0 10px;">' + items + '</ul>' +
-    '<p style="color:#374151;margin:0 0 4px;"><strong>Time:</strong> ' + workshop.timesText + '</p>' +
-    '<p style="color:#374151;margin:0 0 12px;"><strong>Where:</strong> Online (same join link for both days)</p>';
+    '<style>@import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Playfair+Display:wght@600;700&display=swap");</style>' +
+    '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" ' +
+      'style="background:' + C_SOFT + ';margin:0;padding:24px 12px;font-family:' + FONT_BODY + ';">' +
+      '<tr><td align="center">' +
+        '<table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" ' +
+          'style="max-width:600px;width:100%;background:#FFFFFF;border:1px solid ' + C_LINE + ';border-radius:16px;overflow:hidden;">' +
+
+          // Header band
+          '<tr><td style="background:' + C_ACCENT + ';padding:32px 32px 28px;">' +
+            '<p style="margin:0 0 10px;font-family:' + FONT_BODY + ';font-size:12px;letter-spacing:1.5px;' +
+              'text-transform:uppercase;color:#BFDBFE;font-weight:700;">' + ORG_NAME + '</p>' +
+            '<h1 style="margin:0;font-family:' + FONT_HEADING + ';font-size:30px;line-height:1.25;' +
+              'color:#FFFFFF;font-weight:700;">' + headline + '</h1>' +
+            (subhead ? '<p style="margin:10px 0 0;font-family:' + FONT_BODY + ';font-size:15px;line-height:1.5;color:#DBEAFE;">' + subhead + '</p>' : '') +
+          '</td></tr>' +
+
+          // Body
+          '<tr><td style="padding:32px;font-family:' + FONT_BODY + ';font-size:16px;line-height:1.65;color:' + C_BODY + ';">' +
+            innerHtml +
+          '</td></tr>' +
+
+          // Footer
+          '<tr><td style="background:' + C_SOFT + ';border-top:1px solid ' + C_LINE + ';padding:24px 32px;' +
+            'font-family:' + FONT_BODY + ';font-size:13px;line-height:1.6;color:' + C_MUTED + ';">' +
+            '<p style="margin:0 0 4px;color:' + C_TEXT + ';font-weight:700;">' + ORG_NAME + '</p>' +
+            '<p style="margin:0;">' +
+              '<a href="https://almadenvoices.org" style="color:' + C_ACCENT + ';text-decoration:none;">almadenvoices.org</a>' +
+              ' &nbsp;&middot;&nbsp; ' +
+              '<a href="mailto:' + ADMIN_EMAIL + '" style="color:' + C_ACCENT + ';text-decoration:none;">' + ADMIN_EMAIL + '</a>' +
+            '</p>' +
+          '</td></tr>' +
+
+        '</table>' +
+      '</td></tr>' +
+    '</table>';
+}
+
+// Small section heading used inside the body.
+function sectionTitle(text) {
+  return '<p style="margin:0 0 12px;font-family:' + FONT_BODY + ';font-size:12px;letter-spacing:1.2px;' +
+    'text-transform:uppercase;color:' + C_MUTED + ';font-weight:700;">' + text + '</p>';
+}
+
+// One label / value row inside the "other ways to join" list.
+function detailRow(label, valueHtml, note) {
+  return '' +
+    '<tr><td style="padding:14px 0;border-top:1px solid ' + C_LINE + ';font-family:' + FONT_BODY + ';">' +
+      '<p style="margin:0 0 4px;font-size:13px;font-weight:700;color:' + C_TEXT + ';">' + label + '</p>' +
+      '<p style="margin:0;font-size:15px;line-height:1.6;color:' + C_BODY + ';">' + valueHtml + '</p>' +
+      (note ? '<p style="margin:6px 0 0;font-size:12px;line-height:1.5;color:' + C_MUTED + ';">' + note + '</p>' : '') +
+    '</td></tr>';
+}
+
+function scheduleBlockHtml(workshop) {
+  const rows = workshop.sessions.map(function(s, i) {
+    return '<tr><td style="padding:10px 0;' + (i ? 'border-top:1px solid ' + C_LINE + ';' : '') +
+      'font-family:' + FONT_BODY + ';font-size:16px;color:' + C_TEXT + ';font-weight:500;">' + s.label + '</td></tr>';
+  }).join('');
+
+  return '' +
+    '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" ' +
+      'style="background:' + C_SOFT + ';border:1px solid ' + C_LINE + ';border-radius:12px;margin:0 0 24px;">' +
+      '<tr><td style="padding:20px 22px;">' +
+        sectionTitle('When') +
+        '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">' + rows + '</table>' +
+        '<p style="margin:14px 0 0;font-family:' + FONT_BODY + ';font-size:15px;color:' + C_BODY + ';">' +
+          '<strong style="color:' + C_TEXT + ';">Time:</strong> ' + workshop.timesText + '</p>' +
+        '<p style="margin:6px 0 0;font-family:' + FONT_BODY + ';font-size:15px;color:' + C_BODY + ';">' +
+          '<strong style="color:' + C_TEXT + ';">Where:</strong> Online &mdash; the same link works for both days</p>' +
+      '</td></tr>' +
+    '</table>';
 }
 
 // Full Webex join instructions — used in the join-link email and in reminders.
 function joinDetailsHtml(workshop) {
   const w = workshop.webex;
   if (!w) return '';
+
+  const passwordLine = w.password
+    ? '<br/>Meeting password: <strong style="color:' + C_TEXT + ';">' + w.password + '</strong>' +
+      (w.passwordNumeric ? ' (' + w.passwordNumeric + ' from a phone or video system)' : '')
+    : '';
+
   return '' +
-    '<div style="background:#F3F4F6;border-radius:8px;padding:16px;margin:0 0 16px;">' +
-      '<p style="margin:0 0 10px;color:#111827;"><strong>Join the workshop</strong></p>' +
-      '<p style="margin:0 0 14px;">' +
-        '<a href="' + w.link + '" style="background:#2563EB;color:#ffffff;text-decoration:none;padding:12px 22px;border-radius:6px;display:inline-block;font-weight:bold;">Join the meeting</a>' +
-      '</p>' +
-      '<p style="margin:0 0 14px;color:#6B7280;font-size:12px;word-break:break-all;">' +
-        'Or paste this into your browser:<br/><a href="' + w.link + '" style="color:#2563EB;">' + w.link + '</a></p>' +
-      '<p style="margin:0 0 4px;color:#374151;"><strong>Join by meeting number</strong></p>' +
-      '<p style="margin:0 0 14px;color:#374151;line-height:1.7;">' +
-        'Meeting number (access code): <strong>' + w.meetingNumber + '</strong><br/>' +
-        'Meeting password: <strong>' + w.password + '</strong> (' + w.passwordNumeric + ' when dialing from a phone or video system)</p>' +
-      '<p style="margin:0 0 4px;color:#374151;"><strong>Tap to join from a mobile device (attendees only)</strong></p>' +
-      '<p style="margin:0 0 14px;color:#374151;line-height:1.7;">' +
-        '<a href="tel:' + w.phoneTapToJoin.replace(/[^0-9+,#]/g, '') + '" style="color:#2563EB;">' + w.phoneTapToJoin + '</a> United States Toll<br/>' +
-        '<span style="color:#6B7280;font-size:12px;">Some mobile devices may ask attendees to enter a numeric password.</span></p>' +
-      '<p style="margin:0 0 4px;color:#374151;"><strong>Join by phone</strong></p>' +
-      '<p style="margin:0 0 14px;color:#374151;">' + w.phone + ' United States Toll</p>' +
-      '<p style="margin:0 0 4px;color:#374151;"><strong>Join from a video system or application</strong></p>' +
-      '<p style="margin:0 0 14px;color:#374151;line-height:1.7;">' +
-        'Dial <strong>' + w.videoDial + '</strong><br/>' +
-        'You can also dial ' + w.videoIp + ' and enter your meeting number.</p>' +
-      '<p style="margin:0;color:#6B7280;font-size:12px;">Need help? Go to ' +
-        '<a href="https://help.webex.com" style="color:#2563EB;">help.webex.com</a></p>' +
-    '</div>';
+    // Primary call to action
+    '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 24px;">' +
+      '<tr><td align="center" style="padding:0 0 14px;">' +
+        '<a href="' + w.link + '" style="background:' + C_ACCENT + ';color:#FFFFFF;text-decoration:none;' +
+          'display:inline-block;padding:16px 40px;border-radius:10px;font-family:' + FONT_BODY + ';' +
+          'font-size:17px;font-weight:700;">Join the workshop</a>' +
+      '</td></tr>' +
+      '<tr><td align="center" style="font-family:' + FONT_BODY + ';font-size:12px;line-height:1.6;color:' + C_MUTED + ';word-break:break-all;">' +
+        'Button not working? Paste this into your browser:<br/>' +
+        '<a href="' + w.link + '" style="color:' + C_ACCENT + ';">' + w.link + '</a>' +
+      '</td></tr>' +
+    '</table>' +
+
+    // Alternative ways to join
+    '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" ' +
+      'style="background:' + C_SOFT + ';border:1px solid ' + C_LINE + ';border-radius:12px;margin:0 0 24px;">' +
+      '<tr><td style="padding:20px 22px 8px;">' +
+        sectionTitle('Other ways to join') +
+        '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">' +
+          detailRow('Join by meeting number',
+            'Meeting number (access code): <strong style="color:' + C_TEXT + ';">' + w.meetingNumber + '</strong>' + passwordLine) +
+          detailRow('Tap to join from a mobile device',
+            '<a href="tel:' + w.phoneTapToJoin.replace(/[^0-9+,#]/g, '') + '" style="color:' + C_ACCENT + ';">' + w.phoneTapToJoin + '</a> (United States Toll)',
+            'Some phones may ask you to enter the meeting number.') +
+          detailRow('Join by phone',
+            '<a href="tel:' + w.phone.replace(/[^0-9+]/g, '') + '" style="color:' + C_ACCENT + ';">' + w.phone + '</a> (United States Toll)') +
+          detailRow('Join from a video system',
+            'Dial <strong style="color:' + C_TEXT + ';">' + w.videoDial + '</strong>',
+            'You can also dial ' + w.videoIp + ' and enter the meeting number above.') +
+        '</table>' +
+      '</td></tr>' +
+      '<tr><td style="padding:0 22px 18px;font-family:' + FONT_BODY + ';font-size:12px;color:' + C_MUTED + ';">' +
+        'Need help with Webex? Visit <a href="https://help.webex.com" style="color:' + C_ACCENT + ';">help.webex.com</a>' +
+      '</td></tr>' +
+    '</table>';
 }
 
 function buildJoinLinkHtml(registrant, workshop) {
   const childList = registrant.studentNames.length
     ? registrant.studentNames.join(" and ")
     : "your child";
+
+  const inner = '' +
+    '<p style="margin:0 0 16px;">Dear ' + registrant.parentName + ',</p>' +
+    '<p style="margin:0 0 24px;">Here is everything ' + childList + ' needs to join the <strong style="color:' + C_TEXT + ';">' +
+      workshop.name + '</strong>. The <strong style="color:' + C_TEXT + ';">same link works for both days</strong>.</p>' +
+    scheduleBlockHtml(workshop) +
+    joinDetailsHtml(workshop) +
+    '<p style="margin:0 0 16px;">Please join a few minutes early so we can start on time. Attending both days is highly recommended for the best learning experience.</p>' +
+    '<p style="margin:0;">Questions? Just reply to this email &mdash; we\'re happy to help.</p>';
+
+  return emailShell("Your join link is here", workshop.name, inner);
+}
+
+// Styled "who's registered" card, built from the student rows.
+function registeredBlockHtml(students) {
+  const rows = students.map(function(st, i) {
+    return '<tr><td style="padding:10px 0;' + (i ? 'border-top:1px solid ' + C_LINE + ';' : '') +
+      'font-family:' + FONT_BODY + ';font-size:16px;color:' + C_TEXT + ';font-weight:500;">' +
+      st.firstName + ' ' + st.lastName +
+      (st.age ? '<span style="color:' + C_MUTED + ';font-weight:400;"> &middot; Age ' + st.age + '</span>' : '') +
+      '</td></tr>';
+  }).join('');
+
   return '' +
-    '<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">' +
-      '<h2 style="color:#2563EB;">Your join link is here! &#127908;</h2>' +
-      '<p>Dear ' + registrant.parentName + ',</p>' +
-      '<p>The <strong>' + workshop.name + '</strong> starts soon, and here is everything ' + childList +
-        ' needs to join. The <strong>same link works for both days</strong> &mdash; we suggest saving this email.</p>' +
-      scheduleBlockHtml(workshop) +
-      joinDetailsHtml(workshop) +
-      '<p style="color:#374151;">Please join a few minutes early so we can start on time. Attending both days is highly recommended for the best learning experience.</p>' +
-      '<p>Questions? Just reply to this email or contact us at ' +
-        '<a href="mailto:' + ADMIN_EMAIL + '" style="color:#2563EB;">' + ADMIN_EMAIL + '</a>.</p>' +
-      '<hr style="border:1px solid #eee;" />' +
-      '<p style="color:#666;">Best regards,<br/>' + ORG_NAME + ' Team<br/>' +
-        '<a href="https://almadenvoices.org" style="color:#2563EB;">almadenvoices.org</a></p>' +
-    '</div>';
+    '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" ' +
+      'style="background:' + C_SOFT + ';border:1px solid ' + C_LINE + ';border-radius:12px;margin:0 0 24px;">' +
+      '<tr><td style="padding:20px 22px;">' +
+        sectionTitle(students.length === 1 ? 'Registered' : 'Registered students') +
+        '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">' + rows + '</table>' +
+      '</td></tr>' +
+    '</table>';
 }
 
 function buildWorkshopConfirmationHtml(data, workshop, students, studentListHtml, firstStudent) {
   const childPhrase = students.length === 1 ? firstStudent.firstName : "your children";
-  return '' +
-    '<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">' +
-      '<h2 style="color:#2563EB;">You\'re Registered! &#127881;</h2>' +
-      '<p>Dear ' + data.parentName + ',</p>' +
-      '<p>Thank you for registering ' + childPhrase + ' for our <strong>' + workshop.name + '</strong>! ' +
-        (students.length === 1 ? 'Your spot is' : 'Your spots are') + ' confirmed. This is a <strong>free</strong> two-day online workshop where kids learn the fundamentals of public speaking: how to speak clearly and confidently, overcome nervousness, and present in front of others.</p>' +
-      '<h3 style="color:#333;">Registered</h3>' +
-      '<ul style="line-height:1.8;color:#333;">' + studentListHtml + '</ul>' +
-      scheduleBlockHtml(workshop) +
-      '<p style="color:#374151;">This is a two-day workshop (1 hour each day). Students are welcome to attend one or both sessions, but attending both is highly recommended for the best learning experience.</p>' +
-      joinDetailsHtml(workshop) +
-      '<p style="color:#374151;">We\'ll also send you a reminder before the workshop so you\'re all set.</p>' +
-      '<p>If you have any questions, just reply to this email or contact us at ' +
-        '<a href="mailto:' + ADMIN_EMAIL + '" style="color:#2563EB;">' + ADMIN_EMAIL + '</a>.</p>' +
-      '<hr style="border:1px solid #eee;" />' +
-      '<p style="color:#666;">Best regards,<br/>' + ORG_NAME + ' Team<br/>' +
-        '<a href="https://almadenvoices.org" style="color:#2563EB;">almadenvoices.org</a></p>' +
-    '</div>';
+
+  const inner = '' +
+    '<p style="margin:0 0 16px;">Dear ' + data.parentName + ',</p>' +
+    '<p style="margin:0 0 24px;">Thank you for registering ' + childPhrase + ' for our <strong style="color:' + C_TEXT + ';">' +
+      workshop.name + '</strong>. ' + (students.length === 1 ? 'Your spot is' : 'Your spots are') + ' confirmed. This is a ' +
+      '<strong style="color:' + C_TEXT + ';">free</strong> two-day online workshop where kids learn the fundamentals of ' +
+      'public speaking: how to speak clearly and confidently, overcome nervousness, and present in front of others.</p>' +
+    registeredBlockHtml(students) +
+    scheduleBlockHtml(workshop) +
+    '<p style="margin:0 0 24px;">Each day runs about an hour. Students are welcome to attend one or both sessions, but ' +
+      'attending both is highly recommended for the best learning experience.</p>' +
+    joinDetailsHtml(workshop) +
+    '<p style="margin:0 0 16px;">We\'ll also send you a reminder before the workshop so you\'re all set.</p>' +
+    '<p style="margin:0;">Questions? Just reply to this email &mdash; we\'re happy to help.</p>';
+
+  return emailShell("You're registered", workshop.name, inner);
 }
 
 function buildGenericConfirmationHtml(data, students, studentListHtml, firstStudent) {
-  return '' +
-    '<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">' +
-      '<h2 style="color: #2563EB;">Registration Confirmed!</h2>' +
-      '<p>Dear ' + data.parentName + ',</p>' +
-      '<p>Thank you for registering ' + (students.length === 1 ? firstStudent.firstName : 'your children') +
-        ' for our <strong>' + (data.sessionLabel || 'upcoming session') + '</strong>! ' +
-        (students.length === 1 ? 'Your spot is' : 'Your spots are') + ' confirmed.</p>' +
-      '<h3 style="color: #333;">Registration Details</h3>' +
-      '<ul style="line-height: 1.8; color: #333;">' + studentListHtml + '</ul>' +
-      '<p style="color: #333;"><strong>Program:</strong> ' + (data.sessionLabel || '') + '</p>' +
-      '<p>We\'ll follow up with schedule details and location information closer to the session date.</p>' +
-      '<p>If you have any questions, feel free to reply to this email or contact us at ' +
-        '<a href="mailto:' + ADMIN_EMAIL + '" style="color: #2563EB;">' + ADMIN_EMAIL + '</a>.</p>' +
-      '<hr style="border: 1px solid #eee;" />' +
-      '<p style="color: #666;">Best regards,<br/>' + ORG_NAME + ' Team<br/>' +
-        '<a href="https://almadenvoices.org" style="color: #2563EB;">almadenvoices.org</a></p>' +
-    '</div>';
+  const inner = '' +
+    '<p style="margin:0 0 16px;">Dear ' + data.parentName + ',</p>' +
+    '<p style="margin:0 0 24px;">Thank you for registering ' + (students.length === 1 ? firstStudent.firstName : 'your children') +
+      ' for our <strong style="color:' + C_TEXT + ';">' + (data.sessionLabel || 'upcoming session') + '</strong>. ' +
+      (students.length === 1 ? 'Your spot is' : 'Your spots are') + ' confirmed.</p>' +
+    registeredBlockHtml(students) +
+    '<p style="margin:0 0 16px;">We\'ll follow up with schedule details and location information closer to the session date.</p>' +
+    '<p style="margin:0;">Questions? Just reply to this email &mdash; we\'re happy to help.</p>';
+
+  return emailShell("Registration confirmed", data.sessionLabel || '', inner);
 }
 
 function buildAdminHtml(data, students, studentListHtml, childWord, timestamp) {
@@ -392,7 +495,7 @@ const JOIN_LINK_KEY = "joinlink";
 function sendTestJoinLinkEmail() {
   const workshopId = Object.keys(WORKSHOPS)[0];
   const workshop = WORKSHOPS[workshopId];
-  const registrant = { parentName: "Test Kid", studentNames: ["Test Kid"] };
+  const registrant = { parentName: "Test Parent", studentNames: ["Test Kid"] };
 
   GmailApp.sendEmail(TEST_EMAIL,
     "[TEST] Your join link: " + workshop.name,
@@ -470,33 +573,29 @@ function sendReminderEmail(email, registrant, workshop, session, type) {
     ? registrant.studentNames.join(" and ")
     : "your child";
 
-  let subject, intro;
+  let subject, headline, intro;
   if (type === "2day") {
     subject = "In 2 days: " + workshop.name;
-    intro = "This is a friendly reminder that <strong>" + workshop.name + "</strong> begins in <strong>2 days</strong>. " +
-      "We can\'t wait to see " + childList + " there!";
+    headline = "See you in 2 days";
+    intro = 'This is a friendly reminder that <strong style="color:' + C_TEXT + ';">' + workshop.name +
+      '</strong> begins in <strong style="color:' + C_TEXT + ';">2 days</strong>. We can\'t wait to see ' + childList + ' there!';
   } else {
     subject = "Starting soon: your public speaking workshop is today";
-    intro = "Your workshop session starts in about <strong>1–2 hours</strong>" +
-      (session ? " (<strong>" + session.label + "</strong>)" : "") +
-      ". Here is the join link again so " + childList + " can hop on when it\'s time.";
+    headline = "It's almost time";
+    intro = 'Your workshop session starts in about <strong style="color:' + C_TEXT + ';">1&ndash;2 hours</strong>' +
+      (session ? ' (<strong style="color:' + C_TEXT + ';">' + session.label + '</strong>)' : '') +
+      '. Here is the join link again so ' + childList + ' can hop on when it\'s time.';
   }
 
-  const html = '' +
-    '<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">' +
-      '<h2 style="color:#2563EB;">' + (type === "2day" ? "See you in 2 days! &#128075;" : "It\'s almost time! &#9200;") + '</h2>' +
-      '<p>Dear ' + registrant.parentName + ',</p>' +
-      '<p>' + intro + '</p>' +
-      scheduleBlockHtml(workshop) +
-      joinDetailsHtml(workshop) +
-      '<p style="color:#374151;">Questions? Just reply to this email.</p>' +
-      '<hr style="border:1px solid #eee;" />' +
-      '<p style="color:#666;">Best regards,<br/>' + ORG_NAME + ' Team<br/>' +
-        '<a href="https://almadenvoices.org" style="color:#2563EB;">almadenvoices.org</a></p>' +
-    '</div>';
+  const inner = '' +
+    '<p style="margin:0 0 16px;">Dear ' + registrant.parentName + ',</p>' +
+    '<p style="margin:0 0 24px;">' + intro + '</p>' +
+    scheduleBlockHtml(workshop) +
+    joinDetailsHtml(workshop) +
+    '<p style="margin:0;">Questions? Just reply to this email &mdash; we\'re happy to help.</p>';
 
   GmailApp.sendEmail(email, subject, "See the HTML version of this email for your workshop details and join link.",
-    { htmlBody: html, name: ORG_NAME });
+    { htmlBody: emailShell(headline, workshop.name, inner), name: ORG_NAME });
 }
 
 function getReminderLogSheet(ss) {
