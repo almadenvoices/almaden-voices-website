@@ -14,6 +14,8 @@ import VolunteerActivismIcon from "@mui/icons-material/VolunteerActivism";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
+import CloseIcon from "@mui/icons-material/Close";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 
 // ============================================================
 // UPCOMING SESSIONS — Add new sessions here!
@@ -175,8 +177,6 @@ export default function RegisterPage() {
                     setTimeout(() => {
                         window.location.href = `/donate?amount=${donateAmt}`;
                     }, 2500);
-                } else {
-                    document.getElementById("register-success")?.scrollIntoView({ behavior: "smooth" });
                 }
             } else {
                 setError((result && result.error) || "Failed to submit registration. Please try again.");
@@ -628,14 +628,34 @@ export default function RegisterPage() {
                     </form>
                 </section>
 
-                {/* Success message */}
-                {submitted && (
-                    <section id="register-success" className={s.success}>
-                        <h2>Registration Confirmed!</h2>
-                        <p>Thank you for registering! Your spot is confirmed. A confirmation email with workshop details has been sent to your email.</p>
-                    </section>
-                )}
             </div>
+
+            {/* Success popup modal */}
+            {submitted && (
+                <div
+                    className={s.modalOverlay}
+                    role="dialog"
+                    aria-modal="true"
+                    aria-labelledby="register-success-title"
+                    onClick={() => setSubmitted(false)}
+                >
+                    <div className={s.modal} onClick={(e) => e.stopPropagation()}>
+                        <button
+                            type="button"
+                            className={s.modalClose}
+                            aria-label="Close"
+                            onClick={() => setSubmitted(false)}
+                        >
+                            <CloseIcon />
+                        </button>
+                        <div className={s.modalIcon}>
+                            <CheckCircleIcon style={{ fontSize: 56 }} />
+                        </div>
+                        <h2 id="register-success-title">Registration Confirmed!</h2>
+                        <p>Thank you for registering! Your spot is confirmed. A confirmation email with workshop details has been sent to your email.</p>
+                    </div>
+                </div>
+            )}
 
             {/* Toast */}
             <div className={`${s.toast} ${showToast ? s.toastShow : ""}`} onAnimationEnd={() => setShowToast(false)}>
