@@ -440,6 +440,81 @@
     margin: 12px 0 0 !important;
 }
 
+/* ====== Success popup modal ====== */
+.modalOverlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(17, 24, 39, 0.55);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    z-index: 2000;
+    animation: overlayIn 0.2s ease forwards;
+}
+
+.modal {
+    position: relative;
+    background: #f0fdf4;
+    border: 2px solid #22c55e;
+    border-radius: 20px;
+    padding: 40px 32px 32px;
+    max-width: 440px;
+    width: 100%;
+    text-align: center;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    animation: modalIn 0.25s ease forwards;
+}
+
+.modalClose {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.05);
+    color: #374151;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.modalClose:hover {
+    background: rgba(0, 0, 0, 0.12);
+}
+
+.modalIcon {
+    color: #22c55e;
+    line-height: 1;
+    margin-bottom: 12px;
+}
+
+.modal h2 {
+    color: #166534;
+    margin: 0 0 16px;
+    font-size: 1.5rem;
+}
+
+.modal p {
+    color: #374151;
+    margin: 0;
+    line-height: 1.6;
+}
+
+@keyframes overlayIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes modalIn {
+    from { opacity: 0; transform: scale(0.92) translateY(10px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
 /* ====== Toast ====== */
 .toast {
     position: fixed;
