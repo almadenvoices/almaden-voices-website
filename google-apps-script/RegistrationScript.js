@@ -21,6 +21,10 @@
 const ADMIN_EMAIL = "almadenvoices@gmail.com";
 const ORG_NAME = "Almaden Voices";
 
+// Where sendTestJoinLinkEmail() sends its preview copy. Change this to try a
+// different inbox; it never touches real registrants.
+const TEST_EMAIL = ADMIN_EMAIL;
+
 // Desired column order for the Registrations sheet. New columns are appended
 // automatically to existing sheets, so this is safe to extend over time.
 const REG_HEADERS = [
@@ -59,10 +63,14 @@ const WORKSHOPS = {
       { label: "Day 2: Sunday, July 26, 2026", startUtc: "2026-07-26T04:00:00Z" }
     ],
     webex: {
-      link: "https://anjikabansal-405.my.webex.com/meet/almadenvoices",
-      meetingNumber: "2554 439 4487",
+      link: "https://anjikabansal-405.my.webex.com/anjikabansal-405.my/j.php?MTID=maff8bd4cb8821f446277ff56ca42f32a",
+      meetingNumber: "2552 590 1918",
+      password: "freeworkshop",
+      passwordNumeric: "37339675",
       phone: "+1-650-479-3208",
-      globalCallIn: "https://anjikabansal-405.my.webex.com/anjikabansal-405.my/globalcallin.php?MTID=m634a191836d0f42e51b2660a35060125"
+      phoneTapToJoin: "+1-650-479-3208,,25525901918#37339675#",
+      videoDial: "25525901918@webex.com",
+      videoIp: "173.243.2.68"
     }
   }
 };
@@ -191,6 +199,58 @@ function scheduleBlockHtml(workshop) {
     '<p style="color:#374151;margin:0 0 12px;"><strong>Where:</strong> Online (same join link for both days)</p>';
 }
 
+// Full Webex join instructions — used in the join-link email and in reminders.
+function joinDetailsHtml(workshop) {
+  const w = workshop.webex;
+  if (!w) return '';
+  return '' +
+    '<div style="background:#F3F4F6;border-radius:8px;padding:16px;margin:0 0 16px;">' +
+      '<p style="margin:0 0 10px;color:#111827;"><strong>Join the workshop</strong></p>' +
+      '<p style="margin:0 0 14px;">' +
+        '<a href="' + w.link + '" style="background:#2563EB;color:#ffffff;text-decoration:none;padding:12px 22px;border-radius:6px;display:inline-block;font-weight:bold;">Join the meeting</a>' +
+      '</p>' +
+      '<p style="margin:0 0 14px;color:#6B7280;font-size:12px;word-break:break-all;">' +
+        'Or paste this into your browser:<br/><a href="' + w.link + '" style="color:#2563EB;">' + w.link + '</a></p>' +
+      '<p style="margin:0 0 4px;color:#374151;"><strong>Join by meeting number</strong></p>' +
+      '<p style="margin:0 0 14px;color:#374151;line-height:1.7;">' +
+        'Meeting number (access code): <strong>' + w.meetingNumber + '</strong><br/>' +
+        'Meeting password: <strong>' + w.password + '</strong> (' + w.passwordNumeric + ' when dialing from a phone or video system)</p>' +
+      '<p style="margin:0 0 4px;color:#374151;"><strong>Tap to join from a mobile device (attendees only)</strong></p>' +
+      '<p style="margin:0 0 14px;color:#374151;line-height:1.7;">' +
+        '<a href="tel:' + w.phoneTapToJoin.replace(/[^0-9+,#]/g, '') + '" style="color:#2563EB;">' + w.phoneTapToJoin + '</a> United States Toll<br/>' +
+        '<span style="color:#6B7280;font-size:12px;">Some mobile devices may ask attendees to enter a numeric password.</span></p>' +
+      '<p style="margin:0 0 4px;color:#374151;"><strong>Join by phone</strong></p>' +
+      '<p style="margin:0 0 14px;color:#374151;">' + w.phone + ' United States Toll</p>' +
+      '<p style="margin:0 0 4px;color:#374151;"><strong>Join from a video system or application</strong></p>' +
+      '<p style="margin:0 0 14px;color:#374151;line-height:1.7;">' +
+        'Dial <strong>' + w.videoDial + '</strong><br/>' +
+        'You can also dial ' + w.videoIp + ' and enter your meeting number.</p>' +
+      '<p style="margin:0;color:#6B7280;font-size:12px;">Need help? Go to ' +
+        '<a href="https://help.webex.com" style="color:#2563EB;">help.webex.com</a></p>' +
+    '</div>';
+}
+
+function buildJoinLinkHtml(registrant, workshop) {
+  const childList = registrant.studentNames.length
+    ? registrant.studentNames.join(" and ")
+    : "your child";
+  return '' +
+    '<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">' +
+      '<h2 style="color:#2563EB;">Your join link is here! &#127908;</h2>' +
+      '<p>Dear ' + registrant.parentName + ',</p>' +
+      '<p>The <strong>' + workshop.name + '</strong> starts soon, and here is everything ' + childList +
+        ' needs to join. The <strong>same link works for both days</strong> &mdash; we suggest saving this email.</p>' +
+      scheduleBlockHtml(workshop) +
+      joinDetailsHtml(workshop) +
+      '<p style="color:#374151;">Please join a few minutes early so we can start on time. Attending both days is highly recommended for the best learning experience.</p>' +
+      '<p>Questions? Just reply to this email or contact us at ' +
+        '<a href="mailto:' + ADMIN_EMAIL + '" style="color:#2563EB;">' + ADMIN_EMAIL + '</a>.</p>' +
+      '<hr style="border:1px solid #eee;" />' +
+      '<p style="color:#666;">Best regards,<br/>' + ORG_NAME + ' Team<br/>' +
+        '<a href="https://almadenvoices.org" style="color:#2563EB;">almadenvoices.org</a></p>' +
+    '</div>';
+}
+
 function buildWorkshopConfirmationHtml(data, workshop, students, studentListHtml, firstStudent) {
   const childPhrase = students.length === 1 ? firstStudent.firstName : "your children";
   return '' +
@@ -203,7 +263,8 @@ function buildWorkshopConfirmationHtml(data, workshop, students, studentListHtml
       '<ul style="line-height:1.8;color:#333;">' + studentListHtml + '</ul>' +
       scheduleBlockHtml(workshop) +
       '<p style="color:#374151;">This is a two-day workshop (1 hour each day). Students are welcome to attend one or both sessions, but attending both is highly recommended for the best learning experience.</p>' +
-      '<p style="color:#374151;">We\'ll email you an online link to join the meeting a few days before the workshop, along with a reminder so you\'re all set.</p>' +
+      joinDetailsHtml(workshop) +
+      '<p style="color:#374151;">We\'ll also send you a reminder before the workshop so you\'re all set.</p>' +
       '<p>If you have any questions, just reply to this email or contact us at ' +
         '<a href="mailto:' + ADMIN_EMAIL + '" style="color:#2563EB;">' + ADMIN_EMAIL + '</a>.</p>' +
       '<hr style="border:1px solid #eee;" />' +
@@ -319,6 +380,62 @@ function sendWorkshopReminders() {
   });
 }
 
+// ============================================================
+// JOIN-LINK BLAST
+// Run sendTestJoinLinkEmail() first to preview, then
+// sendJoinLinkToAllRegistrants() to send to everyone who registered.
+// Safe to re-run: anyone already sent is skipped via the ReminderLog.
+// ============================================================
+const JOIN_LINK_KEY = "joinlink";
+
+// Preview only — sends one copy to TEST_EMAIL for a fake registrant.
+function sendTestJoinLinkEmail() {
+  const workshopId = Object.keys(WORKSHOPS)[0];
+  const workshop = WORKSHOPS[workshopId];
+  const registrant = { parentName: "Test Kid", studentNames: ["Test Kid"] };
+
+  GmailApp.sendEmail(TEST_EMAIL,
+    "[TEST] Your join link: " + workshop.name,
+    "See the HTML version of this email for the join link and workshop details.",
+    { htmlBody: buildJoinLinkHtml(registrant, workshop), name: ORG_NAME });
+
+  Logger.log("Test join-link email sent to " + TEST_EMAIL);
+}
+
+// The real send — one email per registered family.
+function sendJoinLinkToAllRegistrants() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = ss.getSheetByName("Registrations");
+  if (!sheet || sheet.getLastRow() < 2) {
+    Logger.log("No registrations found.");
+    return;
+  }
+
+  const logSheet = getReminderLogSheet(ss);
+  const alreadySent = getSentSet(logSheet);
+  let sent = 0, skipped = 0;
+
+  Object.keys(WORKSHOPS).forEach(function(workshopId) {
+    const workshop = WORKSHOPS[workshopId];
+    const registrants = getWorkshopRegistrants(sheet, workshopId);
+
+    Object.keys(registrants).forEach(function(email) {
+      if (alreadySent[email + "|" + JOIN_LINK_KEY]) { skipped++; return; }
+
+      GmailApp.sendEmail(email,
+        "Your join link: " + workshop.name,
+        "See the HTML version of this email for the join link and workshop details.",
+        { htmlBody: buildJoinLinkHtml(registrants[email], workshop), name: ORG_NAME });
+
+      recordSent(logSheet, email, workshopId, JOIN_LINK_KEY);
+      alreadySent[email + "|" + JOIN_LINK_KEY] = true;
+      sent++;
+    });
+  });
+
+  Logger.log("Join-link emails sent: " + sent + " (skipped, already sent: " + skipped + ")");
+}
+
 function getWorkshopRegistrants(sheet, workshopId) {
   const idx = headerIndexMap(sheet);
   const emailCol = idx["Email"];
@@ -362,7 +479,7 @@ function sendReminderEmail(email, registrant, workshop, session, type) {
     subject = "Starting soon: your public speaking workshop is today";
     intro = "Your workshop session starts in about <strong>1–2 hours</strong>" +
       (session ? " (<strong>" + session.label + "</strong>)" : "") +
-      ". Have the join link we sent you handy so " + childList + " can hop on when it\'s time.";
+      ". Here is the join link again so " + childList + " can hop on when it\'s time.";
   }
 
   const html = '' +
@@ -371,6 +488,7 @@ function sendReminderEmail(email, registrant, workshop, session, type) {
       '<p>Dear ' + registrant.parentName + ',</p>' +
       '<p>' + intro + '</p>' +
       scheduleBlockHtml(workshop) +
+      joinDetailsHtml(workshop) +
       '<p style="color:#374151;">Questions? Just reply to this email.</p>' +
       '<hr style="border:1px solid #eee;" />' +
       '<p style="color:#666;">Best regards,<br/>' + ORG_NAME + ' Team<br/>' +
