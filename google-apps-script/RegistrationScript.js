@@ -276,7 +276,7 @@ function scheduleBlockHtml(workshop) {
         '<p style="margin:14px 0 0;font-family:' + FONT_BODY + ';font-size:15px;color:' + C_BODY + ';">' +
           '<strong style="color:' + C_TEXT + ';">Time:</strong> ' + workshop.timesText + '</p>' +
         '<p style="margin:6px 0 0;font-family:' + FONT_BODY + ';font-size:15px;color:' + C_BODY + ';">' +
-          '<strong style="color:' + C_TEXT + ';">Where:</strong> Online &mdash; the same link works for both days</p>' +
+          '<strong style="color:' + C_TEXT + ';">Where:</strong> Online. The same link works for both days</p>' +
       '</td></tr>' +
     '</table>';
 }
@@ -341,7 +341,7 @@ function buildJoinLinkHtml(registrant, workshop) {
     scheduleBlockHtml(workshop) +
     joinDetailsHtml(workshop) +
     '<p style="margin:0 0 16px;">Please join a few minutes early so we can start on time. Attending both days is highly recommended for the best learning experience.</p>' +
-    '<p style="margin:0;">Questions? Just reply to this email &mdash; we\'re happy to help.</p>';
+    '<p style="margin:0;">Questions? Just reply to this email. We\'re happy to help.</p>';
 
   return emailShell("Your join link is here", workshop.name, inner);
 }
@@ -381,7 +381,7 @@ function buildWorkshopConfirmationHtml(data, workshop, students, studentListHtml
       'attending both is highly recommended for the best learning experience.</p>' +
     joinDetailsHtml(workshop) +
     '<p style="margin:0 0 16px;">We\'ll also send you a reminder before the workshop so you\'re all set.</p>' +
-    '<p style="margin:0;">Questions? Just reply to this email &mdash; we\'re happy to help.</p>';
+    '<p style="margin:0;">Questions? Just reply to this email. We\'re happy to help.</p>';
 
   return emailShell("You're registered", workshop.name, inner);
 }
@@ -394,7 +394,7 @@ function buildGenericConfirmationHtml(data, students, studentListHtml, firstStud
       (students.length === 1 ? 'Your spot is' : 'Your spots are') + ' confirmed.</p>' +
     registeredBlockHtml(students) +
     '<p style="margin:0 0 16px;">We\'ll follow up with schedule details and location information closer to the session date.</p>' +
-    '<p style="margin:0;">Questions? Just reply to this email &mdash; we\'re happy to help.</p>';
+    '<p style="margin:0;">Questions? Just reply to this email. We\'re happy to help.</p>';
 
   return emailShell("Registration confirmed", data.sessionLabel || '', inner);
 }
@@ -675,7 +675,7 @@ function sendReminderEmail(email, registrant, workshop, session, type, opts) {
     intro = 'Just one more day! <strong style="color:' + C_TEXT + ';">' + workshop.name +
       '</strong> begins <strong style="color:' + C_TEXT + ';">tomorrow</strong>, and we can\'t wait to see ' +
       childList + ' there. Everything ' + (registrant.studentNames.length > 1 ? 'they' : 'you') +
-      ' need to join is below &mdash; the same link works for both days.';
+      ' need to join is below, and the same link works for both days.';
   } else {
     subject = "Starting soon: your public speaking workshop is today";
     headline = "It's almost time";
@@ -690,7 +690,7 @@ function sendReminderEmail(email, registrant, workshop, session, type, opts) {
     scheduleBlockHtml(workshop) +
     joinDetailsHtml(workshop) +
     (type === "1day" ? prepBlockHtml() : '') +
-    '<p style="margin:0;">Questions? Just reply to this email &mdash; we\'re happy to help.</p>';
+    '<p style="margin:0;">Questions? Just reply to this email. We\'re happy to help.</p>';
 
   const options = { htmlBody: emailShell(headline, workshop.name, inner), name: ORG_NAME };
   if (opts && opts.bcc) options.bcc = opts.bcc;
@@ -705,8 +705,8 @@ function prepBlockHtml() {
   const items = [
     'Join a few minutes early so we can start right on time.',
     'Find a quiet spot with a steady internet connection.',
-    'Headphones and a working microphone help a lot &mdash; students will get a chance to speak.',
-    'Bring a notebook and pen in case you\'d like to jot down personal notes &mdash; ' +
+    'Headphones and a working microphone help a lot, since students will get a chance to speak.',
+    'Bring a notebook and pen in case you\'d like to jot down personal notes. Either way, ' +
       'our notes and slideshows will be sent to you after both workshops.'
   ];
 
