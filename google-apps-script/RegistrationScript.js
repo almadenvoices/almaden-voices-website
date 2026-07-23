@@ -227,10 +227,10 @@ function emailShell(headline, subhead, innerHtml) {
           '</td></tr>' +
 
           // Footer
-          '<tr><td style="background:' + C_SOFT + ';border-top:1px solid ' + C_LINE + ';padding:24px 32px;' +
-            'font-family:' + FONT_BODY + ';font-size:13px;line-height:1.6;color:' + C_MUTED + ';">' +
-            '<p style="margin:0 0 4px;color:' + C_TEXT + ';font-weight:700;">' + ORG_NAME + '</p>' +
-            '<p style="margin:0;">' +
+          '<tr><td align="center" style="background:' + C_SOFT + ';border-top:1px solid ' + C_LINE + ';padding:24px 32px;' +
+            'font-family:' + FONT_BODY + ';font-size:13px;line-height:1.6;color:' + C_MUTED + ';text-align:center;">' +
+            '<p style="margin:0 0 4px;color:' + C_TEXT + ';font-weight:700;text-align:center;">' + ORG_NAME + '</p>' +
+            '<p style="margin:0;text-align:center;">' +
               '<a href="https://almadenvoices.org" style="color:' + C_ACCENT + ';text-decoration:none;">almadenvoices.org</a>' +
               ' &nbsp;&middot;&nbsp; ' +
               '<a href="mailto:' + ADMIN_EMAIL + '" style="color:' + C_ACCENT + ';text-decoration:none;">' + ADMIN_EMAIL + '</a>' +
