@@ -658,7 +658,7 @@ function getWorkshopRegistrants(sheet, workshopId) {
   return out;
 }
 
-function sendReminderEmail(email, registrant, workshop, session, type) {
+function sendReminderEmail(email, registrant, workshop, session, type, opts) {
   const childList = registrant.studentNames.length
     ? registrant.studentNames.join(" and ")
     : "your child";
@@ -669,6 +669,13 @@ function sendReminderEmail(email, registrant, workshop, session, type) {
     headline = "See you in 2 days";
     intro = 'This is a friendly reminder that <strong style="color:' + C_TEXT + ';">' + workshop.name +
       '</strong> begins in <strong style="color:' + C_TEXT + ';">2 days</strong>. We can\'t wait to see ' + childList + ' there!';
+  } else if (type === "1day") {
+    subject = "Tomorrow: " + workshop.name;
+    headline = "See you tomorrow";
+    intro = 'Just one more day! <strong style="color:' + C_TEXT + ';">' + workshop.name +
+      '</strong> begins <strong style="color:' + C_TEXT + ';">tomorrow</strong>, and we can\'t wait to see ' +
+      childList + ' there. Everything ' + (registrant.studentNames.length > 1 ? 'they' : 'you') +
+      ' need to join is below &mdash; the same link works for both days.';
   } else {
     subject = "Starting soon: your public speaking workshop is today";
     headline = "It's almost time";
@@ -682,10 +689,121 @@ function sendReminderEmail(email, registrant, workshop, session, type) {
     '<p style="margin:0 0 24px;">' + intro + '</p>' +
     scheduleBlockHtml(workshop) +
     joinDetailsHtml(workshop) +
+    (type === "1day" ? prepBlockHtml() : '') +
     '<p style="margin:0;">Questions? Just reply to this email &mdash; we\'re happy to help.</p>';
 
+  const options = { htmlBody: emailShell(headline, workshop.name, inner), name: ORG_NAME };
+  if (opts && opts.bcc) options.bcc = opts.bcc;
+  if (opts && opts.subjectPrefix) subject = opts.subjectPrefix + subject;
+
   GmailApp.sendEmail(email, subject, "See the HTML version of this email for your workshop details and join link.",
-    { htmlBody: emailShell(headline, workshop.name, inner), name: ORG_NAME });
+    options);
+}
+
+// Short "how to get ready" checklist — used in the day-before reminder.
+function prepBlockHtml() {
+  const items = [
+    'Join a few minutes early so we can start right on time.',
+    'Find a quiet spot with a steady internet connection.',
+    'Headphones and a working microphone help a lot &mdash; students will get a chance to speak.',
+    'Bring a notebook and pen for the practice exercises.'
+  ];
+
+  const rows = items.map(function(text, i) {
+    return '<tr><td style="padding:10px 0;' + (i ? 'border-top:1px solid ' + C_LINE + ';' : '') +
+      'font-family:' + FONT_BODY + ';font-size:15px;line-height:1.6;color:' + C_BODY + ';">' + text + '</td></tr>';
+  }).join('');
+
+  return '' +
+    '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" ' +
+      'style="background:' + C_SOFT + ';border:1px solid ' + C_LINE + ';border-radius:12px;margin:0 0 24px;">' +
+      '<tr><td style="padding:20px 22px;">' +
+        sectionTitle('How to get ready') +
+        '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">' + rows + '</table>' +
+      '</td></tr>' +
+    '</table>';
+}
+
+// ============================================================
+// ONE-DAY-BEFORE REMINDER BLAST
+// Run sendTestOneDayReminder() first to preview, then
+// scheduleOneDayReminder() to have it go out automatically.
+// Safe to re-run: anyone already sent is skipped via the ReminderLog.
+// ============================================================
+const ONE_DAY_KEY = "1day";
+
+// When the day-before reminder should go out, as a UTC instant.
+// 2026-07-24T04:00:00Z = 9:00 PM PDT on Thursday, July 23, 2026 —
+// exactly 24 hours before Day 1 begins.
+const ONE_DAY_REMINDER_TIME_UTC = "2026-07-24T04:00:00Z";
+
+// Preview only — sends one copy to TEST_EMAIL for a fake registrant.
+function sendTestOneDayReminder() {
+  const workshopId = Object.keys(WORKSHOPS)[0];
+  const workshop = WORKSHOPS[workshopId];
+  const registrant = { parentName: "Test Parent", studentNames: ["Test Kid"] };
+
+  sendReminderEmail(TEST_EMAIL, registrant, workshop, null, ONE_DAY_KEY, { subjectPrefix: "[TEST] " });
+  Logger.log("Test day-before reminder sent to " + TEST_EMAIL);
+}
+
+// Run this ONCE to schedule the reminder. Creates a one-time trigger that fires
+// sendOneDayReminderToAll() at ONE_DAY_REMINDER_TIME_UTC. Re-running replaces any
+// reminder trigger already scheduled, so it's safe to run again after edits.
+// To call it off, run cancelScheduledOneDayReminder().
+function scheduleOneDayReminder() {
+  cancelScheduledOneDayReminder();
+
+  const when = new Date(ONE_DAY_REMINDER_TIME_UTC);
+  if (when.getTime() <= Date.now()) {
+    Logger.log("ONE_DAY_REMINDER_TIME_UTC is in the past — nothing scheduled. Update it and run again.");
+    return;
+  }
+
+  ScriptApp.newTrigger("sendOneDayReminderToAll").timeBased().at(when).create();
+  Logger.log("Day-before reminder scheduled for " + when + " (BCC: " + BCC_EMAIL + ")");
+}
+
+function cancelScheduledOneDayReminder() {
+  let removed = 0;
+  ScriptApp.getProjectTriggers().forEach(function(t) {
+    if (t.getHandlerFunction() === "sendOneDayReminderToAll") {
+      ScriptApp.deleteTrigger(t);
+      removed++;
+    }
+  });
+  Logger.log("Day-before reminder triggers removed: " + removed);
+}
+
+// The real send — one email per registered family.
+function sendOneDayReminderToAll() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = ss.getSheetByName("Registrations");
+  if (!sheet || sheet.getLastRow() < 2) {
+    Logger.log("No registrations found.");
+    return;
+  }
+
+  const logSheet = getReminderLogSheet(ss);
+  const alreadySent = getSentSet(logSheet);
+  let sent = 0, skipped = 0;
+
+  Object.keys(WORKSHOPS).forEach(function(workshopId) {
+    const workshop = WORKSHOPS[workshopId];
+    const registrants = getWorkshopRegistrants(sheet, workshopId);
+
+    Object.keys(registrants).forEach(function(email) {
+      if (alreadySent[email + "|" + ONE_DAY_KEY]) { skipped++; return; }
+
+      sendReminderEmail(email, registrants[email], workshop, null, ONE_DAY_KEY, { bcc: BCC_EMAIL });
+
+      recordSent(logSheet, email, workshopId, ONE_DAY_KEY);
+      alreadySent[email + "|" + ONE_DAY_KEY] = true;
+      sent++;
+    });
+  });
+
+  Logger.log("Day-before reminders sent: " + sent + " (skipped, already sent: " + skipped + ")");
 }
 
 function getReminderLogSheet(ss) {
