@@ -706,7 +706,8 @@ function prepBlockHtml() {
     'Join a few minutes early so we can start right on time.',
     'Find a quiet spot with a steady internet connection.',
     'Headphones and a working microphone help a lot &mdash; students will get a chance to speak.',
-    'Bring a notebook and pen for the practice exercises.'
+    'Bring a notebook and pen in case you\'d like to jot down personal notes &mdash; ' +
+      'our notes and slideshows will be sent to you after both workshops.'
   ];
 
   const rows = items.map(function(text, i) {
