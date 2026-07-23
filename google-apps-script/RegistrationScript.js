@@ -505,6 +505,60 @@ function sendTestJoinLinkEmail() {
   Logger.log("Test join-link email sent to " + TEST_EMAIL);
 }
 
+// Sends the real (non-[TEST]) join-link email to the most recent registration
+// whose Parent Name contains "test" — i.e. the "Test Parent" row in the
+// Registrations sheet. Use this to see exactly what registrants will receive.
+// The send is recorded in the ReminderLog so the full blast won't double-send.
+function sendJoinLinkToTestParent() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = ss.getSheetByName("Registrations");
+  if (!sheet || sheet.getLastRow() < 2) {
+    Logger.log("No registrations found.");
+    return;
+  }
+
+  const idx = headerIndexMap(sheet);
+  const values = sheet.getRange(2, 1, sheet.getLastRow() - 1, sheet.getLastColumn()).getValues();
+
+  // Walk from the bottom up so we pick the newest matching row.
+  let match = null;
+  for (let i = values.length - 1; i >= 0 && !match; i--) {
+    const parentName = String(values[i][idx["Parent Name"]] || "");
+    if (parentName.toLowerCase().indexOf("test") !== -1) match = values[i];
+  }
+  if (!match) {
+    Logger.log('No row found with "test" in the Parent Name column.');
+    return;
+  }
+
+  const email = String(match[idx["Email"]] || "").trim();
+  if (!email) {
+    Logger.log("The matching test row has no email address.");
+    return;
+  }
+
+  const workshopId = String(match[idx["Session ID"]] || "") || Object.keys(WORKSHOPS)[0];
+  const workshop = WORKSHOPS[workshopId];
+  if (!workshop) {
+    Logger.log("No workshop config found for session ID: " + workshopId);
+    return;
+  }
+
+  const firstName = String(match[idx["Student First Name"]] || "").trim();
+  const registrant = {
+    parentName: String(match[idx["Parent Name"]] || "").trim() || "there",
+    studentNames: firstName ? [firstName] : []
+  };
+
+  GmailApp.sendEmail(email,
+    "Your join link: " + workshop.name,
+    "See the HTML version of this email for the join link and workshop details.",
+    { htmlBody: buildJoinLinkHtml(registrant, workshop), name: ORG_NAME });
+
+  recordSent(getReminderLogSheet(ss), email, workshopId, JOIN_LINK_KEY);
+  Logger.log("Join-link email sent to " + registrant.parentName + " <" + email + ">");
+}
+
 // The real send — one email per registered family.
 function sendJoinLinkToAllRegistrants() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
