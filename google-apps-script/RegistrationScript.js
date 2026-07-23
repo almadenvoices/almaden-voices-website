@@ -25,6 +25,9 @@ const ORG_NAME = "Almaden Voices";
 // different inbox; it never touches real registrants.
 const TEST_EMAIL = ADMIN_EMAIL;
 
+// BCC'd on every join-link email in the blast, so there's a copy of each send.
+const BCC_EMAIL = ADMIN_EMAIL;
+
 // Desired column order for the Registrations sheet. New columns are appended
 // automatically to existing sheets, so this is safe to extend over time.
 const REG_HEADERS = [
@@ -559,6 +562,39 @@ function sendJoinLinkToTestParent() {
   Logger.log("Join-link email sent to " + registrant.parentName + " <" + email + ">");
 }
 
+// When the scheduled blast should go out, as a UTC instant.
+// 2026-07-23T04:00:00Z = 9:00 PM PDT on Wednesday, July 22, 2026.
+const BLAST_TIME_UTC = "2026-07-23T04:00:00Z";
+
+// Run this ONCE to schedule the blast. It creates a one-time trigger that fires
+// sendJoinLinkToAllRegistrants() at BLAST_TIME_UTC. Re-running replaces any
+// blast trigger already scheduled, so it's safe to run again after edits.
+// To call the whole thing off, run cancelScheduledJoinLinkBlast().
+function scheduleJoinLinkBlast() {
+  cancelScheduledJoinLinkBlast();
+
+  const when = new Date(BLAST_TIME_UTC);
+  if (when.getTime() <= Date.now()) {
+    Logger.log("BLAST_TIME_UTC is in the past — nothing scheduled. Update it and run again.");
+    return;
+  }
+
+  ScriptApp.newTrigger("sendJoinLinkToAllRegistrants").timeBased().at(when).create();
+  Logger.log("Join-link blast scheduled for " + when + " (BCC: " + BCC_EMAIL + ")");
+}
+
+// Removes a scheduled blast trigger, if one exists.
+function cancelScheduledJoinLinkBlast() {
+  let removed = 0;
+  ScriptApp.getProjectTriggers().forEach(function(t) {
+    if (t.getHandlerFunction() === "sendJoinLinkToAllRegistrants") {
+      ScriptApp.deleteTrigger(t);
+      removed++;
+    }
+  });
+  Logger.log("Blast triggers removed: " + removed);
+}
+
 // The real send — one email per registered family.
 function sendJoinLinkToAllRegistrants() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
@@ -582,7 +618,7 @@ function sendJoinLinkToAllRegistrants() {
       GmailApp.sendEmail(email,
         "Your join link: " + workshop.name,
         "See the HTML version of this email for the join link and workshop details.",
-        { htmlBody: buildJoinLinkHtml(registrants[email], workshop), name: ORG_NAME });
+        { htmlBody: buildJoinLinkHtml(registrants[email], workshop), name: ORG_NAME, bcc: BCC_EMAIL });
 
       recordSent(logSheet, email, workshopId, JOIN_LINK_KEY);
       alreadySent[email + "|" + JOIN_LINK_KEY] = true;
