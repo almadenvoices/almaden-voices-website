@@ -282,11 +282,9 @@ function scheduleBlockHtml(workshop) {
 }
 
 // Full Webex join instructions — used in the join-link email and in reminders.
-// middleHtml, if given, sits between the join button and the "other ways to
-// join" list, so important notes land above the fine print.
-function joinDetailsHtml(workshop, middleHtml) {
+function joinDetailsHtml(workshop) {
   const w = workshop.webex;
-  if (!w) return middleHtml || '';
+  if (!w) return '';
 
   const passwordLine = w.password
     ? '<br/>Meeting password: <strong style="color:' + C_TEXT + ';">' + w.password + '</strong>' +
@@ -306,8 +304,6 @@ function joinDetailsHtml(workshop, middleHtml) {
         '<a href="' + w.link + '" style="color:' + C_ACCENT + ';">' + w.link + '</a>' +
       '</td></tr>' +
     '</table>' +
-
-    (middleHtml || '') +
 
     // Alternative ways to join
     '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" ' +
@@ -683,9 +679,8 @@ function sendReminderEmail(email, registrant, workshop, session, type, opts) {
   } else if (type === "1hour") {
     subject = "Starting in 1 hour: " + workshop.name;
     headline = "We start in one hour";
-    intro = '<strong style="color:' + C_TEXT + ';">' + workshop.name + '</strong> begins in about ' +
-      '<strong style="color:' + C_TEXT + ';">one hour</strong>. Here is the join link so ' + childList +
-      ' can hop on when it\'s time, plus two quick things to know before we begin.';
+    intro = 'We begin in about <strong style="color:' + C_TEXT + ';">one hour</strong>. Two quick things to know, ' +
+      'and then the join link for ' + childList + ' is just below.';
   } else {
     subject = "Starting soon: your public speaking workshop is today";
     headline = "It's almost time";
@@ -695,14 +690,15 @@ function sendReminderEmail(email, registrant, workshop, session, type, opts) {
   }
 
   // The last two reminders carry the camera/lighting rule and the note about
-  // how long parents are actually needed.
+  // how long parents are actually needed, right up top.
   const showLastMinuteNotes = (type === "1hour" || type === "dayof");
 
   const inner = '' +
-    '<p style="margin:0 0 16px;">Dear ' + registrant.parentName + ',</p>' +
-    '<p style="margin:0 0 24px;">' + intro + '</p>' +
+    '<p style="margin:0 0 14px;">Dear ' + registrant.parentName + ',</p>' +
+    '<p style="margin:0 0 20px;">' + intro + '</p>' +
+    (showLastMinuteNotes ? lastMinuteNotesHtml() : '') +
     (type === "1hour" ? '' : scheduleBlockHtml(workshop)) +
-    joinDetailsHtml(workshop, showLastMinuteNotes ? cameraBlockHtml() + parentsBlockHtml() : '') +
+    joinDetailsHtml(workshop) +
     (type === "1day" ? prepBlockHtml() : '') +
     '<p style="margin:0;">Questions? Just reply to this email. We\'re happy to help.</p>';
 
@@ -714,46 +710,31 @@ function sendReminderEmail(email, registrant, workshop, session, type, opts) {
     options);
 }
 
-// Camera + lighting rule. Highlighted, because this is the one thing we
-// really need every student to get right in a public speaking workshop.
-function cameraBlockHtml() {
-  const items = [
-    'Please keep your <strong style="color:' + C_TEXT + ';">camera on</strong> for the whole session. ' +
-      'This is a public speaking workshop, so we need to be able to see you.',
-    'Sit facing a <strong style="color:' + C_TEXT + ';">window or a lamp</strong> so your face is well lit. ' +
-      'Try not to sit with a bright window right behind you, since that turns you into a silhouette.',
-    'Check that your whole face and shoulders fit in the frame, and that the camera is close to eye level.'
-  ];
-
-  const rows = items.map(function(text, i) {
-    return '<tr><td style="padding:10px 0;' + (i ? 'border-top:1px solid ' + C_LINE + ';' : '') +
-      'font-family:' + FONT_BODY + ';font-size:15px;line-height:1.6;color:' + C_BODY + ';">' + text + '</td></tr>';
-  }).join('');
+// The two things we most need families to read. Deliberately compact and
+// highlighted, and placed above the join button so it lands in the first
+// screenful without any scrolling.
+function lastMinuteNotesHtml() {
+  const note = function(number, title, body) {
+    return '' +
+      '<tr><td style="padding:0 0 14px;font-family:' + FONT_BODY + ';font-size:15px;line-height:1.55;color:' + C_BODY + ';">' +
+        '<p style="margin:0 0 3px;color:' + C_TEXT + ';font-weight:700;">' + number + '. ' + title + '</p>' +
+        '<p style="margin:0;">' + body + '</p>' +
+      '</td></tr>';
+  };
 
   return '' +
     '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" ' +
-      'style="background:#EFF6FF;border:1px solid ' + C_ACCENT + ';border-radius:12px;margin:0 0 24px;">' +
-      '<tr><td style="padding:20px 22px;">' +
-        sectionTitle('Camera and lighting') +
-        '<p style="margin:0 0 12px;font-family:' + FONT_BODY + ';font-size:15px;line-height:1.6;color:' + C_TEXT + ';font-weight:700;">' +
-          'This one really matters. We need to be able to see every student clearly.</p>' +
-        '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">' + rows + '</table>' +
-      '</td></tr>' +
-    '</table>';
-}
-
-// How long parents are actually needed — the first ten minutes only.
-function parentsBlockHtml() {
-  return '' +
-    '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" ' +
-      'style="background:' + C_SOFT + ';border:1px solid ' + C_LINE + ';border-radius:12px;margin:0 0 24px;">' +
-      '<tr><td style="padding:20px 22px;font-family:' + FONT_BODY + ';font-size:15px;line-height:1.6;color:' + C_BODY + ';">' +
-        sectionTitle('For parents') +
-        '<p style="margin:0 0 10px;">You do not need to stay for the whole workshop. We only need a parent nearby for the ' +
-          '<strong style="color:' + C_TEXT + ';">first ten minutes</strong>, to help with sign-in and to make sure the camera, ' +
-          'microphone and sound are all working.</p>' +
-        '<p style="margin:0;">After that, your child is in good hands and you are free to step away. ' +
-          'If you would rather stay and watch the whole session, you are very welcome to.</p>' +
+      'style="background:#EFF6FF;border:2px solid ' + C_ACCENT + ';border-radius:12px;margin:0 0 24px;">' +
+      '<tr><td style="padding:20px 22px 8px;">' +
+        sectionTitle('Two quick things before we start') +
+        '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">' +
+          note(1, 'Camera on, and please be well lit.',
+            'This is a <strong style="color:' + C_TEXT + ';">public speaking</strong> workshop, so we really do need to be ' +
+            'able to see you. Sit facing a window or a lamp, not with a bright window behind you.') +
+          note(2, 'Parents, we only need you for the first ten minutes.',
+            'Stay for sign-in and a quick camera and sound check, then feel free to step away. ' +
+            'You are very welcome to stay for the whole session if you would like to.') +
+        '</table>' +
       '</td></tr>' +
     '</table>';
 }
