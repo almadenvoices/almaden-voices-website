@@ -215,13 +215,14 @@ function emailShell(headline, subhead, innerHtml) {
         '<table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" ' +
           'style="max-width:600px;width:100%;background:#FFFFFF;border:1px solid ' + C_LINE + ';border-radius:16px;overflow:hidden;">' +
 
-          // Header band
-          '<tr><td style="background:' + C_ACCENT + ';padding:32px 32px 28px;">' +
-            '<p style="margin:0 0 10px;font-family:' + FONT_BODY + ';font-size:12px;letter-spacing:1.5px;' +
+          // Header band — kept compact so the email opens on the actual message
+          // rather than on a screenful of blue.
+          '<tr><td style="background:' + C_ACCENT + ';padding:18px 28px 16px;">' +
+            '<p style="margin:0 0 6px;font-family:' + FONT_BODY + ';font-size:11px;letter-spacing:1.4px;' +
               'text-transform:uppercase;color:#BFDBFE;font-weight:700;">' + ORG_NAME + '</p>' +
-            '<h1 style="margin:0;font-family:' + FONT_HEADING + ';font-size:30px;line-height:1.25;' +
+            '<h1 style="margin:0;font-family:' + FONT_HEADING + ';font-size:21px;line-height:1.3;' +
               'color:#FFFFFF;font-weight:700;">' + headline + '</h1>' +
-            (subhead ? '<p style="margin:10px 0 0;font-family:' + FONT_BODY + ';font-size:15px;line-height:1.5;color:#DBEAFE;">' + subhead + '</p>' : '') +
+            (subhead ? '<p style="margin:5px 0 0;font-family:' + FONT_BODY + ';font-size:13px;line-height:1.45;color:#DBEAFE;">' + subhead + '</p>' : '') +
           '</td></tr>' +
 
           // Body
@@ -1046,7 +1047,7 @@ function sendDay1RecapEmail(email, registrant, workshop, opts) {
       'concerns, please do not hesitate to reply to this email or write to us at ' +
       '<a href="mailto:' + ADMIN_EMAIL + '" style="color:' + C_ACCENT + ';">' + ADMIN_EMAIL + '</a>.</p>';
 
-  let subject = "Thank you for Day 1: a quick survey, notes, and tomorrow's link";
+  let subject = ORG_NAME + ": thank you for Day 1, plus a quick survey and tomorrow's link";
   if (opts && opts.subjectPrefix) subject = opts.subjectPrefix + subject;
 
   const options = { htmlBody: emailShell("Thank you for Day 1", workshop.name, inner), name: ORG_NAME };
