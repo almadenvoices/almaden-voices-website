@@ -971,6 +971,158 @@ function sendOneHourReminderToAll() {
   Logger.log("One-hour reminders sent: " + sent + " (skipped, already sent: " + skipped + ")");
 }
 
+// ============================================================
+// AFTER DAY 1 — RECAP + PRE-SURVEY EMAIL
+// Run sendTestDay1Recap() first to preview it in your own inbox, then
+// sendDay1RecapToAll() when you're happy with it.
+// Safe to re-run: anyone already sent is skipped via the ReminderLog.
+// ============================================================
+const DAY1_RECAP_KEY = "day1recap";
+
+// Quick 2-question pre-survey, meant to capture where students stood before
+// any teaching — which is why we ask families to fill it in with their child.
+const PRE_SURVEY_URL = "https://forms.gle/T5hmD7NGRuoAb3Xo9";
+
+// Day 1 transcript + meeting notes.
+const DAY1_NOTES_URL = "https://docs.google.com/document/d/1hsEY9DJQR55K40-23TQYFQMjgXAKOZDUlw-JvDrA4w0/edit?usp=sharing";
+
+// Preview only — sends one copy to TEST_EMAIL for a fake registrant.
+function sendTestDay1Recap() {
+  const workshopId = Object.keys(WORKSHOPS)[0];
+  const workshop = WORKSHOPS[workshopId];
+  const registrant = { parentName: "Test Parent", studentNames: ["Test Kid"] };
+
+  sendDay1RecapEmail(TEST_EMAIL, registrant, workshop, { subjectPrefix: "[TEST] " });
+  Logger.log("Test Day 1 recap sent to " + TEST_EMAIL);
+}
+
+// The real send — one email per registered family.
+function sendDay1RecapToAll() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = ss.getSheetByName("Registrations");
+  if (!sheet || sheet.getLastRow() < 2) {
+    Logger.log("No registrations found.");
+    return;
+  }
+
+  const logSheet = getReminderLogSheet(ss);
+  const alreadySent = getSentSet(logSheet);
+  let sent = 0, skipped = 0;
+
+  Object.keys(WORKSHOPS).forEach(function(workshopId) {
+    const workshop = WORKSHOPS[workshopId];
+    const registrants = getWorkshopRegistrants(sheet, workshopId);
+
+    Object.keys(registrants).forEach(function(email) {
+      if (alreadySent[email + "|" + DAY1_RECAP_KEY]) { skipped++; return; }
+
+      sendDay1RecapEmail(email, registrants[email], workshop, { bcc: BCC_EMAIL });
+
+      recordSent(logSheet, email, workshopId, DAY1_RECAP_KEY);
+      alreadySent[email + "|" + DAY1_RECAP_KEY] = true;
+      sent++;
+    });
+  });
+
+  Logger.log("Day 1 recap emails sent: " + sent + " (skipped, already sent: " + skipped + ")");
+}
+
+function sendDay1RecapEmail(email, registrant, workshop, opts) {
+  const childList = registrant.studentNames.length
+    ? registrant.studentNames.join(" and ")
+    : "your child";
+
+  const inner = '' +
+    '<p style="margin:0 0 14px;">Dear ' + registrant.parentName + ',</p>' +
+    '<p style="margin:0 0 20px;">Thank you to everyone who joined Day 1 of the <strong style="color:' + C_TEXT + ';">' +
+      workshop.name + '</strong>. It was so much fun to see ' + childList + ' there, and we are looking forward to ' +
+      'Day 2 tomorrow.</p>' +
+    surveyBlockHtml() +
+    day1NotesBlockHtml() +
+    mobileAppBlockHtml() +
+    joinDetailsHtml(workshop) +
+    inviteBlockHtml() +
+    '<p style="margin:0;">Thank you so much. We are excited to see you all tomorrow. If you have any questions or ' +
+      'concerns, please do not hesitate to reply to this email or write to us at ' +
+      '<a href="mailto:' + ADMIN_EMAIL + '" style="color:' + C_ACCENT + ';">' + ADMIN_EMAIL + '</a>.</p>';
+
+  let subject = "Thank you for Day 1: a quick survey, notes, and tomorrow's link";
+  if (opts && opts.subjectPrefix) subject = opts.subjectPrefix + subject;
+
+  const options = { htmlBody: emailShell("Thank you for Day 1", workshop.name, inner), name: ORG_NAME };
+  if (opts && opts.bcc) options.bcc = opts.bcc;
+
+  GmailApp.sendEmail(email, subject,
+    "See the HTML version of this email for the pre-survey, Day 1 notes, and tomorrow's join link.", options);
+}
+
+// The pre-survey. Highlighted, because it was meant to go out before Day 1 and
+// we need it answered as-of-before-the-workshop for the results to mean anything.
+function surveyBlockHtml() {
+  return '' +
+    '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" ' +
+      'style="background:#EFF6FF;border:2px solid ' + C_ACCENT + ';border-radius:12px;margin:0 0 20px;">' +
+      '<tr><td style="padding:20px 22px;">' +
+        sectionTitle('Quick pre-survey') +
+        '<p style="margin:0 0 12px;font-family:' + FONT_BODY + ';font-size:15px;line-height:1.6;color:' + C_TEXT + ';font-weight:700;">' +
+          'Just 2 multiple choice questions, and it only takes a minute.</p>' +
+        '<p style="margin:0 0 16px;font-family:' + FONT_BODY + ';font-size:15px;line-height:1.6;color:' + C_BODY + ';">' +
+          'We meant to send this out before Day 1, so please fill it in together with your child ' +
+          '<strong style="color:' + C_TEXT + ';">based on how they felt before the workshop started</strong>. ' +
+          'That way we can see where each student began, before any teaching at all.</p>' +
+        '<table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr><td>' +
+          '<a href="' + PRE_SURVEY_URL + '" style="background:' + C_ACCENT + ';color:#FFFFFF;text-decoration:none;' +
+            'display:inline-block;padding:13px 30px;border-radius:10px;font-family:' + FONT_BODY + ';' +
+            'font-size:15px;font-weight:700;">Take the pre-survey</a>' +
+        '</td></tr></table>' +
+        '<p style="margin:14px 0 0;font-family:' + FONT_BODY + ';font-size:12px;line-height:1.6;color:' + C_MUTED + ';word-break:break-all;">' +
+          '<a href="' + PRE_SURVEY_URL + '" style="color:' + C_ACCENT + ';">' + PRE_SURVEY_URL + '</a></p>' +
+      '</td></tr>' +
+    '</table>';
+}
+
+// Day 1 transcript + notes, and when the rest of the materials arrive.
+function day1NotesBlockHtml() {
+  return '' +
+    '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" ' +
+      'style="background:' + C_SOFT + ';border:1px solid ' + C_LINE + ';border-radius:12px;margin:0 0 20px;">' +
+      '<tr><td style="padding:20px 22px;font-family:' + FONT_BODY + ';font-size:15px;line-height:1.6;color:' + C_BODY + ';">' +
+        sectionTitle('Day 1 transcript and notes') +
+        '<p style="margin:0 0 10px;">Here is the transcript and the meeting notes from today\'s session: ' +
+          '<a href="' + DAY1_NOTES_URL + '" style="color:' + C_ACCENT + ';">Day 1 transcript and notes</a>.</p>' +
+        '<p style="margin:0;">The recordings and slideshows will be sent out after tomorrow\'s session.</p>' +
+      '</td></tr>' +
+    '</table>';
+}
+
+// Mobile users need the Webex app installed before they can join.
+function mobileAppBlockHtml() {
+  return '' +
+    '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" ' +
+      'style="background:' + C_SOFT + ';border:1px solid ' + C_LINE + ';border-radius:12px;margin:0 0 24px;">' +
+      '<tr><td style="padding:20px 22px;font-family:' + FONT_BODY + ';font-size:15px;line-height:1.6;color:' + C_BODY + ';">' +
+        sectionTitle('Joining from a phone or tablet') +
+        '<p style="margin:0;">If you are joining from a mobile device, you will need to ' +
+          '<strong style="color:' + C_TEXT + ';">download the Webex app</strong> first. Please allow an extra five ' +
+          'minutes for that, or simply join about five minutes before we start so the download does not cut into the session.</p>' +
+      '</td></tr>' +
+    '</table>';
+}
+
+// It is not too late for friends to register.
+function inviteBlockHtml() {
+  return '' +
+    '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" ' +
+      'style="background:' + C_SOFT + ';border:1px solid ' + C_LINE + ';border-radius:12px;margin:0 0 24px;">' +
+      '<tr><td style="padding:20px 22px;font-family:' + FONT_BODY + ';font-size:15px;line-height:1.6;color:' + C_BODY + ';">' +
+        sectionTitle('Invite a friend') +
+        '<p style="margin:0;">It is not too late to invite your friends. Send them to ' +
+          '<a href="https://almadenvoices.org/register" style="color:' + C_ACCENT + ';">almadenvoices.org/register</a> ' +
+          'and they will receive an automatic link to this free workshop.</p>' +
+      '</td></tr>' +
+    '</table>';
+}
+
 function getReminderLogSheet(ss) {
   let sheet = ss.getSheetByName("ReminderLog");
   if (!sheet) {
