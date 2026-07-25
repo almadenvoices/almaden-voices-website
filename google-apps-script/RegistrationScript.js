@@ -282,9 +282,11 @@ function scheduleBlockHtml(workshop) {
 }
 
 // Full Webex join instructions — used in the join-link email and in reminders.
-function joinDetailsHtml(workshop) {
+// middleHtml, if given, sits between the join button and the "other ways to
+// join" list, so important notes land above the fine print.
+function joinDetailsHtml(workshop, middleHtml) {
   const w = workshop.webex;
-  if (!w) return '';
+  if (!w) return middleHtml || '';
 
   const passwordLine = w.password
     ? '<br/>Meeting password: <strong style="color:' + C_TEXT + ';">' + w.password + '</strong>' +
@@ -304,6 +306,8 @@ function joinDetailsHtml(workshop) {
         '<a href="' + w.link + '" style="color:' + C_ACCENT + ';">' + w.link + '</a>' +
       '</td></tr>' +
     '</table>' +
+
+    (middleHtml || '') +
 
     // Alternative ways to join
     '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" ' +
@@ -698,8 +702,7 @@ function sendReminderEmail(email, registrant, workshop, session, type, opts) {
     '<p style="margin:0 0 16px;">Dear ' + registrant.parentName + ',</p>' +
     '<p style="margin:0 0 24px;">' + intro + '</p>' +
     (type === "1hour" ? '' : scheduleBlockHtml(workshop)) +
-    joinDetailsHtml(workshop) +
-    (showLastMinuteNotes ? cameraBlockHtml() + parentsBlockHtml() : '') +
+    joinDetailsHtml(workshop, showLastMinuteNotes ? cameraBlockHtml() + parentsBlockHtml() : '') +
     (type === "1day" ? prepBlockHtml() : '') +
     '<p style="margin:0;">Questions? Just reply to this email. We\'re happy to help.</p>';
 
