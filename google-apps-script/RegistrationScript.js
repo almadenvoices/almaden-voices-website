@@ -1033,11 +1033,14 @@ function sendDay1RecapEmail(email, registrant, workshop, opts) {
     ? registrant.studentNames.join(" and ")
     : "your child";
 
+  // Written to work for families who came to Day 1 AND families who did not.
+  // We have no attendance data here, so the copy must never assume they were there.
   const inner = '' +
     '<p style="margin:0 0 14px;">Dear ' + registrant.parentName + ',</p>' +
     '<p style="margin:0 0 20px;">Thank you to everyone who joined Day 1 of the <strong style="color:' + C_TEXT + ';">' +
-      workshop.name + '</strong>. It was so much fun to see ' + childList + ' there, and we are looking forward to ' +
-      'Day 2 tomorrow.</p>' +
+      workshop.name + '</strong>. It was so much fun, and we are already looking forward to Day 2 tomorrow. ' +
+      'If ' + childList + ' was not able to make Day 1, that is completely fine, and we would still love to see ' +
+      'them tomorrow. Everything you need is below.</p>' +
     surveyBlockHtml() +
     day1NotesBlockHtml() +
     mobileAppBlockHtml() +
