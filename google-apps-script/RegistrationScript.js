@@ -1127,6 +1127,115 @@ function inviteBlockHtml() {
     '</table>';
 }
 
+// ============================================================
+// PRE-SURVEY NUDGE — "please fill it in as of before Day 1"
+// A short follow-up for everyone: the pre-survey plus the join link for
+// today's Day 2 session.
+// Run sendTestPreSurveyNudge() first to preview it in your own inbox, then
+// sendPreSurveyNudgeToAll() when you're happy with it.
+// Safe to re-run: anyone already sent is skipped via the ReminderLog.
+// ============================================================
+const PRE_SURVEY_NUDGE_KEY = "presurveynudge";
+
+// Preview only — sends one copy to TEST_EMAIL for a fake registrant.
+function sendTestPreSurveyNudge() {
+  const workshopId = Object.keys(WORKSHOPS)[0];
+  const workshop = WORKSHOPS[workshopId];
+  const registrant = { parentName: "Test Parent", studentNames: ["Test Kid"] };
+
+  sendPreSurveyNudgeEmail(TEST_EMAIL, registrant, workshop, { subjectPrefix: "[TEST] " });
+  Logger.log("Test pre-survey nudge sent to " + TEST_EMAIL);
+}
+
+// The real send — one email per registered family.
+function sendPreSurveyNudgeToAll() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = ss.getSheetByName("Registrations");
+  if (!sheet || sheet.getLastRow() < 2) {
+    Logger.log("No registrations found.");
+    return;
+  }
+
+  const logSheet = getReminderLogSheet(ss);
+  const alreadySent = getSentSet(logSheet);
+  let sent = 0, skipped = 0;
+
+  Object.keys(WORKSHOPS).forEach(function(workshopId) {
+    const workshop = WORKSHOPS[workshopId];
+    const registrants = getWorkshopRegistrants(sheet, workshopId);
+
+    Object.keys(registrants).forEach(function(email) {
+      if (alreadySent[email + "|" + PRE_SURVEY_NUDGE_KEY]) { skipped++; return; }
+
+      sendPreSurveyNudgeEmail(email, registrants[email], workshop, { bcc: BCC_EMAIL });
+
+      recordSent(logSheet, email, workshopId, PRE_SURVEY_NUDGE_KEY);
+      alreadySent[email + "|" + PRE_SURVEY_NUDGE_KEY] = true;
+      sent++;
+    });
+  });
+
+  Logger.log("Pre-survey nudge emails sent: " + sent + " (skipped, already sent: " + skipped + ")");
+}
+
+function sendPreSurveyNudgeEmail(email, registrant, workshop, opts) {
+  const childList = registrant.studentNames.length
+    ? registrant.studentNames.join(" and ")
+    : "your child";
+
+  // Same rule as the recap: no attendance data here, so never assume the
+  // family was at Day 1.
+  const inner = '' +
+    '<p style="margin:0 0 14px;">Dear ' + registrant.parentName + ',</p>' +
+    '<p style="margin:0 0 20px;">A quick favour before today\'s Day 2 session of the ' +
+      '<strong style="color:' + C_TEXT + ';">' + workshop.name + '</strong>. If you have not had a chance yet, ' +
+      'please fill in our short pre-survey with ' + childList + '. It takes about a minute, and it makes a real ' +
+      'difference to us. The join link for today is further down.</p>' +
+    preSurveyNudgeBlockHtml() +
+    '<p style="margin:0 0 20px;">Here is the link for today\'s session. It is the same link as yesterday, ' +
+      'and it works for everyone, whether or not ' + childList + ' was able to join Day 1.</p>' +
+    joinDetailsHtml(workshop) +
+    '<p style="margin:0;">Thank you so much. We are excited to see you all today. If you have any questions or ' +
+      'concerns, please do not hesitate to reply to this email or write to us at ' +
+      '<a href="mailto:' + ADMIN_EMAIL + '" style="color:' + C_ACCENT + ';">' + ADMIN_EMAIL + '</a>.</p>';
+
+  let subject = ORG_NAME + ": please fill in the quick pre-survey, plus today's join link";
+  if (opts && opts.subjectPrefix) subject = opts.subjectPrefix + subject;
+
+  const options = { htmlBody: emailShell("A quick pre-survey, and today's link", workshop.name, inner), name: ORG_NAME };
+  if (opts && opts.bcc) options.bcc = opts.bcc;
+
+  GmailApp.sendEmail(email, subject,
+    "See the HTML version of this email for the pre-survey and today's join link.", options);
+}
+
+// The nudge version of the survey block. The one instruction that really
+// matters: answer it as of before yesterday's session, not as of today.
+function preSurveyNudgeBlockHtml() {
+  return '' +
+    '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" ' +
+      'style="background:#EFF6FF;border:2px solid ' + C_ACCENT + ';border-radius:12px;margin:0 0 24px;">' +
+      '<tr><td style="padding:20px 22px;">' +
+        sectionTitle('Quick pre-survey') +
+        '<p style="margin:0 0 12px;font-family:' + FONT_BODY + ';font-size:15px;line-height:1.6;color:' + C_TEXT + ';font-weight:700;">' +
+          'Just 2 multiple choice questions, and it only takes a minute.</p>' +
+        '<p style="margin:0 0 12px;font-family:' + FONT_BODY + ';font-size:15px;line-height:1.6;color:' + C_BODY + ';">' +
+          'This was meant to reach you before we began, so please answer it ' +
+          '<strong style="color:' + C_TEXT + ';">as if it were before yesterday\'s session</strong>, ' +
+          'the way your child felt before any of the teaching started.</p>' +
+        '<p style="margin:0 0 16px;font-family:' + FONT_BODY + ';font-size:15px;line-height:1.6;color:' + C_BODY + ';">' +
+          'That is what lets us see where each student began, and how far they have come by the end.</p>' +
+        '<table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr><td>' +
+          '<a href="' + PRE_SURVEY_URL + '" style="background:' + C_ACCENT + ';color:#FFFFFF;text-decoration:none;' +
+            'display:inline-block;padding:13px 30px;border-radius:10px;font-family:' + FONT_BODY + ';' +
+            'font-size:15px;font-weight:700;">Take the pre-survey</a>' +
+        '</td></tr></table>' +
+        '<p style="margin:14px 0 0;font-family:' + FONT_BODY + ';font-size:12px;line-height:1.6;color:' + C_MUTED + ';word-break:break-all;">' +
+          '<a href="' + PRE_SURVEY_URL + '" style="color:' + C_ACCENT + ';">' + PRE_SURVEY_URL + '</a></p>' +
+      '</td></tr>' +
+    '</table>';
+}
+
 function getReminderLogSheet(ss) {
   let sheet = ss.getSheetByName("ReminderLog");
   if (!sheet) {
