@@ -16,6 +16,7 @@ import RemoveIcon from "@mui/icons-material/Remove";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import CloseIcon from "@mui/icons-material/Close";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import WorkshopInterestForm from "../../components/WorkshopInterestForm";
 
 // ============================================================
 // UPCOMING SESSIONS — Add new sessions here!
@@ -34,21 +35,7 @@ import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 //     status: "Open",  // "Open" or "Full"
 // }
 // ============================================================
-const upcomingSessions = [
-    {
-        id: "intl-workshop-jul-2026",
-        title: "Free International Public Speaking Workshop for Kids",
-        date: "July 25 & 26, 2026",
-        time: "9:30–10:30 AM IST · 12–1 PM Singapore",
-        location: "Online",
-        grades: "Kids of all levels welcome",
-        capacity: 500,
-        enrolled: 0,
-        description: "A free two-day online workshop where kids learn the fundamentals of public speaking — how to speak clearly and confidently, overcome nervousness, and present in front of others. Runs Saturday, July 25 and Sunday, July 26 (1 hour each day) live online. Join from anywhere in the world! You're welcome to attend one or both days.",
-        status: "Open",
-        online: true,
-    },
-];
+const upcomingSessions = [];
 
 const emptyStudent = () => ({ firstName: "", lastName: "", age: "" });
 
@@ -83,6 +70,17 @@ export default function RegisterPage() {
             .then(res => res.json())
             .then(data => setEnrollmentCounts(data))
             .catch(() => {});
+    }, []);
+
+    // Scroll to a section when the page is opened with a #hash (e.g. the
+    // footer's "Free Workshop Sign-Up" link -> /register#workshop-signup).
+    useEffect(() => {
+        const hash = window.location.hash;
+        if (hash) {
+            setTimeout(() => {
+                document.querySelector(hash)?.scrollIntoView({ behavior: "smooth" });
+            }, 100);
+        }
     }, []);
 
     const sessions = upcomingSessions.map(ses => ({
@@ -235,7 +233,7 @@ export default function RegisterPage() {
                             </div>
                             <h3>What to Expect</h3>
                             <p className={s.muted}>
-                                Two 1-hour live sessions online — Saturday, July 25 & Sunday, July 26. Come to one or both days. We'll send your join link and reminders before the workshop begins.
+                                Short, hands-on live sessions with plenty of practice. Once you're registered, we'll send all the details and reminders before the workshop begins.
                             </p>
                         </div>
                     </aside>
@@ -287,7 +285,7 @@ export default function RegisterPage() {
                                     No sessions are open for registration right now
                                 </p>
                                 <p style={{ color: "#6B7280", fontSize: "0.9rem", lineHeight: 1.7, margin: "0 auto", maxWidth: "380px" }}>
-                                    New sessions are announced regularly. <a href="/contact" style={{ color: "#2563EB", fontWeight: 600, textDecoration: "none" }}>Contact us</a> to be the first to know!
+                                    New sessions are announced regularly. Leave your info in the form below and we&apos;ll email you as soon as the next workshop opens!
                                 </p>
                             </div>
                         )}
@@ -626,6 +624,11 @@ export default function RegisterPage() {
                             </>
                         )}
                     </form>
+                </section>
+
+                {/* Public speaking workshop interest form (bilingual) */}
+                <section id="workshop-signup" style={{ padding: "8px 0 64px", scrollMarginTop: "90px" }}>
+                    <WorkshopInterestForm />
                 </section>
 
             </div>
