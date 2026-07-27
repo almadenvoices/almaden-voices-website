@@ -132,7 +132,7 @@ const Footer = () => {
         ],
         programs: [
             { label: 'Upcoming Events', href: '/events' },
-            { label: 'Free Workshop Sign-Up', href: '/courses1#workshop-signup' },
+            { label: 'Free Workshop Sign-Up', href: '/register#workshop-signup' },
             { label: 'Past Sessions', href: '/impact#past-sessions' }
         ],
         getInvolved: [
