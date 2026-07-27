@@ -203,6 +203,11 @@ export default function RegisterPage() {
             </section>
 
             <div className="container">
+                {/* Public speaking workshop interest form (bilingual) */}
+                <section id="workshop-signup" style={{ padding: "8px 0 40px", scrollMarginTop: "90px" }}>
+                    <WorkshopInterestForm />
+                </section>
+
                 {/* Card: left rail + form */}
                 <section className={s.card}>
                     {/* LEFT RAIL */}
@@ -624,11 +629,6 @@ export default function RegisterPage() {
                             </>
                         )}
                     </form>
-                </section>
-
-                {/* Public speaking workshop interest form (bilingual) */}
-                <section id="workshop-signup" style={{ padding: "8px 0 64px", scrollMarginTop: "90px" }}>
-                    <WorkshopInterestForm />
                 </section>
 
             </div>
