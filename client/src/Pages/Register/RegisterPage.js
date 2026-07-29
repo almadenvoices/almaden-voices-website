@@ -30,6 +30,11 @@ const PANEL_IDS = {
     coaching: "coaching-signup",
 };
 
+// The 1-on-1 coaching slots take real payments, so the button stays hidden
+// until the five session dates in server.js are confirmed. Flip to true to
+// open bookings.
+const SHOW_COACHING = false;
+
 // ============================================================
 // UPCOMING SESSIONS — Add new sessions here!
 // Copy this template and fill in the details:
@@ -52,7 +57,7 @@ const upcomingSessions = [
         id: "canada-workshop-aug-2026",
         title: "Free Canada Public Speaking Workshop for Kids",
         date: "August 4 & 5, 2026",
-        time: "4–5 PM PT (Vancouver) · 7–8 PM ET (Toronto)",
+        time: "6–7 PM PT (Vancouver) · 9–10 PM ET (Toronto)",
         location: "Online",
         grades: "Kids of all levels welcome",
         capacity: 500,
@@ -273,12 +278,12 @@ export default function RegisterPage() {
                         <span className={s.chooseIcon}><HowToRegIcon /></span>
                         <span className={s.chooseText}>
                             <span className={s.chooseTitle}>Click here to sign up for our international Canada workshop</span>
-                            <span className={s.chooseSub}>Free two-day online workshop · August 4 &amp; 5, 2026 · 4–5 PM PT</span>
+                            <span className={s.chooseSub}>Free two-day online workshop · August 4 &amp; 5, 2026 · 6–7 PM PT</span>
                         </span>
                         <ChevronRightIcon className={s.chooseArrow} />
                     </button>
 
-                    <button
+                    {SHOW_COACHING && <button
                         type="button"
                         onClick={() => pickChoice("coaching")}
                         className={`${s.chooseBtn} ${choice === "coaching" ? s.chooseBtnActive : ""}`}
@@ -291,11 +296,11 @@ export default function RegisterPage() {
                             <span className={s.chooseSub}>One hour of personal coaching · $20 online or $30 in person · Funds our free workshops</span>
                         </span>
                         <ChevronRightIcon className={s.chooseArrow} />
-                    </button>
+                    </button>}
                 </div>
 
                 {/* 1-on-1 coaching slots */}
-                {choice === "coaching" && (
+                {SHOW_COACHING && choice === "coaching" && (
                     <section id="coaching-signup" style={{ padding: "8px 0 48px", scrollMarginTop: "90px" }}>
                         <CoachingSlots />
                     </section>

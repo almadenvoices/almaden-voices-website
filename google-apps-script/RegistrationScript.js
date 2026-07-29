@@ -59,11 +59,12 @@ const WORKSHOPS = {
   "canada-workshop-aug-2026": {
     name: "Free Canada Public Speaking Workshop for Kids",
     datesText: "Tuesday, August 4 & Wednesday, August 5, 2026",
-    timesText: "4:00–5:00 PM PT (Vancouver) &middot; 7:00–8:00 PM ET (Toronto)",
-    // Each session's start time in UTC (ISO 8601). 4:00 PM PDT = 11:00 PM UTC.
+    timesText: "6:00–7:00 PM PT (Vancouver) &middot; 9:00–10:00 PM ET (Toronto)",
+    // Each session's start time in UTC (ISO 8601). 6:00 PM PDT is 1:00 AM UTC
+    // the following day, so these dates are one ahead of the labels.
     sessions: [
-      { label: "Day 1: Tuesday, August 4, 2026", startUtc: "2026-08-04T23:00:00Z" },
-      { label: "Day 2: Wednesday, August 5, 2026", startUtc: "2026-08-05T23:00:00Z" }
+      { label: "Day 1: Tuesday, August 4, 2026", startUtc: "2026-08-05T01:00:00Z" },
+      { label: "Day 2: Wednesday, August 5, 2026", startUtc: "2026-08-06T01:00:00Z" }
     ],
     // Webex Personal Room — no meeting password required.
     // The same room hosts both days.
@@ -565,9 +566,9 @@ function sendJoinLinkToTestParent() {
 }
 
 // When the scheduled blast should go out, as a UTC instant.
-// 2026-08-02T23:00:00Z = 4:00 PM PDT on Sunday, August 2, 2026 —
+// 2026-08-03T01:00:00Z = 6:00 PM PDT on Sunday, August 2, 2026 —
 // exactly two days before Day 1 begins.
-const BLAST_TIME_UTC = "2026-08-02T23:00:00Z";
+const BLAST_TIME_UTC = "2026-08-03T01:00:00Z";
 
 // Run this ONCE to schedule the blast. It creates a one-time trigger that fires
 // sendJoinLinkToAllRegistrants() at BLAST_TIME_UTC. Re-running replaces any
@@ -812,9 +813,9 @@ function prepBlockHtml() {
 const ONE_DAY_KEY = "1day";
 
 // When the day-before reminder should go out, as a UTC instant.
-// 2026-08-03T23:00:00Z = 4:00 PM PDT on Monday, August 3, 2026 —
+// 2026-08-04T01:00:00Z = 6:00 PM PDT on Monday, August 3, 2026 —
 // exactly 24 hours before Day 1 begins.
-const ONE_DAY_REMINDER_TIME_UTC = "2026-08-03T23:00:00Z";
+const ONE_DAY_REMINDER_TIME_UTC = "2026-08-04T01:00:00Z";
 
 // Preview only — sends one copy to TEST_EMAIL for a fake registrant.
 function sendTestOneDayReminder() {
@@ -894,9 +895,9 @@ function sendOneDayReminderToAll() {
 const ONE_HOUR_KEY = "1hour";
 
 // When the one-hour reminder should go out, as a UTC instant.
-// 2026-08-04T22:00:00Z = 3:00 PM PDT on Tuesday, August 4, 2026 —
+// 2026-08-05T00:00:00Z = 5:00 PM PDT on Tuesday, August 4, 2026 —
 // exactly one hour before Day 1 begins.
-const ONE_HOUR_REMINDER_TIME_UTC = "2026-08-04T22:00:00Z";
+const ONE_HOUR_REMINDER_TIME_UTC = "2026-08-05T00:00:00Z";
 
 // Preview only — sends one copy to TEST_EMAIL for a fake registrant.
 function sendTestOneHourReminder() {

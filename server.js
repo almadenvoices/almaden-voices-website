@@ -1013,28 +1013,6 @@ app.get("/unsubscribe", async (req, res) => {
     }
 });
 
-// Temporary debug endpoint — remove after fixing PayPal
-app.get("/api/paypal/debug", async (req, res) => {
-    const cfg = getPayPalConfig();
-    const id = cfg.clientId || "(not set)";
-    const secret = cfg.clientSecret || "(not set)";
-    const info = {
-        clientIdFirst10: id.substring(0, 10) + "...",
-        secretFirst10: secret.substring(0, 10) + "...",
-        clientIdLength: id.length,
-        secretLength: secret.length,
-        env: cfg.env,
-        base: cfg.base
-    };
-    try {
-        const token = await generateAccessToken();
-        info.authTest = "SUCCESS — got access token";
-    } catch (err) {
-        info.authTest = "FAILED — " + err.message;
-    }
-    res.json(info);
-});
-
 // Get enrollment counts per session from registrations.csv
 app.get("/api/sessions/enrollment", (req, res) => {
     try {
