@@ -16,6 +16,9 @@ import RemoveIcon from "@mui/icons-material/Remove";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import CloseIcon from "@mui/icons-material/Close";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import NotificationsActiveIcon from "@mui/icons-material/NotificationsActive";
+import HowToRegIcon from "@mui/icons-material/HowToReg";
+import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import WorkshopInterestForm from "../../components/WorkshopInterestForm";
 
 // ============================================================
@@ -66,6 +69,8 @@ export default function RegisterPage() {
     const [donationAmount, setDonationAmount] = useState(5);
     const [parentFirstName, setParentFirstName] = useState("");
     const [parentLastName, setParentLastName] = useState("");
+    // Which of the chooser buttons is open: "" | "interest" | "workshop"
+    const [choice, setChoice] = useState("");
 
     // Google Apps Script web app URL — replace with your deployed URL
     const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxrbVWSjMpAB4Ru1mm_DSywPdfFS3KfMMA07Ie_e1VbXGeW_ILtNQ-vE8rQrIYubjFI/exec";
@@ -86,16 +91,31 @@ export default function RegisterPage() {
             .catch(() => {});
     }, []);
 
-    // Scroll to a section when the page is opened with a #hash (e.g. the
-    // footer's "Free Workshop Sign-Up" link -> /register#workshop-signup).
+    // Open the matching chooser panel and scroll to it when the page is opened
+    // with a #hash (e.g. the footer's "Free Workshop Sign-Up" link ->
+    // /register#workshop-signup, or /register#session-signup).
     useEffect(() => {
         const hash = window.location.hash;
-        if (hash) {
-            setTimeout(() => {
-                document.querySelector(hash)?.scrollIntoView({ behavior: "smooth" });
-            }, 100);
-        }
+        if (!hash) return;
+        if (hash === "#workshop-signup") setChoice("interest");
+        if (hash === "#session-signup") setChoice("workshop");
+        setTimeout(() => {
+            document.querySelector(hash)?.scrollIntoView({ behavior: "smooth" });
+        }, 150);
     }, []);
+
+    // Open a chooser panel (clicking the open one closes it again) and bring it
+    // into view. Only scroll when we're opening — there's nothing to scroll to
+    // on the way back.
+    function pickChoice(next) {
+        const opening = choice !== next;
+        setChoice(opening ? next : "");
+        if (!opening) return;
+        setTimeout(() => {
+            document.getElementById(next === "interest" ? "workshop-signup" : "session-signup")
+                ?.scrollIntoView({ behavior: "smooth", block: "start" });
+        }, 60);
+    }
 
     const sessions = upcomingSessions.map(ses => ({
         ...ses,
@@ -211,19 +231,55 @@ export default function RegisterPage() {
                     </div>
                     <h1 className={s.heroTitle}>Register for a Session</h1>
                     <p className={s.heroSub}>
-                        Sign up your child for our upcoming speech & debate sessions and watch them grow into confident communicators.
+                        Choose an option below to get started, and watch your child grow into a confident communicator.
                     </p>
                 </div>
             </section>
 
             <div className="container">
+                {/* Chooser — pick what you're here to do */}
+                <div className={s.chooser}>
+                    <button
+                        type="button"
+                        onClick={() => pickChoice("interest")}
+                        className={`${s.chooseBtn} ${choice === "interest" ? s.chooseBtnActive : ""}`}
+                        aria-expanded={choice === "interest"}
+                        aria-controls="workshop-signup"
+                    >
+                        <span className={s.chooseIcon}><NotificationsActiveIcon /></span>
+                        <span className={s.chooseText}>
+                            <span className={s.chooseTitle}>Click here if you&apos;re interested in an upcoming workshop</span>
+                            <span className={s.chooseSub}>Leave your info and we&apos;ll email you as soon as the next one opens.</span>
+                            <span className={s.chooseSubEs}>Deje su información y le avisaremos cuando abra el próximo taller.</span>
+                        </span>
+                        <ChevronRightIcon className={s.chooseArrow} />
+                    </button>
+
+                    <button
+                        type="button"
+                        onClick={() => pickChoice("workshop")}
+                        className={`${s.chooseBtn} ${choice === "workshop" ? s.chooseBtnActive : ""}`}
+                        aria-expanded={choice === "workshop"}
+                        aria-controls="session-signup"
+                    >
+                        <span className={s.chooseIcon}><HowToRegIcon /></span>
+                        <span className={s.chooseText}>
+                            <span className={s.chooseTitle}>Click here to sign up for our international Canada workshop</span>
+                            <span className={s.chooseSub}>Free two-day online workshop · August 4 &amp; 5, 2026 · 4–5 PM PT</span>
+                        </span>
+                        <ChevronRightIcon className={s.chooseArrow} />
+                    </button>
+                </div>
+
                 {/* Public speaking workshop interest form (bilingual) */}
-                <section id="workshop-signup" style={{ padding: "8px 0 40px", scrollMarginTop: "90px" }}>
-                    <WorkshopInterestForm />
-                </section>
+                {choice === "interest" && (
+                    <section id="workshop-signup" style={{ padding: "8px 0 40px", scrollMarginTop: "90px" }}>
+                        <WorkshopInterestForm />
+                    </section>
+                )}
 
                 {/* Card: left rail + form */}
-                <section className={s.card}>
+                <section id="session-signup" className={s.card} style={{ display: choice === "workshop" ? undefined : "none", scrollMarginTop: "90px" }}>
                     {/* LEFT RAIL */}
                     <aside className={s.info}>
                         <div className={s.block}>
