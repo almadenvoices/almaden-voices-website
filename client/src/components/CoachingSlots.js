@@ -5,6 +5,7 @@ import VideocamIcon from "@mui/icons-material/Videocam";
 import PlaceIcon from "@mui/icons-material/Place";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import usePayPalScript from "../hooks/usePayPalScript";
+import c from "./CoachingSlots.module.css";
 
 /**
  * Five one-hour 1-on-1 coaching slots. The slot list, their prices, and which
@@ -157,26 +158,28 @@ export default function CoachingSlots() {
     }
 
     return (
-        <div style={{ maxWidth: "760px", margin: "0 auto" }}>
-            <h3 style={{ fontSize: "1.5rem", fontWeight: 700, color: "#111827", margin: "0 0 4px", textAlign: "center" }}>
-                1-on-1 Coaching Sessions
-            </h3>
-            <p style={{ color: "#6B7280", fontSize: "0.95rem", lineHeight: 1.7, margin: "0 auto 8px", maxWidth: "560px", textAlign: "center" }}>
-                One hour of focused, personal coaching — we work on whatever your child needs most,
-                whether that&apos;s a speech they&apos;re preparing, nerves, or building confidence from scratch.
-            </p>
-            <p style={{ color: "#6B7280", fontSize: "0.88rem", lineHeight: 1.7, margin: "0 auto 24px", maxWidth: "560px", textAlign: "center" }}>
-                <strong style={{ color: "#111827" }}>${prices.online} online · ${prices.inPerson} in person.</strong>{" "}
-                Every dollar goes straight back into funding our free workshops.
-            </p>
+        <div className={c.wrap}>
+            <div className={c.intro}>
+                <h3 style={{ fontSize: "1.5rem", fontWeight: 700, color: "#111827", margin: "0 0 4px" }}>
+                    1-on-1 Coaching Sessions
+                </h3>
+                <p style={{ color: "#6B7280", fontSize: "0.95rem", lineHeight: 1.7, margin: "0 0 8px" }}>
+                    One hour of focused, personal coaching — we work on whatever your child needs most,
+                    whether that&apos;s a speech they&apos;re preparing, nerves, or building confidence from scratch.
+                </p>
+                <p style={{ color: "#6B7280", fontSize: "0.88rem", lineHeight: 1.7, margin: 0 }}>
+                    <strong style={{ color: "#111827" }}>${prices.online} online · ${prices.inPerson} in person.</strong>{" "}
+                    Every dollar goes straight back into funding our free workshops.
+                </p>
+            </div>
 
             {loading && <p style={{ textAlign: "center", color: "#6B7280" }}>Loading available sessions…</p>}
             {loadError && (
                 <p style={{ textAlign: "center", color: "#DC2626", fontSize: "0.9rem" }}>{loadError}</p>
             )}
 
-            {/* Slot boxes */}
-            <div style={{ display: "grid", gap: "12px", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", marginBottom: "28px" }}>
+            {/* Slot boxes — five across, collapsing on narrower screens */}
+            <div className={c.slotGrid}>
                 {slots.map(slot => {
                     const isSelected = slot.id === selectedId;
                     return (
@@ -187,7 +190,7 @@ export default function CoachingSlots() {
                             onClick={() => setSelectedId(isSelected ? "" : slot.id)}
                             style={{
                                 textAlign: "left",
-                                padding: "18px 20px",
+                                padding: "16px 14px",
                                 borderRadius: "14px",
                                 border: isSelected ? "2px solid #2563EB" : "2px solid #E5E7EB",
                                 background: slot.booked ? "#F9FAFB" : isSelected ? "#F0F6FF" : "#FFFFFF",
@@ -197,18 +200,20 @@ export default function CoachingSlots() {
                                 transition: "border-color 0.2s, background-color 0.2s",
                             }}
                         >
-                            <span style={{ display: "block", fontWeight: 700, color: "#111827", marginBottom: "6px" }}>
+                            <span style={{ display: "block", fontWeight: 700, color: "#111827", marginBottom: "8px", fontSize: "0.95rem" }}>
                                 {slot.label}
-                                {slot.booked && <span style={{ color: "#DC2626", fontWeight: 600, fontSize: "0.85rem" }}> · Booked</span>}
+                                {slot.booked && <span style={{ display: "block", color: "#DC2626", fontWeight: 600, fontSize: "0.8rem" }}>Booked</span>}
                             </span>
-                            <span style={{ display: "flex", alignItems: "center", gap: "6px", color: "#374151", fontSize: "0.88rem" }}>
-                                <CalendarMonthIcon style={{ fontSize: 15, color: "#2563EB" }} /> {slot.date}
+                            <span style={{ display: "flex", alignItems: "flex-start", gap: "5px", color: "#374151", fontSize: "0.83rem", lineHeight: 1.4 }}>
+                                <CalendarMonthIcon style={{ fontSize: 14, color: "#2563EB", flex: "none", marginTop: "2px" }} /> {slot.date}
                             </span>
-                            <span style={{ display: "flex", alignItems: "center", gap: "6px", color: "#374151", fontSize: "0.88rem", marginTop: "2px" }}>
-                                <AccessTimeIcon style={{ fontSize: 15, color: "#2563EB" }} /> {slot.time}
+                            <span style={{ display: "flex", alignItems: "flex-start", gap: "5px", color: "#374151", fontSize: "0.83rem", marginTop: "3px", lineHeight: 1.4 }}>
+                                <AccessTimeIcon style={{ fontSize: 14, color: "#2563EB", flex: "none", marginTop: "2px" }} /> {slot.time}
                             </span>
-                            <span style={{ display: "block", marginTop: "8px", fontWeight: 700, color: "#2563EB" }}>
-                                ${prices.online} online · ${prices.inPerson} in person
+                            <span style={{ display: "block", marginTop: "10px", fontWeight: 700, color: "#2563EB", fontSize: "0.83rem", lineHeight: 1.5 }}>
+                                ${prices.online} online
+                                <br />
+                                ${prices.inPerson} in person
                             </span>
                         </button>
                     );
@@ -216,7 +221,7 @@ export default function CoachingSlots() {
             </div>
 
             {selectedSlot && (
-                <div style={{ background: "#FFFFFF", border: "1px solid #E5E7EB", borderRadius: "16px", padding: "26px 24px", boxShadow: "0 4px 16px rgba(0,0,0,0.06)" }}>
+                <div className={c.bookingPanel}>
                     <h4 style={{ margin: "0 0 18px", fontSize: "1.1rem", fontWeight: 700, color: "#111827" }}>
                         Book {selectedSlot.label} — {selectedSlot.date}
                     </h4>
