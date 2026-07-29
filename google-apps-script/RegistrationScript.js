@@ -56,16 +56,18 @@ const REG_HEADERS = [
 // confirmation email + automatic reminders.
 // ============================================================
 const WORKSHOPS = {
-  "intl-workshop-jul-2026": {
-    name: "Free International Public Speaking Workshop for Kids",
-    datesText: "Saturday, July 25 & Sunday, July 26, 2026",
-    timesText: "9:30–10:30 AM IST &middot; 12:00–1:00 PM Singapore",
-    // Each session's start time in UTC (ISO 8601). 12:00 PM Singapore = 4:00 AM UTC.
+  "canada-workshop-aug-2026": {
+    name: "Free Canada Public Speaking Workshop for Kids",
+    datesText: "Tuesday, August 4 & Wednesday, August 5, 2026",
+    timesText: "4:00–5:00 PM PT (Vancouver) &middot; 7:00–8:00 PM ET (Toronto)",
+    // Each session's start time in UTC (ISO 8601). 4:00 PM PDT = 11:00 PM UTC.
     sessions: [
-      { label: "Day 1: Saturday, July 25, 2026", startUtc: "2026-07-25T04:00:00Z" },
-      { label: "Day 2: Sunday, July 26, 2026", startUtc: "2026-07-26T04:00:00Z" }
+      { label: "Day 1: Tuesday, August 4, 2026", startUtc: "2026-08-04T23:00:00Z" },
+      { label: "Day 2: Wednesday, August 5, 2026", startUtc: "2026-08-05T23:00:00Z" }
     ],
-    // Webex Personal Room — no meeting password required.
+    // TODO: swap in the new Webex room for this workshop. These are the July
+    // workshop's Personal Room details, kept only as a placeholder so the
+    // emails render — update before sending any join links.
     webex: {
       link: "https://anjikabansal-405.my.webex.com/meet/almadenvoices",
       meetingNumber: "2554 439 4487",
@@ -464,10 +466,10 @@ function sendWorkshopReminders() {
     if (now >= firstStart - 2 * DAY && now < firstStart - DAY) {
       emails.forEach(function(email) {
         const key = "2day";
-        if (alreadySent[email + "|" + key]) return;
+        if (alreadySent[sentKey(email, workshopId, key)]) return;
         sendReminderEmail(email, registrants[email], workshop, null, "2day");
         recordSent(logSheet, email, workshopId, key);
-        alreadySent[email + "|" + key] = true;
+        alreadySent[sentKey(email, workshopId, key)] = true;
       });
     }
 
@@ -477,10 +479,10 @@ function sendWorkshopReminders() {
       if (now >= start - 2 * HOUR && now <= start) {
         emails.forEach(function(email) {
           const key = "dayof-" + session.startUtc;
-          if (alreadySent[email + "|" + key]) return;
+          if (alreadySent[sentKey(email, workshopId, key)]) return;
           sendReminderEmail(email, registrants[email], workshop, session, "dayof");
           recordSent(logSheet, email, workshopId, key);
-          alreadySent[email + "|" + key] = true;
+          alreadySent[sentKey(email, workshopId, key)] = true;
         });
       }
     });
@@ -564,8 +566,9 @@ function sendJoinLinkToTestParent() {
 }
 
 // When the scheduled blast should go out, as a UTC instant.
-// 2026-07-23T04:00:00Z = 9:00 PM PDT on Wednesday, July 22, 2026.
-const BLAST_TIME_UTC = "2026-07-23T04:00:00Z";
+// 2026-08-02T23:00:00Z = 4:00 PM PDT on Sunday, August 2, 2026 —
+// exactly two days before Day 1 begins.
+const BLAST_TIME_UTC = "2026-08-02T23:00:00Z";
 
 // Run this ONCE to schedule the blast. It creates a one-time trigger that fires
 // sendJoinLinkToAllRegistrants() at BLAST_TIME_UTC. Re-running replaces any
@@ -614,7 +617,7 @@ function sendJoinLinkToAllRegistrants() {
     const registrants = getWorkshopRegistrants(sheet, workshopId);
 
     Object.keys(registrants).forEach(function(email) {
-      if (alreadySent[email + "|" + JOIN_LINK_KEY]) { skipped++; return; }
+      if (alreadySent[sentKey(email, workshopId, JOIN_LINK_KEY)]) { skipped++; return; }
 
       GmailApp.sendEmail(email,
         "Your join link: " + workshop.name,
@@ -622,7 +625,7 @@ function sendJoinLinkToAllRegistrants() {
         { htmlBody: buildJoinLinkHtml(registrants[email], workshop), name: ORG_NAME, bcc: BCC_EMAIL });
 
       recordSent(logSheet, email, workshopId, JOIN_LINK_KEY);
-      alreadySent[email + "|" + JOIN_LINK_KEY] = true;
+      alreadySent[sentKey(email, workshopId, JOIN_LINK_KEY)] = true;
       sent++;
     });
   });
@@ -810,9 +813,9 @@ function prepBlockHtml() {
 const ONE_DAY_KEY = "1day";
 
 // When the day-before reminder should go out, as a UTC instant.
-// 2026-07-24T04:00:00Z = 9:00 PM PDT on Thursday, July 23, 2026 —
+// 2026-08-03T23:00:00Z = 4:00 PM PDT on Monday, August 3, 2026 —
 // exactly 24 hours before Day 1 begins.
-const ONE_DAY_REMINDER_TIME_UTC = "2026-07-24T04:00:00Z";
+const ONE_DAY_REMINDER_TIME_UTC = "2026-08-03T23:00:00Z";
 
 // Preview only — sends one copy to TEST_EMAIL for a fake registrant.
 function sendTestOneDayReminder() {
@@ -870,12 +873,12 @@ function sendOneDayReminderToAll() {
     const registrants = getWorkshopRegistrants(sheet, workshopId);
 
     Object.keys(registrants).forEach(function(email) {
-      if (alreadySent[email + "|" + ONE_DAY_KEY]) { skipped++; return; }
+      if (alreadySent[sentKey(email, workshopId, ONE_DAY_KEY)]) { skipped++; return; }
 
       sendReminderEmail(email, registrants[email], workshop, null, ONE_DAY_KEY, { bcc: BCC_EMAIL });
 
       recordSent(logSheet, email, workshopId, ONE_DAY_KEY);
-      alreadySent[email + "|" + ONE_DAY_KEY] = true;
+      alreadySent[sentKey(email, workshopId, ONE_DAY_KEY)] = true;
       sent++;
     });
   });
@@ -892,9 +895,9 @@ function sendOneDayReminderToAll() {
 const ONE_HOUR_KEY = "1hour";
 
 // When the one-hour reminder should go out, as a UTC instant.
-// 2026-07-25T03:00:00Z = 8:00 PM PDT on Friday, July 24, 2026 —
+// 2026-08-04T22:00:00Z = 3:00 PM PDT on Tuesday, August 4, 2026 —
 // exactly one hour before Day 1 begins.
-const ONE_HOUR_REMINDER_TIME_UTC = "2026-07-25T03:00:00Z";
+const ONE_HOUR_REMINDER_TIME_UTC = "2026-08-04T22:00:00Z";
 
 // Preview only — sends one copy to TEST_EMAIL for a fake registrant.
 function sendTestOneHourReminder() {
@@ -955,15 +958,15 @@ function sendOneHourReminderToAll() {
     const dayOfKey = "dayof-" + workshop.sessions[0].startUtc;
 
     Object.keys(registrants).forEach(function(email) {
-      if (alreadySent[email + "|" + ONE_HOUR_KEY]) { skipped++; return; }
+      if (alreadySent[sentKey(email, workshopId, ONE_HOUR_KEY)]) { skipped++; return; }
 
       sendReminderEmail(email, registrants[email], workshop, null, ONE_HOUR_KEY, { bcc: BCC_EMAIL });
 
       recordSent(logSheet, email, workshopId, ONE_HOUR_KEY);
-      alreadySent[email + "|" + ONE_HOUR_KEY] = true;
-      if (!alreadySent[email + "|" + dayOfKey]) {
+      alreadySent[sentKey(email, workshopId, ONE_HOUR_KEY)] = true;
+      if (!alreadySent[sentKey(email, workshopId, dayOfKey)]) {
         recordSent(logSheet, email, workshopId, dayOfKey);
-        alreadySent[email + "|" + dayOfKey] = true;
+        alreadySent[sentKey(email, workshopId, dayOfKey)] = true;
       }
       sent++;
     });
@@ -1015,12 +1018,12 @@ function sendDay1RecapToAll() {
     const registrants = getWorkshopRegistrants(sheet, workshopId);
 
     Object.keys(registrants).forEach(function(email) {
-      if (alreadySent[email + "|" + DAY1_RECAP_KEY]) { skipped++; return; }
+      if (alreadySent[sentKey(email, workshopId, DAY1_RECAP_KEY)]) { skipped++; return; }
 
       sendDay1RecapEmail(email, registrants[email], workshop, { bcc: BCC_EMAIL });
 
       recordSent(logSheet, email, workshopId, DAY1_RECAP_KEY);
-      alreadySent[email + "|" + DAY1_RECAP_KEY] = true;
+      alreadySent[sentKey(email, workshopId, DAY1_RECAP_KEY)] = true;
       sent++;
     });
   });
@@ -1165,12 +1168,12 @@ function sendPreSurveyNudgeToAll() {
     const registrants = getWorkshopRegistrants(sheet, workshopId);
 
     Object.keys(registrants).forEach(function(email) {
-      if (alreadySent[email + "|" + PRE_SURVEY_NUDGE_KEY]) { skipped++; return; }
+      if (alreadySent[sentKey(email, workshopId, PRE_SURVEY_NUDGE_KEY)]) { skipped++; return; }
 
       sendPreSurveyNudgeEmail(email, registrants[email], workshop, { bcc: BCC_EMAIL });
 
       recordSent(logSheet, email, workshopId, PRE_SURVEY_NUDGE_KEY);
-      alreadySent[email + "|" + PRE_SURVEY_NUDGE_KEY] = true;
+      alreadySent[sentKey(email, workshopId, PRE_SURVEY_NUDGE_KEY)] = true;
       sent++;
     });
   });
@@ -1246,12 +1249,18 @@ function getReminderLogSheet(ss) {
   return sheet;
 }
 
+// Key for the "already sent" set. Scoped per workshop so a family that
+// attended an earlier workshop still receives every email for the next one.
+function sentKey(email, workshopId, reminderKey) {
+  return String(email).trim() + "|" + String(workshopId).trim() + "|" + String(reminderKey).trim();
+}
+
 function getSentSet(logSheet) {
   const set = {};
   if (logSheet.getLastRow() < 2) return set;
   const values = logSheet.getRange(2, 1, logSheet.getLastRow() - 1, 3).getValues();
   values.forEach(function(row) {
-    set[String(row[0]).trim() + "|" + String(row[2]).trim()] = true;
+    set[sentKey(row[0], row[1], row[2])] = true;
   });
   return set;
 }

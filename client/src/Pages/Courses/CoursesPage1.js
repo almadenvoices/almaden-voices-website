@@ -47,7 +47,22 @@ const CoursesPage = () => {
     //     cover: "/images/your-image.jpg"
     // }
     // ============================================================
-    const upcomingSessions = [];
+    const upcomingSessions = [
+        {
+            id: "canada-workshop-aug-2026",
+            title: "Free Canada Public Speaking Workshop for Kids",
+            date: "August 4 & 5, 2026",
+            time: "4–5 PM PT (Vancouver) · 7–8 PM ET (Toronto)",
+            location: "Online",
+            ageGroup: "Kids of all levels",
+            capacity: 500,
+            enrolled: 0,
+            description: "A free two-day online workshop where kids learn the fundamentals of public speaking: speaking clearly and confidently, overcoming nervousness, and presenting in front of others. Join from anywhere in Canada.",
+            status: "Open",
+            online: true,
+            cover: "/images/teaching-beginner.JPG",
+        },
+    ];
 
     const sessions = upcomingSessions.map(ses => ({
         ...ses,
@@ -184,9 +199,12 @@ const CoursesPage = () => {
                 <>
                     <div style={{ backgroundColor: '#F9FAFB', padding: '48px 20px 0' }}>
                         <h2 style={{ fontSize: 'clamp(1.5rem, 3vw, 2rem)', fontWeight: 700, color: '#111827', textAlign: 'center', marginBottom: '8px' }}>
-                            Upcoming Sessions
+                            Free Public Speaking Workshop
                         </h2>
                         <div style={{ width: '80px', height: '4px', backgroundColor: '#2563EB', borderRadius: '2px', margin: '0 auto 8px' }}></div>
+                        <p style={{ textAlign: 'center', color: '#6B7280', fontSize: '1rem', marginBottom: '0' }}>
+                            A free two-day online workshop for kids on August 4 &amp; 5, 2026. Register below and we&apos;ll send your join link and reminders before the workshop.
+                        </p>
                     </div>
 
                     <section className={s.gridSection} style={{ backgroundColor: '#F9FAFB', border: 'none' }}>
