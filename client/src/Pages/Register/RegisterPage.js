@@ -19,7 +19,16 @@ import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import NotificationsActiveIcon from "@mui/icons-material/NotificationsActive";
 import HowToRegIcon from "@mui/icons-material/HowToReg";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
+import RecordVoiceOverIcon from "@mui/icons-material/RecordVoiceOver";
 import WorkshopInterestForm from "../../components/WorkshopInterestForm";
+import CoachingSlots from "../../components/CoachingSlots";
+
+// Which panel each chooser button opens, and the id it scrolls to.
+const PANEL_IDS = {
+    interest: "workshop-signup",
+    workshop: "session-signup",
+    coaching: "coaching-signup",
+};
 
 // ============================================================
 // UPCOMING SESSIONS — Add new sessions here!
@@ -97,8 +106,8 @@ export default function RegisterPage() {
     useEffect(() => {
         const hash = window.location.hash;
         if (!hash) return;
-        if (hash === "#workshop-signup") setChoice("interest");
-        if (hash === "#session-signup") setChoice("workshop");
+        const match = Object.keys(PANEL_IDS).find(key => `#${PANEL_IDS[key]}` === hash);
+        if (match) setChoice(match);
         setTimeout(() => {
             document.querySelector(hash)?.scrollIntoView({ behavior: "smooth" });
         }, 150);
@@ -112,8 +121,7 @@ export default function RegisterPage() {
         setChoice(opening ? next : "");
         if (!opening) return;
         setTimeout(() => {
-            document.getElementById(next === "interest" ? "workshop-signup" : "session-signup")
-                ?.scrollIntoView({ behavior: "smooth", block: "start" });
+            document.getElementById(PANEL_IDS[next])?.scrollIntoView({ behavior: "smooth", block: "start" });
         }, 60);
     }
 
@@ -269,7 +277,29 @@ export default function RegisterPage() {
                         </span>
                         <ChevronRightIcon className={s.chooseArrow} />
                     </button>
+
+                    <button
+                        type="button"
+                        onClick={() => pickChoice("coaching")}
+                        className={`${s.chooseBtn} ${choice === "coaching" ? s.chooseBtnActive : ""}`}
+                        aria-expanded={choice === "coaching"}
+                        aria-controls="coaching-signup"
+                    >
+                        <span className={s.chooseIcon}><RecordVoiceOverIcon /></span>
+                        <span className={s.chooseText}>
+                            <span className={s.chooseTitle}>Click here to book a 1-on-1 coaching session</span>
+                            <span className={s.chooseSub}>One hour of personal coaching · $20 online or $30 in person · Funds our free workshops</span>
+                        </span>
+                        <ChevronRightIcon className={s.chooseArrow} />
+                    </button>
                 </div>
+
+                {/* 1-on-1 coaching slots */}
+                {choice === "coaching" && (
+                    <section id="coaching-signup" style={{ padding: "8px 0 48px", scrollMarginTop: "90px" }}>
+                        <CoachingSlots />
+                    </section>
+                )}
 
                 {/* Public speaking workshop interest form (bilingual) */}
                 {choice === "interest" && (

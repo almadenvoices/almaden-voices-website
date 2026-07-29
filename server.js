@@ -13,29 +13,114 @@ const { initConfig } = require("./config");
 // Google Cloud Storage for persistent registration data
 const GCS_BUCKET = "almaden-voices-data";
 const GCS_FILE = "registrations.csv";
+const COACHING_GCS_FILE = "coaching-bookings.csv";
 const storage = new Storage();
 
-async function downloadRegistrationsFromGCS() {
+// Split one CSV line into fields, honouring double-quoted values.
+function parseCSVLine(line) {
+    const fields = [];
+    let current = '';
+    let inQuotes = false;
+    for (let i = 0; i < line.length; i++) {
+        const ch = line[i];
+        if (ch === '"') {
+            inQuotes = !inQuotes;
+        } else if (ch === ',' && !inQuotes) {
+            fields.push(current);
+            current = '';
+        } else {
+            current += ch;
+        }
+    }
+    fields.push(current);
+    return fields;
+}
+
+// Wrap a value for safe CSV output.
+function csvCell(value) {
+    return `"${String(value == null ? "" : value).replace(/"/g, '""')}"`;
+}
+
+// Local paths for the two files we keep mirrored in GCS. The container disk is
+// wiped on every deploy, so these are downloaded at boot and re-uploaded on
+// every write.
+const registrationsPath = () => path.join(__dirname, 'registrations.csv');
+const coachingPath = () => path.join(__dirname, 'coaching-bookings.csv');
+
+async function downloadFromGCS(gcsFile, destination, label) {
     try {
-        const registrationsFile = path.join(__dirname, 'registrations.csv');
-        await storage.bucket(GCS_BUCKET).file(GCS_FILE).download({ destination: registrationsFile });
-        console.log("Downloaded registrations.csv from GCS");
+        await storage.bucket(GCS_BUCKET).file(gcsFile).download({ destination });
+        console.log(`Downloaded ${gcsFile} from GCS`);
     } catch (err) {
         if (err.code === 404) {
-            console.log("No registrations.csv in GCS yet — starting fresh");
+            console.log(`No ${gcsFile} in GCS yet — starting fresh`);
         } else {
-            console.error("Error downloading registrations from GCS:", err.message);
+            console.error(`Error downloading ${label} from GCS:`, err.message);
         }
     }
 }
 
-async function uploadRegistrationsToGCS() {
+async function uploadToGCS(localFile, gcsFile, label) {
     try {
-        const registrationsFile = path.join(__dirname, 'registrations.csv');
-        await storage.bucket(GCS_BUCKET).upload(registrationsFile, { destination: GCS_FILE });
-        console.log("Uploaded registrations.csv to GCS");
+        await storage.bucket(GCS_BUCKET).upload(localFile, { destination: gcsFile });
+        console.log(`Uploaded ${gcsFile} to GCS`);
     } catch (err) {
-        console.error("Error uploading registrations to GCS:", err.message);
+        console.error(`Error uploading ${label} to GCS:`, err.message);
+    }
+}
+
+async function downloadRegistrationsFromGCS() {
+    await downloadFromGCS(GCS_FILE, registrationsPath(), "registrations");
+}
+
+async function uploadRegistrationsToGCS() {
+    await uploadToGCS(registrationsPath(), GCS_FILE, "registrations");
+}
+
+async function downloadCoachingFromGCS() {
+    await downloadFromGCS(COACHING_GCS_FILE, coachingPath(), "coaching bookings");
+}
+
+async function uploadCoachingToGCS() {
+    await uploadToGCS(coachingPath(), COACHING_GCS_FILE, "coaching bookings");
+}
+
+// ============================================================
+// 1-ON-1 COACHING SLOTS — edit this list to change what's offered.
+// Prices live here on the server so the amount charged can't be altered
+// by the browser. Each slot is a single one-hour session; the family
+// chooses online or in person when they book.
+// ============================================================
+const COACHING_PRICES = { online: 20, inPerson: 30 };
+
+const COACHING_SLOTS = [
+    { id: "coach-1", label: "Session 1", date: "Monday, August 10, 2026", time: "6:30–7:30 PM PT" },
+    { id: "coach-2", label: "Session 2", date: "Tuesday, August 11, 2026", time: "6:30–7:30 PM PT" },
+    { id: "coach-3", label: "Session 3", date: "Wednesday, August 12, 2026", time: "6:30–7:30 PM PT" },
+    { id: "coach-4", label: "Session 4", date: "Thursday, August 13, 2026", time: "6:30–7:30 PM PT" },
+    { id: "coach-5", label: "Session 5", date: "Monday, August 17, 2026", time: "6:30–7:30 PM PT" },
+];
+
+const COACHING_HEADERS = [
+    "Timestamp", "Slot ID", "Slot Label", "Slot Date", "Slot Time", "Format",
+    "Amount Paid", "PayPal Order ID", "Parent Name", "Email", "Phone",
+    "Student Name", "Student Age", "Notes"
+];
+
+// Slot ids that already have a paid booking recorded.
+function bookedCoachingSlotIds() {
+    try {
+        const file = coachingPath();
+        if (!fs.existsSync(file)) return [];
+        const lines = fs.readFileSync(file, 'utf-8').split('\n').filter(l => l.trim());
+        if (lines.length < 2) return [];
+        const idIndex = COACHING_HEADERS.indexOf("Slot ID");
+        return lines.slice(1)
+            .map(line => (parseCSVLine(line)[idIndex] || "").trim())
+            .filter(Boolean);
+    } catch (err) {
+        console.error("Error reading coaching bookings:", err.message);
+        return [];
     }
 }
 
@@ -91,7 +176,7 @@ async function generateAccessToken() {
     return data.access_token;
 }
 
-async function createOrder({ amount, frequency }) {
+async function createOrder({ amount, frequency, description }) {
     const accessToken = await generateAccessToken();
 
     const body = {
@@ -102,10 +187,12 @@ async function createOrder({ amount, frequency }) {
                     currency_code: "USD",
                     value: amount.toFixed(2)
                 },
-                description:
+                // What the payer sees on the PayPal screen and their receipt.
+                description: description || (
                     frequency === "monthly"
                         ? "Monthly donation to Almaden Voices"
                         : "One-time donation to Almaden Voices"
+                )
             }
         ]
     };
@@ -964,26 +1051,6 @@ app.get("/api/sessions/enrollment", (req, res) => {
             return res.json({});
         }
 
-        // Parse CSV fields helper
-        const parseCSVLine = (line) => {
-            const fields = [];
-            let current = '';
-            let inQuotes = false;
-            for (let i = 0; i < line.length; i++) {
-                const ch = line[i];
-                if (ch === '"') {
-                    inQuotes = !inQuotes;
-                } else if (ch === ',' && !inQuotes) {
-                    fields.push(current);
-                    current = '';
-                } else {
-                    current += ch;
-                }
-            }
-            fields.push(current);
-            return fields;
-        };
-
         // Detect session type column from header
         const headerFields = parseCSVLine(lines[0]);
         const sessionColIndex = headerFields.findIndex(h => h.trim().toLowerCase() === 'session type');
@@ -1009,6 +1076,117 @@ app.get("/api/sessions/enrollment", (req, res) => {
     } catch (err) {
         console.error("Enrollment count error:", err);
         res.status(500).json({ error: "Error fetching enrollment data" });
+    }
+});
+
+// ---------- 1-on-1 coaching ----------
+
+// The slot list plus which ones are already taken. Prices come from the server
+// so the browser can't change what gets charged.
+app.get("/api/coaching/slots", (req, res) => {
+    const booked = bookedCoachingSlotIds();
+    res.json({
+        prices: COACHING_PRICES,
+        slots: COACHING_SLOTS.map(slot => ({ ...slot, booked: booked.includes(slot.id) }))
+    });
+});
+
+// Create a PayPal order for one slot. The slot must exist and still be free.
+app.post("/api/coaching/orders", async (req, res) => {
+    try {
+        const { slotId, format } = req.body;
+
+        const slot = COACHING_SLOTS.find(s => s.id === slotId);
+        if (!slot) return res.status(400).json({ error: "That session is no longer offered." });
+        if (format !== "online" && format !== "inPerson") {
+            return res.status(400).json({ error: "Choose online or in person." });
+        }
+        if (bookedCoachingSlotIds().includes(slotId)) {
+            return res.status(409).json({ error: "Sorry — that session was just booked by someone else." });
+        }
+
+        const amount = COACHING_PRICES[format];
+        const order = await createOrder({
+            amount,
+            description: `1-on-1 coaching (${format === "inPerson" ? "in person" : "online"}) — ${slot.date}`
+        });
+        res.json({ id: order.id });
+    } catch (err) {
+        console.error("Coaching order error:", err);
+        res.status(500).json({ error: "Error creating order: " + err.message });
+    }
+});
+
+// Capture payment, then record the booking. Kept separate from the donation
+// capture route so coaching payments never get a donation receipt.
+app.post("/api/coaching/orders/:orderID/capture", async (req, res) => {
+    try {
+        const { orderID } = req.params;
+        const { slotId, format, parentName, email, phone, studentName, studentAge, notes } = req.body;
+
+        const slot = COACHING_SLOTS.find(s => s.id === slotId);
+        if (!slot) return res.status(400).json({ error: "That session is no longer offered." });
+
+        const capture = await captureOrder(orderID);
+        const amount = COACHING_PRICES[format] || 0;
+        const formatLabel = format === "inPerson" ? "In person" : "Online";
+
+        // Record the booking. This happens after a successful capture, so a
+        // failure here must not lose the payment — log loudly and still return
+        // success to the browser.
+        try {
+            const file = coachingPath();
+            if (!fs.existsSync(file)) {
+                fs.writeFileSync(file, COACHING_HEADERS.map(csvCell).join(",") + "\n");
+            }
+            const row = [
+                new Date().toISOString(), slot.id, slot.label, slot.date, slot.time,
+                formatLabel, amount, orderID, parentName, email, phone,
+                studentName, studentAge, notes
+            ].map(csvCell).join(",") + "\n";
+            fs.appendFileSync(file, row);
+            uploadCoachingToGCS().catch(e => console.error("Coaching GCS upload failed:", e.message));
+        } catch (writeErr) {
+            console.error("⚠️ PAID BUT NOT RECORDED — order", orderID, writeErr.message);
+        }
+
+        // Confirmation to the family + a copy to the admin.
+        try {
+            if (emailTransporter) {
+                const when = `${slot.date} · ${slot.time}`;
+                await emailTransporter.sendMail({
+                    from: `"Almaden Voices" <${process.env.EMAIL_USER}>`,
+                    to: email,
+                    bcc: process.env.EMAIL_USER,
+                    subject: `Your 1-on-1 coaching session — ${slot.date}`,
+                    html: `
+                        <div style="font-family: 'DM Sans', Arial, sans-serif; max-width: 560px; margin: 0 auto; color: #111827; line-height: 1.6;">
+                            <h2 style="margin: 0 0 16px;">Your session is booked</h2>
+                            <p style="margin: 0 0 20px;">Hi ${parentName || "there"}, thanks for booking a 1-on-1 coaching session with Almaden Voices. Here are the details:</p>
+                            <table style="width: 100%; border-collapse: collapse; background: #F9FAFB; border-radius: 12px;">
+                                <tr><td style="padding: 12px 16px; color: #6B7280;">Student</td><td style="padding: 12px 16px; font-weight: 600; text-align: right;">${studentName || ""}</td></tr>
+                                <tr><td style="padding: 12px 16px; color: #6B7280;">When</td><td style="padding: 12px 16px; font-weight: 600; text-align: right;">${when}</td></tr>
+                                <tr><td style="padding: 12px 16px; color: #6B7280;">Format</td><td style="padding: 12px 16px; font-weight: 600; text-align: right;">${formatLabel}</td></tr>
+                                <tr><td style="padding: 12px 16px; color: #6B7280;">Paid</td><td style="padding: 12px 16px; font-weight: 600; text-align: right;">$${amount}.00 USD</td></tr>
+                            </table>
+                            <p style="margin: 20px 0 0;">${format === "inPerson"
+                                ? "We'll email you the meeting location before your session."
+                                : "We'll email you the join link before your session."}</p>
+                            <p style="margin: 16px 0 0;">Need to reschedule? Just reply to this email.</p>
+                            <p style="margin: 24px 0 0; font-size: 13px; color: #6B7280;">Every dollar goes straight back into running our free workshops. This is a payment for coaching, not a tax-deductible donation.</p>
+                        </div>`
+                });
+            } else {
+                console.warn("Email transporter not configured, coaching confirmation not sent");
+            }
+        } catch (emailErr) {
+            console.error("Coaching email error:", emailErr);
+        }
+
+        res.json(capture);
+    } catch (err) {
+        console.error("Coaching capture error:", err);
+        res.status(500).json({ error: "Error capturing order" });
     }
 });
 
@@ -1188,8 +1366,9 @@ async function startServer() {
         // Initialize email transporter AFTER config is loaded
         initializeEmailTransporter();
 
-        // Download persistent registrations from GCS
+        // Download persistent registrations + coaching bookings from GCS
         await downloadRegistrationsFromGCS();
+        await downloadCoachingFromGCS();
 
         // Start the server
         app.listen(PORT, () => {

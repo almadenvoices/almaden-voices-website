@@ -6,6 +6,7 @@ import ShieldIcon from "@mui/icons-material/Shield";
 import VerifiedIcon from "@mui/icons-material/Verified";
 import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
 import SendIcon from "@mui/icons-material/Send";
+import usePayPalScript from "../../hooks/usePayPalScript";
 
 /**
  * ====== CONFIG – UPDATE THESE ======
@@ -13,40 +14,6 @@ import SendIcon from "@mui/icons-material/Send";
 
 // Use relative URL so it works on both localhost and production
 const API_BASE_URL = "";
-
-// Use your real PayPal CLIENT ID (same as backend env)
-const PAYPAL_CLIENT_ID = "AXjQeGEP8yRg32Ze14iVZFB24aYw37Gp8M3udPPwRewK3etierQ7tmSGnU3LI8ZNskzhjpgJMgBWERoZ";
-
-/**
- * Dynamically load PayPal JS SDK script
- */
-function usePayPalScript() {
-    const [loaded, setLoaded] = useState(false);
-    const [error, setError] = useState("");
-
-    useEffect(() => {
-        if (window.paypal) {
-            setLoaded(true);
-            return;
-        }
-
-        const script = document.createElement("script");
-        script.src = `https://www.paypal.com/sdk/js?client-id=${PAYPAL_CLIENT_ID}&currency=USD&intent=capture`;
-        script.async = true;
-        script.onload = () => {
-            if (window.paypal) setLoaded(true);
-            else setError("PayPal SDK failed to load.");
-        };
-        script.onerror = () => setError("PayPal SDK failed to load.");
-        document.body.appendChild(script);
-
-        return () => {
-            // optional: do nothing; PayPal script can stay cached
-        };
-    }, []);
-
-    return { loaded, error };
-}
 
 export default function DonatePage() {
     // Check for pre-filled amount from URL (e.g., /donate?amount=5)
