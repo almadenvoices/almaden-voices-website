@@ -26,6 +26,10 @@
 # subscriber data (contains user emails - sensitive)
 subscribers.csv
 
+# runtime data mirrored to GCS (contains names, emails, phone numbers)
+registrations.csv
+coaching-bookings.csv
+
 # IDE
 .idea/
 .vscode/
