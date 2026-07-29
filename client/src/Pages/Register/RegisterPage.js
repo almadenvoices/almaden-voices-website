@@ -35,7 +35,21 @@ import WorkshopInterestForm from "../../components/WorkshopInterestForm";
 //     status: "Open",  // "Open" or "Full"
 // }
 // ============================================================
-const upcomingSessions = [];
+const upcomingSessions = [
+    {
+        id: "canada-workshop-aug-2026",
+        title: "Free Canada Public Speaking Workshop for Kids",
+        date: "August 4 & 5, 2026",
+        time: "4–5 PM PT (Vancouver) · 7–8 PM ET (Toronto)",
+        location: "Online",
+        grades: "Kids of all levels welcome",
+        capacity: 500,
+        enrolled: 0,
+        description: "A free two-day online workshop where kids learn the fundamentals of public speaking — how to speak clearly and confidently, overcome nervousness, and present in front of others. Runs Tuesday, August 4 and Wednesday, August 5 (1 hour each day) live online. Join from anywhere in Canada! You're welcome to attend one or both days.",
+        status: "Open",
+        online: true,
+    },
+];
 
 const emptyStudent = () => ({ firstName: "", lastName: "", age: "" });
 
@@ -218,7 +232,7 @@ export default function RegisterPage() {
                             </div>
                             <h3>Who Can Join?</h3>
                             <p className={s.muted}>
-                                This free workshop is open to kids ages 5 to 15, anywhere in the world. No experience needed — all levels welcome!
+                                This free workshop is open to kids ages 5 to 15, anywhere in Canada. No experience needed — all levels welcome!
                             </p>
                         </div>
 
@@ -238,7 +252,7 @@ export default function RegisterPage() {
                             </div>
                             <h3>What to Expect</h3>
                             <p className={s.muted}>
-                                Short, hands-on live sessions with plenty of practice. Once you're registered, we'll send all the details and reminders before the workshop begins.
+                                Two 1-hour live sessions online — Tuesday, August 4 & Wednesday, August 5. Come to one or both days. We'll send your join link and reminders before the workshop begins.
                             </p>
                         </div>
                     </aside>
