@@ -65,9 +65,8 @@ const WORKSHOPS = {
       { label: "Day 1: Tuesday, August 4, 2026", startUtc: "2026-08-04T23:00:00Z" },
       { label: "Day 2: Wednesday, August 5, 2026", startUtc: "2026-08-05T23:00:00Z" }
     ],
-    // TODO: swap in the new Webex room for this workshop. These are the July
-    // workshop's Personal Room details, kept only as a placeholder so the
-    // emails render — update before sending any join links.
+    // Webex Personal Room — no meeting password required.
+    // The same room hosts both days.
     webex: {
       link: "https://anjikabansal-405.my.webex.com/meet/almadenvoices",
       meetingNumber: "2554 439 4487",
