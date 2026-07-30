@@ -57,7 +57,7 @@ const upcomingSessions = [
         id: "canada-workshop-aug-2026",
         title: "Free Canada Public Speaking Workshop for Kids",
         date: "August 4 & 5, 2026",
-        time: "6–7 PM PT (Vancouver) · 9–10 PM ET (Toronto)",
+        time: "Aug 4: 3–4 PM PT · Aug 5: 6–7 PM PT",
         location: "Online",
         grades: "Kids of all levels welcome",
         capacity: 500,
@@ -181,6 +181,7 @@ export default function RegisterPage() {
             sessionType: formData.get("sessionType"),
             sessionLabel: sessionLabel,
             country: formData.get("country"),
+            schoolName: formData.get("schoolName"),
             streetAddress: formData.get("streetAddress"),
             city: formData.get("city"),
             state: formData.get("state"),
@@ -278,7 +279,7 @@ export default function RegisterPage() {
                         <span className={s.chooseIcon}><HowToRegIcon /></span>
                         <span className={s.chooseText}>
                             <span className={s.chooseTitle}>Click here to sign up for our international Canada workshop</span>
-                            <span className={s.chooseSub}>Free two-day online workshop · August 4 &amp; 5, 2026 · 6–7 PM PT</span>
+                            <span className={s.chooseSub}>Free two-day online workshop · Aug 4 (3–4 PM PT) &amp; Aug 5 (6–7 PM PT)</span>
                         </span>
                         <ChevronRightIcon className={s.chooseArrow} />
                     </button>
@@ -599,11 +600,22 @@ export default function RegisterPage() {
                                     </div>
                                 </div>
 
+                                <div className={s.grid}>
+                                    <div className={s.field}>
+                                        <label>School Name <span className={s.req}>*</span></label>
+                                        <input name="schoolName" placeholder="e.g. Graystone Elementary" required disabled={isSubmitting} />
+                                    </div>
+                                </div>
+
                                 {selectedSession.online ? (
                                     <div className={s.grid}>
                                         <div className={s.field}>
                                             <label>Country <span className={s.req}>*</span></label>
-                                            <input name="country" placeholder="e.g. India, Singapore, United States" required disabled={isSubmitting} />
+                                            <input name="country" placeholder="e.g. Canada, India, United States" required disabled={isSubmitting} />
+                                        </div>
+                                        <div className={s.field}>
+                                            <label>Home ZIP / Postal Code <span className={s.req}>*</span></label>
+                                            <input name="zipCode" placeholder="e.g. V6B 1A1 or 95120" required disabled={isSubmitting} />
                                         </div>
                                     </div>
                                 ) : (

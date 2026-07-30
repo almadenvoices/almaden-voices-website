@@ -40,6 +40,7 @@ const REG_HEADERS = [
   "Age",
   "Session",
   "Session ID",
+  "School Name",
   "Country",
   "Street Address",
   "City",
@@ -59,12 +60,22 @@ const WORKSHOPS = {
   "canada-workshop-aug-2026": {
     name: "Free Canada Public Speaking Workshop for Kids",
     datesText: "Tuesday, August 4 & Wednesday, August 5, 2026",
-    timesText: "6:00–7:00 PM PT (Vancouver) &middot; 9:00–10:00 PM ET (Toronto)",
-    // Each session's start time in UTC (ISO 8601). 6:00 PM PDT is 1:00 AM UTC
-    // the following day, so these dates are one ahead of the labels.
+    // The two days run at different times, so each session carries its own.
+    // This line is the at-a-glance summary; the schedule block shows both.
+    timesText: "Day 1: 3:00–4:00 PM PT &middot; Day 2: 6:00–7:00 PM PT",
+    // Start times in UTC (ISO 8601). 3:00 PM PDT = 10:00 PM UTC the same day;
+    // 6:00 PM PDT = 1:00 AM UTC the following day, so Day 2's date is one ahead.
     sessions: [
-      { label: "Day 1: Tuesday, August 4, 2026", startUtc: "2026-08-05T01:00:00Z" },
-      { label: "Day 2: Wednesday, August 5, 2026", startUtc: "2026-08-06T01:00:00Z" }
+      {
+        label: "Day 1: Tuesday, August 4, 2026",
+        time: "3:00–4:00 PM PT (Vancouver) &middot; 6:00–7:00 PM ET (Toronto)",
+        startUtc: "2026-08-04T22:00:00Z"
+      },
+      {
+        label: "Day 2: Wednesday, August 5, 2026",
+        time: "6:00–7:00 PM PT (Vancouver) &middot; 9:00–10:00 PM ET (Toronto)",
+        startUtc: "2026-08-06T01:00:00Z"
+      }
     ],
     // Webex Personal Room — no meeting password required.
     // The same room hosts both days.
@@ -109,6 +120,7 @@ function doPost(e) {
         "Age": student.age,
         "Session": data.sessionLabel || data.sessionType,
         "Session ID": data.sessionType || "",
+        "School Name": data.schoolName || "",
         "Country": data.country || "",
         "Street Address": data.streetAddress || "",
         "City": data.city || "",
@@ -265,9 +277,16 @@ function detailRow(label, valueHtml, note) {
 }
 
 function scheduleBlockHtml(workshop) {
+  // Each day shows its own time underneath the date, since the two days don't
+  // always run at the same hour. Falls back to the workshop-wide timesText for
+  // any session that doesn't carry its own.
   const rows = workshop.sessions.map(function(s, i) {
+    const timeText = s.time || workshop.timesText;
     return '<tr><td style="padding:10px 0;' + (i ? 'border-top:1px solid ' + C_LINE + ';' : '') +
-      'font-family:' + FONT_BODY + ';font-size:16px;color:' + C_TEXT + ';font-weight:500;">' + s.label + '</td></tr>';
+      'font-family:' + FONT_BODY + ';">' +
+      '<p style="margin:0;font-size:16px;color:' + C_TEXT + ';font-weight:500;">' + s.label + '</p>' +
+      (timeText ? '<p style="margin:3px 0 0;font-size:15px;color:' + C_BODY + ';">' + timeText + '</p>' : '') +
+      '</td></tr>';
   }).join('');
 
   return '' +
@@ -277,8 +296,6 @@ function scheduleBlockHtml(workshop) {
         sectionTitle('When') +
         '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">' + rows + '</table>' +
         '<p style="margin:14px 0 0;font-family:' + FONT_BODY + ';font-size:15px;color:' + C_BODY + ';">' +
-          '<strong style="color:' + C_TEXT + ';">Time:</strong> ' + workshop.timesText + '</p>' +
-        '<p style="margin:6px 0 0;font-family:' + FONT_BODY + ';font-size:15px;color:' + C_BODY + ';">' +
           '<strong style="color:' + C_TEXT + ';">Where:</strong> Online. The same link works for both days</p>' +
       '</td></tr>' +
     '</table>';
@@ -414,7 +431,10 @@ function buildAdminHtml(data, students, studentListHtml, childWord, timestamp) {
       '<p><strong>Name:</strong> ' + data.parentName + '</p>' +
       '<p><strong>Email:</strong> ' + data.email + '</p>' +
       '<p><strong>Phone:</strong> ' + data.phone + '</p>' +
+      (data.schoolName ? '<p><strong>School:</strong> ' + data.schoolName + '</p>' : '') +
       (data.country ? '<p><strong>Country:</strong> ' + data.country + '</p>' : '') +
+      // Online registrations collect a home ZIP without a full mailing address.
+      (data.zipCode && !data.streetAddress ? '<p><strong>Home ZIP:</strong> ' + data.zipCode + '</p>' : '') +
       (data.streetAddress ?
         '<h3 style="color: #333;">Mailing Address</h3>' +
         '<p>' + data.streetAddress + '<br/>' + (data.city || '') + ', ' + (data.state || '') + ' ' + (data.zipCode || '') + '</p>'
@@ -566,9 +586,9 @@ function sendJoinLinkToTestParent() {
 }
 
 // When the scheduled blast should go out, as a UTC instant.
-// 2026-08-03T01:00:00Z = 6:00 PM PDT on Sunday, August 2, 2026 —
+// 2026-08-02T22:00:00Z = 3:00 PM PDT on Sunday, August 2, 2026 —
 // exactly two days before Day 1 begins.
-const BLAST_TIME_UTC = "2026-08-03T01:00:00Z";
+const BLAST_TIME_UTC = "2026-08-02T22:00:00Z";
 
 // Run this ONCE to schedule the blast. It creates a one-time trigger that fires
 // sendJoinLinkToAllRegistrants() at BLAST_TIME_UTC. Re-running replaces any
@@ -813,9 +833,9 @@ function prepBlockHtml() {
 const ONE_DAY_KEY = "1day";
 
 // When the day-before reminder should go out, as a UTC instant.
-// 2026-08-04T01:00:00Z = 6:00 PM PDT on Monday, August 3, 2026 —
+// 2026-08-03T22:00:00Z = 3:00 PM PDT on Monday, August 3, 2026 —
 // exactly 24 hours before Day 1 begins.
-const ONE_DAY_REMINDER_TIME_UTC = "2026-08-04T01:00:00Z";
+const ONE_DAY_REMINDER_TIME_UTC = "2026-08-03T22:00:00Z";
 
 // Preview only — sends one copy to TEST_EMAIL for a fake registrant.
 function sendTestOneDayReminder() {
@@ -895,9 +915,9 @@ function sendOneDayReminderToAll() {
 const ONE_HOUR_KEY = "1hour";
 
 // When the one-hour reminder should go out, as a UTC instant.
-// 2026-08-05T00:00:00Z = 5:00 PM PDT on Tuesday, August 4, 2026 —
+// 2026-08-04T21:00:00Z = 2:00 PM PDT on Tuesday, August 4, 2026 —
 // exactly one hour before Day 1 begins.
-const ONE_HOUR_REMINDER_TIME_UTC = "2026-08-05T00:00:00Z";
+const ONE_HOUR_REMINDER_TIME_UTC = "2026-08-04T21:00:00Z";
 
 // Preview only — sends one copy to TEST_EMAIL for a fake registrant.
 function sendTestOneHourReminder() {

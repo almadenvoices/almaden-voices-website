@@ -23,13 +23,16 @@ const WorkshopInterestForm = () => {
     const [phone, setPhone] = useState('');
     const [childName, setChildName] = useState('');
     const [childGrade, setChildGrade] = useState('');
+    const [schoolName, setSchoolName] = useState('');
+    const [zipCode, setZipCode] = useState('');
     const [status, setStatus] = useState('idle'); // idle | submitting | success | error
     const [message, setMessage] = useState('');
 
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        if (!fullName.trim() || !phone.trim() || !childName.trim() || !childGrade.trim()) {
+        if (!fullName.trim() || !phone.trim() || !childName.trim() || !childGrade.trim() ||
+            !schoolName.trim() || !zipCode.trim()) {
             setStatus('error');
             setMessage('Please fill in all fields. / Por favor complete todos los campos.');
             return;
@@ -53,6 +56,8 @@ const WorkshopInterestForm = () => {
                     phone,
                     childName,
                     childGrade,
+                    schoolName,
+                    zipCode,
                     interest: 'Public Speaking Workshop'
                 })
             });
@@ -66,6 +71,8 @@ const WorkshopInterestForm = () => {
                 setPhone('');
                 setChildName('');
                 setChildGrade('');
+                setSchoolName('');
+                setZipCode('');
             } else {
                 setStatus('error');
                 setMessage(result.error || 'Something went wrong. Please try again. / Algo salió mal. Por favor intente de nuevo.');
@@ -215,6 +222,28 @@ const WorkshopInterestForm = () => {
                             <option value="11th grade">11th grade / 11º grado</option>
                             <option value="12th grade">12th grade / 12º grado</option>
                         </select>
+                    </BilingualField>
+
+                    <BilingualField labelEn="School name" labelEs="Nombre de la escuela">
+                        <input
+                            type="text"
+                            placeholder="School name / Nombre de la escuela"
+                            value={schoolName}
+                            onChange={(e) => setSchoolName(e.target.value)}
+                            disabled={status === 'submitting'}
+                            style={inputStyle}
+                        />
+                    </BilingualField>
+
+                    <BilingualField labelEn="Home ZIP code" labelEs="Código postal de su casa">
+                        <input
+                            type="text"
+                            placeholder="e.g. 95120"
+                            value={zipCode}
+                            onChange={(e) => setZipCode(e.target.value)}
+                            disabled={status === 'submitting'}
+                            style={inputStyle}
+                        />
                     </BilingualField>
 
                     {status === 'error' && (
