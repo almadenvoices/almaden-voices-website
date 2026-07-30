@@ -60,11 +60,10 @@ const WORKSHOPS = {
   "canada-workshop-aug-2026": {
     name: "Free Canada Public Speaking Workshop for Kids",
     datesText: "Tuesday, August 4 & Wednesday, August 5, 2026",
-    // The two days run at different times, so each session carries its own.
-    // This line is the at-a-glance summary; the schedule block shows both.
-    timesText: "Day 1: 3:00–4:00 PM PT &middot; Day 2: 6:00–7:00 PM PT",
-    // Start times in UTC (ISO 8601). 3:00 PM PDT = 10:00 PM UTC the same day;
-    // 6:00 PM PDT = 1:00 AM UTC the following day, so Day 2's date is one ahead.
+    // Shown as one "Time" line while both days match; each session can carry
+    // its own `time` if they ever diverge, and the schedule block adapts.
+    timesText: "3:00–4:00 PM PT (Vancouver) &middot; 6:00–7:00 PM ET (Toronto)",
+    // Start times in UTC (ISO 8601). 3:00 PM PDT = 10:00 PM UTC the same day.
     sessions: [
       {
         label: "Day 1: Tuesday, August 4, 2026",
@@ -73,8 +72,8 @@ const WORKSHOPS = {
       },
       {
         label: "Day 2: Wednesday, August 5, 2026",
-        time: "6:00–7:00 PM PT (Vancouver) &middot; 9:00–10:00 PM ET (Toronto)",
-        startUtc: "2026-08-06T01:00:00Z"
+        time: "3:00–4:00 PM PT (Vancouver) &middot; 6:00–7:00 PM ET (Toronto)",
+        startUtc: "2026-08-05T22:00:00Z"
       }
     ],
     // Webex Personal Room — no meeting password required.
@@ -277,15 +276,18 @@ function detailRow(label, valueHtml, note) {
 }
 
 function scheduleBlockHtml(workshop) {
-  // Each day shows its own time underneath the date, since the two days don't
-  // always run at the same hour. Falls back to the workshop-wide timesText for
-  // any session that doesn't carry its own.
+  // When every day runs at the same hour, print one "Time" line under the list.
+  // When they differ, print each day's time beneath its own date instead.
+  const times = workshop.sessions.map(function(s) { return s.time || workshop.timesText || ''; });
+  const sameEveryDay = times.every(function(t) { return t === times[0]; });
+
   const rows = workshop.sessions.map(function(s, i) {
-    const timeText = s.time || workshop.timesText;
     return '<tr><td style="padding:10px 0;' + (i ? 'border-top:1px solid ' + C_LINE + ';' : '') +
       'font-family:' + FONT_BODY + ';">' +
       '<p style="margin:0;font-size:16px;color:' + C_TEXT + ';font-weight:500;">' + s.label + '</p>' +
-      (timeText ? '<p style="margin:3px 0 0;font-size:15px;color:' + C_BODY + ';">' + timeText + '</p>' : '') +
+      (!sameEveryDay && times[i]
+        ? '<p style="margin:3px 0 0;font-size:15px;color:' + C_BODY + ';">' + times[i] + '</p>'
+        : '') +
       '</td></tr>';
   }).join('');
 
@@ -295,7 +297,11 @@ function scheduleBlockHtml(workshop) {
       '<tr><td style="padding:20px 22px;">' +
         sectionTitle('When') +
         '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">' + rows + '</table>' +
-        '<p style="margin:14px 0 0;font-family:' + FONT_BODY + ';font-size:15px;color:' + C_BODY + ';">' +
+        (sameEveryDay && times[0]
+          ? '<p style="margin:14px 0 0;font-family:' + FONT_BODY + ';font-size:15px;color:' + C_BODY + ';">' +
+            '<strong style="color:' + C_TEXT + ';">Time:</strong> ' + times[0] + '</p>'
+          : '') +
+        '<p style="margin:6px 0 0;font-family:' + FONT_BODY + ';font-size:15px;color:' + C_BODY + ';">' +
           '<strong style="color:' + C_TEXT + ';">Where:</strong> Online. The same link works for both days</p>' +
       '</td></tr>' +
     '</table>';
