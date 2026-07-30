@@ -104,7 +104,7 @@ const COACHING_SLOTS = [
 const COACHING_HEADERS = [
     "Timestamp", "Slot ID", "Slot Label", "Slot Date", "Slot Time", "Format",
     "Amount Paid", "PayPal Order ID", "Parent Name", "Email", "Phone",
-    "Student Name", "Student Age", "Notes"
+    "Student Name", "Student Age", "School Name", "Home ZIP", "Notes"
 ];
 
 // Slot ids that already have a paid booking recorded.
@@ -388,7 +388,7 @@ app.post("/api/contact", async (req, res) => {
 // Newsletter subscription endpoint
 app.post("/api/subscribe", async (req, res) => {
     try {
-        const { email, name, phone, childName, childGrade, interest } = req.body;
+        const { email, name, phone, childName, childGrade, schoolName, zipCode, interest } = req.body;
 
         // Validate email
         if (!email || !email.includes('@')) {
@@ -403,6 +403,8 @@ app.post("/api/subscribe", async (req, res) => {
         const subscriberPhone = (phone || "").toString().trim().replace(/,/g, " ");
         const subscriberChildName = (childName || "").toString().trim().replace(/,/g, " ");
         const subscriberChildGrade = (childGrade || "").toString().trim().replace(/,/g, " ");
+        const subscriberSchool = (schoolName || "").toString().trim().replace(/,/g, " ");
+        const subscriberZip = (zipCode || "").toString().trim().replace(/,/g, " ");
         const subscriberInterest = (interest || "Newsletter").toString().trim().replace(/,/g, " ");
 
         // Path to subscribers file
@@ -428,9 +430,11 @@ app.post("/api/subscribe", async (req, res) => {
             }
         }
 
-        // Add new subscriber to CSV (email,name,phone,childName,childGrade,interest,timestamp)
+        // Add new subscriber to CSV. School and ZIP are appended after the
+        // timestamp so every column that already existed keeps its position.
+        // Order: email,name,phone,childName,childGrade,interest,timestamp,schoolName,zipCode
         const timestamp = new Date().toISOString();
-        const newSubscriber = `${normalizedEmail},${subscriberName},${subscriberPhone},${subscriberChildName},${subscriberChildGrade},${subscriberInterest},${timestamp}\n`;
+        const newSubscriber = `${normalizedEmail},${subscriberName},${subscriberPhone},${subscriberChildName},${subscriberChildGrade},${subscriberInterest},${timestamp},${subscriberSchool},${subscriberZip}\n`;
 
         fs.appendFileSync(subscribersFile, newSubscriber);
 
@@ -445,6 +449,8 @@ app.post("/api/subscribe", async (req, res) => {
                     ${subscriberPhone ? `<p><strong>Phone:</strong> ${subscriberPhone}</p>` : ''}
                     ${subscriberChildName ? `<p><strong>Child's Name:</strong> ${subscriberChildName}</p>` : ''}
                     ${subscriberChildGrade ? `<p><strong>Child's Grade:</strong> ${subscriberChildGrade}</p>` : ''}
+                    ${subscriberSchool ? `<p><strong>School:</strong> ${subscriberSchool}</p>` : ''}
+                    ${subscriberZip ? `<p><strong>Home ZIP:</strong> ${subscriberZip}</p>` : ''}
                     <p><strong>Interested In:</strong> ${subscriberInterest}</p>
                     <p><strong>Subscribed At:</strong> ${new Date().toLocaleString()}</p>
                     <hr style="border: 1px solid #eee;" />
@@ -1100,7 +1106,7 @@ app.post("/api/coaching/orders", async (req, res) => {
 app.post("/api/coaching/orders/:orderID/capture", async (req, res) => {
     try {
         const { orderID } = req.params;
-        const { slotId, format, parentName, email, phone, studentName, studentAge, notes } = req.body;
+        const { slotId, format, parentName, email, phone, studentName, studentAge, schoolName, zipCode, notes } = req.body;
 
         const slot = COACHING_SLOTS.find(s => s.id === slotId);
         if (!slot) return res.status(400).json({ error: "That session is no longer offered." });
@@ -1120,7 +1126,7 @@ app.post("/api/coaching/orders/:orderID/capture", async (req, res) => {
             const row = [
                 new Date().toISOString(), slot.id, slot.label, slot.date, slot.time,
                 formatLabel, amount, orderID, parentName, email, phone,
-                studentName, studentAge, notes
+                studentName, studentAge, schoolName, zipCode, notes
             ].map(csvCell).join(",") + "\n";
             fs.appendFileSync(file, row);
             uploadCoachingToGCS().catch(e => console.error("Coaching GCS upload failed:", e.message));

@@ -28,6 +28,8 @@ export default function CoachingSlots() {
     const [phone, setPhone] = useState("");
     const [studentName, setStudentName] = useState("");
     const [studentAge, setStudentAge] = useState("");
+    const [schoolName, setSchoolName] = useState("");
+    const [zipCode, setZipCode] = useState("");
     const [notes, setNotes] = useState("");
 
     const [payError, setPayError] = useState("");
@@ -58,8 +60,9 @@ export default function CoachingSlots() {
     // let anyone reach the PayPal buttons.
     const detailsComplete = useMemo(() => (
         parentName.trim() && studentName.trim() && phone.trim() &&
+        schoolName.trim() && zipCode.trim() &&
         /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
-    ), [parentName, studentName, phone, email]);
+    ), [parentName, studentName, phone, schoolName, zipCode, email]);
 
     const readyToPay = Boolean(selectedSlot) && !selectedSlot?.booked && detailsComplete;
 
@@ -77,7 +80,7 @@ export default function CoachingSlots() {
         // the buttons were rendered.
         const slotId = selectedId;
         const chosenFormat = format;
-        const details = { parentName, email, phone, studentName, studentAge, notes };
+        const details = { parentName, email, phone, studentName, studentAge, schoolName, zipCode, notes };
 
         window.paypal.Buttons({
             style: { layout: "vertical", shape: "rect", color: "gold", label: "pay" },
@@ -122,7 +125,7 @@ export default function CoachingSlots() {
 
             onCancel: () => setPayError("")
         }).render("#coaching-paypal-container");
-    }, [paypalLoaded, readyToPay, booked, selectedId, format, parentName, email, phone, studentName, studentAge, notes, price, selectedSlot]);
+    }, [paypalLoaded, readyToPay, booked, selectedId, format, parentName, email, phone, studentName, studentAge, schoolName, zipCode, notes, price, selectedSlot]);
 
     const inputStyle = {
         width: "100%",
@@ -278,6 +281,14 @@ export default function CoachingSlots() {
                             <input id="coach-phone" type="tel" style={inputStyle} value={phone} onChange={e => setPhone(e.target.value)} placeholder="+1 (000) 000-0000" />
                         </div>
                         <div>
+                            <label style={labelStyle} htmlFor="coach-school">School name</label>
+                            <input id="coach-school" style={inputStyle} value={schoolName} onChange={e => setSchoolName(e.target.value)} placeholder="e.g. Graystone Elementary" />
+                        </div>
+                        <div>
+                            <label style={labelStyle} htmlFor="coach-zip">Home ZIP code</label>
+                            <input id="coach-zip" style={inputStyle} value={zipCode} onChange={e => setZipCode(e.target.value)} placeholder="e.g. 95120" />
+                        </div>
+                        <div>
                             <label style={labelStyle} htmlFor="coach-age">Student&apos;s age</label>
                             <select id="coach-age" style={{ ...inputStyle, backgroundColor: "#FFFFFF" }} value={studentAge} onChange={e => setStudentAge(e.target.value)}>
                                 <option value="">Select age…</option>
@@ -301,7 +312,7 @@ export default function CoachingSlots() {
 
                         {!detailsComplete && (
                             <p style={{ color: "#6B7280", fontSize: "0.88rem", margin: "0 0 12px", textAlign: "center" }}>
-                                Fill in your name, your child&apos;s name, email and phone to continue to payment.
+                                Fill in your name, your child&apos;s name, email, phone, school and ZIP to continue to payment.
                             </p>
                         )}
                         {payError && (
