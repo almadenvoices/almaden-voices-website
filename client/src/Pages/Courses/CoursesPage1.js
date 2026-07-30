@@ -52,7 +52,7 @@ const CoursesPage = () => {
             id: "canada-workshop-aug-2026",
             title: "Free Canada Public Speaking Workshop for Kids",
             date: "August 4 & 5, 2026",
-            time: "Aug 4: 3–4 PM PT · Aug 5: 6–7 PM PT",
+            time: "3–4 PM PT (Vancouver) · 6–7 PM ET (Toronto)",
             location: "Online",
             ageGroup: "Kids of all levels",
             capacity: 500,

@@ -57,7 +57,7 @@ const upcomingSessions = [
         id: "canada-workshop-aug-2026",
         title: "Free Canada Public Speaking Workshop for Kids",
         date: "August 4 & 5, 2026",
-        time: "Aug 4: 3–4 PM PT · Aug 5: 6–7 PM PT",
+        time: "3–4 PM PT (Vancouver) · 6–7 PM ET (Toronto)",
         location: "Online",
         grades: "Kids of all levels welcome",
         capacity: 500,
@@ -279,7 +279,7 @@ export default function RegisterPage() {
                         <span className={s.chooseIcon}><HowToRegIcon /></span>
                         <span className={s.chooseText}>
                             <span className={s.chooseTitle}>Click here to sign up for our international Canada workshop</span>
-                            <span className={s.chooseSub}>Free two-day online workshop · Aug 4 (3–4 PM PT) &amp; Aug 5 (6–7 PM PT)</span>
+                            <span className={s.chooseSub}>Free two-day online workshop · August 4 &amp; 5, 2026 · 3–4 PM PT</span>
                         </span>
                         <ChevronRightIcon className={s.chooseArrow} />
                     </button>
