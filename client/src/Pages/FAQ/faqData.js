@@ -51,7 +51,7 @@ export const CATEGORIES = [
 
 export const FAQS = [
     { id: "what",   cat: "program",    q: "What is Almaden Voices?", a: "A youth public speaking program that builds confidence through weekly practice, coaching, and a short showcase speech." },
-    { id: "who",    cat: "program",    q: "Who can join?", a: "Grades 2–8. Programs vary by grade level, and specific eligibility is listed for each session." },
+    { id: "who",    cat: "program",    q: "Who can join?", a: "Grades K–9. Programs vary by grade level, and specific eligibility is listed for each session." },
     { id: "length", cat: "program",    q: "How long is the program?", a: "Core series runs 4 weeks (75–90 minutes each); we also host seasonal workshops." },
 
     { id: "enroll", cat: "enrollment", q: "How do I enroll my student?", a: "Complete the registration form; we’ll confirm dates/availability and next steps by email." },
