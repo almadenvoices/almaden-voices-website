@@ -1011,7 +1011,7 @@ const DAY1_RECAP_KEY = "day1recap";
 
 // Quick 2-question pre-survey, meant to capture where students stood before
 // any teaching — which is why we ask families to fill it in with their child.
-const PRE_SURVEY_URL = "https://forms.gle/T5hmD7NGRuoAb3Xo9";
+const PRE_SURVEY_URL = "https://forms.gle/57L2AyFPyR9XkbQB8";
 
 // Day 1 transcript + meeting notes.
 const DAY1_NOTES_URL = "https://docs.google.com/document/d/1hsEY9DJQR55K40-23TQYFQMjgXAKOZDUlw-JvDrA4w0/edit?usp=sharing";
@@ -1089,8 +1089,9 @@ function sendDay1RecapEmail(email, registrant, workshop, opts) {
     "See the HTML version of this email for the pre-survey, Day 1 notes, and tomorrow's join link.", options);
 }
 
-// The pre-survey. Highlighted, because it was meant to go out before Day 1 and
-// we need it answered as-of-before-the-workshop for the results to mean anything.
+// The pre-survey, for families who did not fill it in before Day 1. Answers
+// have to describe how the child felt before any teaching, or the before/after
+// comparison means nothing.
 function surveyBlockHtml() {
   return '' +
     '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" ' +
@@ -1099,10 +1100,11 @@ function surveyBlockHtml() {
         sectionTitle('Quick pre-survey') +
         '<p style="margin:0 0 12px;font-family:' + FONT_BODY + ';font-size:15px;line-height:1.6;color:' + C_TEXT + ';font-weight:700;">' +
           'Just 2 multiple choice questions, and it only takes a minute.</p>' +
-        '<p style="margin:0 0 16px;font-family:' + FONT_BODY + ';font-size:15px;line-height:1.6;color:' + C_BODY + ';">' +
-          'We meant to send this out before Day 1, so please fill it in together with your child ' +
+        '<p style="margin:0 0 12px;font-family:' + FONT_BODY + ';font-size:15px;line-height:1.6;color:' + C_BODY + ';">' +
+          'If you have not filled this in yet, please do it together with your child ' +
           '<strong style="color:' + C_TEXT + ';">based on how they felt before the workshop started</strong>. ' +
           'That way we can see where each student began, before any teaching at all.</p>' +
+        honestyNoteHtml() +
         '<table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr><td>' +
           '<a href="' + PRE_SURVEY_URL + '" style="background:' + C_ACCENT + ';color:#FFFFFF;text-decoration:none;' +
             'display:inline-block;padding:13px 30px;border-radius:10px;font-family:' + FONT_BODY + ';' +
@@ -1157,9 +1159,9 @@ function inviteBlockHtml() {
 }
 
 // ============================================================
-// PRE-SURVEY NUDGE — "please fill it in as of before Day 1"
-// A short follow-up for everyone: the pre-survey plus the join link for
-// today's Day 2 session.
+// PRE-SURVEY — send this BEFORE Day 1.
+// Asks every registered family to fill in the 2-question baseline survey, with
+// an explicit ask to answer honestly, and repeats the join link underneath.
 // Run sendTestPreSurveyNudge() first to preview it in your own inbox, then
 // sendPreSurveyNudgeToAll() when you're happy with it.
 // Safe to re-run: anyone already sent is skipped via the ReminderLog.
@@ -1212,26 +1214,28 @@ function sendPreSurveyNudgeEmail(email, registrant, workshop, opts) {
     ? registrant.studentNames.join(" and ")
     : "your child";
 
-  // Same rule as the recap: no attendance data here, so never assume the
-  // family was at Day 1.
+  // Goes out before Day 1, so it asks how the child feels right now rather
+  // than asking anyone to think back past a session.
+  const firstDay = workshop.sessions && workshop.sessions[0] ? workshop.sessions[0] : null;
+
   const inner = '' +
     '<p style="margin:0 0 14px;">Dear ' + registrant.parentName + ',</p>' +
-    '<p style="margin:0 0 20px;">A quick favour before today\'s Day 2 session of the ' +
-      '<strong style="color:' + C_TEXT + ';">' + workshop.name + '</strong>. If you have not had a chance yet, ' +
-      'please fill in our short pre-survey with ' + childList + '. It takes about a minute, and it makes a real ' +
-      'difference to us. The join link for today is further down.</p>' +
+    '<p style="margin:0 0 20px;">One small thing before the ' +
+      '<strong style="color:' + C_TEXT + ';">' + workshop.name + '</strong> begins' +
+      (firstDay ? ' on ' + firstDay.label.replace(/^Day 1:\s*/, '') : '') + '. ' +
+      'Please fill in our short pre-survey together with ' + childList + '. It takes about a minute, ' +
+      'and it is how we measure whether the workshop actually helps.</p>' +
     preSurveyNudgeBlockHtml() +
-    '<p style="margin:0 0 20px;">Here is the link for today\'s session. It is the same link as yesterday, ' +
-      'and it works for everyone, whether or not ' + childList + ' was able to join Day 1.</p>' +
+    '<p style="margin:0 0 20px;">Your join link is below — the same link works for both days.</p>' +
     joinDetailsHtml(workshop) +
-    '<p style="margin:0;">Thank you so much. We are excited to see you all today. If you have any questions or ' +
+    '<p style="margin:0;">Thank you so much. We are excited to meet ' + childList + '. If you have any questions or ' +
       'concerns, please do not hesitate to reply to this email or write to us at ' +
       '<a href="mailto:' + ADMIN_EMAIL + '" style="color:' + C_ACCENT + ';">' + ADMIN_EMAIL + '</a>.</p>';
 
-  let subject = ORG_NAME + ": please fill in the quick pre-survey, plus today's join link";
+  let subject = ORG_NAME + ": please fill in this 1-minute survey before the workshop";
   if (opts && opts.subjectPrefix) subject = opts.subjectPrefix + subject;
 
-  const options = { htmlBody: emailShell("A quick pre-survey, and today's link", workshop.name, inner), name: ORG_NAME };
+  const options = { htmlBody: emailShell("Before we begin: a 1-minute survey", workshop.name, inner), name: ORG_NAME };
   if (opts && opts.bcc) options.bcc = opts.bcc;
 
   GmailApp.sendEmail(email, subject,
@@ -1249,11 +1253,9 @@ function preSurveyNudgeBlockHtml() {
         '<p style="margin:0 0 12px;font-family:' + FONT_BODY + ';font-size:15px;line-height:1.6;color:' + C_TEXT + ';font-weight:700;">' +
           'Just 2 multiple choice questions, and it only takes a minute.</p>' +
         '<p style="margin:0 0 12px;font-family:' + FONT_BODY + ';font-size:15px;line-height:1.6;color:' + C_BODY + ';">' +
-          'This was meant to reach you before we began, so please answer it ' +
-          '<strong style="color:' + C_TEXT + ';">as if it were before yesterday\'s session</strong>, ' +
-          'the way your child felt before any of the teaching started.</p>' +
-        '<p style="margin:0 0 16px;font-family:' + FONT_BODY + ';font-size:15px;line-height:1.6;color:' + C_BODY + ';">' +
-          'That is what lets us see where each student began, and how far they have come by the end.</p>' +
+          'Please fill it in <strong style="color:' + C_TEXT + ';">before the first session begins</strong>, ' +
+          'sitting with your child so the answers are really theirs.</p>' +
+        honestyNoteHtml() +
         '<table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr><td>' +
           '<a href="' + PRE_SURVEY_URL + '" style="background:' + C_ACCENT + ';color:#FFFFFF;text-decoration:none;' +
             'display:inline-block;padding:13px 30px;border-radius:10px;font-family:' + FONT_BODY + ';' +
@@ -1261,6 +1263,23 @@ function preSurveyNudgeBlockHtml() {
         '</td></tr></table>' +
         '<p style="margin:14px 0 0;font-family:' + FONT_BODY + ';font-size:12px;line-height:1.6;color:' + C_MUTED + ';word-break:break-all;">' +
           '<a href="' + PRE_SURVEY_URL + '" style="color:' + C_ACCENT + ';">' + PRE_SURVEY_URL + '</a></p>' +
+      '</td></tr>' +
+    '</table>';
+}
+
+// The honesty ask, shared by every place the pre-survey appears. The survey is
+// a baseline measurement, so a flattering answer is worse than an unflattering
+// one — this spells out why, rather than just saying "be honest".
+function honestyNoteHtml() {
+  return '' +
+    '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" ' +
+      'style="background:#FFFFFF;border:1px solid ' + C_LINE + ';border-radius:10px;margin:0 0 16px;">' +
+      '<tr><td style="padding:14px 16px;font-family:' + FONT_BODY + ';font-size:15px;line-height:1.6;color:' + C_BODY + ';">' +
+        '<p style="margin:0 0 8px;font-weight:700;color:' + C_TEXT + ';">Please answer honestly</p>' +
+        '<p style="margin:0 0 8px;">There are no right or wrong answers, and nobody is being graded or judged. ' +
+          'If your child feels nervous or has never spoken in front of a group, say exactly that.</p>' +
+        '<p style="margin:0;">We ask the same questions again at the end. An honest answer now is the only way ' +
+          'we can see how far your child has come — a generous one today just hides their progress later.</p>' +
       '</td></tr>' +
     '</table>';
 }
