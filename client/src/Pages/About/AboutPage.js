@@ -26,12 +26,6 @@ const founder = {
 
 const boardMembers = [
     {
-        name: "Suchita Shirke",
-        role: "Board Director",
-        intro: "Suchita is a seasoned engineering leader with over 14 years of experience at companies like PayPal and BILL. She specializes in fraud risk management, data security, and building high-performance teams, and is passionate about mentoring women in tech. Her dedication to empowering the next generation through education and leadership drew her to Almaden Voices.",
-        photo: "/images/suchita-shirke.png",
-    },
-    {
         name: "Amit Bansal",
         role: "Board Director",
         intro: "Amit is a Staff Engineer at PayPal specializing in identity and access management. With nearly two decades of experience at companies like eBay, Oracle, and Cisco, he is passionate about crafting exceptional user experiences and frontend architecture. His belief in building confidence in young people through communication skills inspired him to join Almaden Voices.",
