@@ -47,22 +47,7 @@ const CoursesPage = () => {
     //     cover: "/images/your-image.jpg"
     // }
     // ============================================================
-    const upcomingSessions = [
-        {
-            id: "canada-workshop-aug-2026",
-            title: "Free Canada Public Speaking Workshop for Kids",
-            date: "August 4 & 5, 2026",
-            time: "3–4 PM PT (Vancouver) · 6–7 PM ET (Toronto)",
-            location: "Online",
-            ageGroup: "Kids of all levels",
-            capacity: 500,
-            enrolled: 0,
-            description: "A free two-day online workshop where kids learn the fundamentals of public speaking: speaking clearly and confidently, overcoming nervousness, and presenting in front of others. Join from anywhere in Canada.",
-            status: "Open",
-            online: true,
-            cover: "/images/teaching-beginner.JPG",
-        },
-    ];
+    const upcomingSessions = [];
 
     const sessions = upcomingSessions.map(ses => ({
         ...ses,
