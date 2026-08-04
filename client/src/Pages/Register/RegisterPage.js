@@ -269,6 +269,23 @@ export default function RegisterPage() {
                     there's more than one thing to pick; with no session open and
                     coaching off, the interest form renders on its own below. */}
                 {showChooser && <div className={s.chooser}>
+                    {/* The open session leads, highlighted — it's the thing most
+                        visitors are here to do. */}
+                    {hasOpenSessions && <button
+                        type="button"
+                        onClick={() => pickChoice("workshop")}
+                        className={`${s.chooseBtn} ${s.chooseBtnYellow} ${choice === "workshop" ? s.chooseBtnActive : ""}`}
+                        aria-expanded={choice === "workshop"}
+                        aria-controls="session-signup"
+                    >
+                        <span className={s.chooseIcon}><HowToRegIcon /></span>
+                        <span className={s.chooseText}>
+                            <span className={s.chooseTitle}>Click here to sign up for our {sessions[0].title.replace(/^Free\s+/i, "")}</span>
+                            <span className={s.chooseSub}>{sessions[0].date} · {sessions[0].time}</span>
+                        </span>
+                        <ChevronRightIcon className={s.chooseArrow} />
+                    </button>}
+
                     <button
                         type="button"
                         onClick={() => pickChoice("interest")}
@@ -284,21 +301,6 @@ export default function RegisterPage() {
                         </span>
                         <ChevronRightIcon className={s.chooseArrow} />
                     </button>
-
-                    {hasOpenSessions && <button
-                        type="button"
-                        onClick={() => pickChoice("workshop")}
-                        className={`${s.chooseBtn} ${choice === "workshop" ? s.chooseBtnActive : ""}`}
-                        aria-expanded={choice === "workshop"}
-                        aria-controls="session-signup"
-                    >
-                        <span className={s.chooseIcon}><HowToRegIcon /></span>
-                        <span className={s.chooseText}>
-                            <span className={s.chooseTitle}>Click here to sign up for our {sessions[0].title.replace(/^Free\s+/i, "")}</span>
-                            <span className={s.chooseSub}>{sessions[0].date} · {sessions[0].time}</span>
-                        </span>
-                        <ChevronRightIcon className={s.chooseArrow} />
-                    </button>}
 
                     {SHOW_COACHING && <button
                         type="button"
