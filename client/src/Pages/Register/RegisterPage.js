@@ -52,21 +52,7 @@ const SHOW_COACHING = false;
 //     status: "Open",  // "Open" or "Full"
 // }
 // ============================================================
-const upcomingSessions = [
-    {
-        id: "canada-workshop-aug-2026",
-        title: "Free Canada Public Speaking Workshop for Kids",
-        date: "August 4 & 5, 2026",
-        time: "3–4 PM PT (Vancouver) · 6–7 PM ET (Toronto)",
-        location: "Online",
-        grades: "Kids of all levels welcome",
-        capacity: 500,
-        enrolled: 0,
-        description: "A free two-day online workshop where kids learn the fundamentals of public speaking — how to speak clearly and confidently, overcome nervousness, and present in front of others. Runs Tuesday, August 4 and Wednesday, August 5 (1 hour each day) live online. Join from anywhere in Canada! You're welcome to attend one or both days.",
-        status: "Open",
-        online: true,
-    },
-];
+const upcomingSessions = [];
 
 const emptyStudent = () => ({ firstName: "", lastName: "", age: "" });
 
@@ -136,6 +122,11 @@ export default function RegisterPage() {
     }));
     const selectedSession = sessions.find(ses => ses.id === selectedSessionId);
     const spotsRemaining = selectedSession ? selectedSession.capacity - selectedSession.enrolled : 0;
+
+    // With no session open and coaching off there's only one thing to do, so
+    // the chooser is skipped and the interest form shows on its own.
+    const hasOpenSessions = sessions.length > 0;
+    const showChooser = hasOpenSessions || SHOW_COACHING;
 
     function updateStudent(index, field, value) {
         setStudents(prev => prev.map((st, i) => i === index ? { ...st, [field]: value } : st));
@@ -251,8 +242,10 @@ export default function RegisterPage() {
             </section>
 
             <div className="container">
-                {/* Chooser — pick what you're here to do */}
-                <div className={s.chooser}>
+                {/* Chooser — pick what you're here to do. Only worth showing when
+                    there's more than one thing to pick; with no session open and
+                    coaching off, the interest form renders on its own below. */}
+                {showChooser && <div className={s.chooser}>
                     <button
                         type="button"
                         onClick={() => pickChoice("interest")}
@@ -269,7 +262,7 @@ export default function RegisterPage() {
                         <ChevronRightIcon className={s.chooseArrow} />
                     </button>
 
-                    <button
+                    {hasOpenSessions && <button
                         type="button"
                         onClick={() => pickChoice("workshop")}
                         className={`${s.chooseBtn} ${choice === "workshop" ? s.chooseBtnActive : ""}`}
@@ -278,11 +271,11 @@ export default function RegisterPage() {
                     >
                         <span className={s.chooseIcon}><HowToRegIcon /></span>
                         <span className={s.chooseText}>
-                            <span className={s.chooseTitle}>Click here to sign up for our international Canada workshop</span>
-                            <span className={s.chooseSub}>Free two-day online workshop · August 4 &amp; 5, 2026 · 3–4 PM PT</span>
+                            <span className={s.chooseTitle}>Click here to sign up for our {sessions[0].title.replace(/^Free\s+/i, "")}</span>
+                            <span className={s.chooseSub}>{sessions[0].date} · {sessions[0].time}</span>
                         </span>
                         <ChevronRightIcon className={s.chooseArrow} />
-                    </button>
+                    </button>}
 
                     {SHOW_COACHING && <button
                         type="button"
@@ -298,7 +291,7 @@ export default function RegisterPage() {
                         </span>
                         <ChevronRightIcon className={s.chooseArrow} />
                     </button>}
-                </div>
+                </div>}
 
                 {/* 1-on-1 coaching slots */}
                 {SHOW_COACHING && choice === "coaching" && (
@@ -307,15 +300,16 @@ export default function RegisterPage() {
                     </section>
                 )}
 
-                {/* Public speaking workshop interest form (bilingual) */}
-                {choice === "interest" && (
+                {/* Public speaking workshop interest form (bilingual). Without a
+                    chooser above it there's nothing to click, so it renders open. */}
+                {(!showChooser || choice === "interest") && (
                     <section id="workshop-signup" style={{ padding: "8px 0 40px", scrollMarginTop: "90px" }}>
                         <WorkshopInterestForm />
                     </section>
                 )}
 
-                {/* Card: left rail + form */}
-                <section id="session-signup" className={s.card} style={{ display: choice === "workshop" ? undefined : "none", scrollMarginTop: "90px" }}>
+                {/* Card: left rail + form — only while a session is open */}
+                {hasOpenSessions && <section id="session-signup" className={s.card} style={{ display: choice === "workshop" ? undefined : "none", scrollMarginTop: "90px" }}>
                     {/* LEFT RAIL */}
                     <aside className={s.info}>
                         <div className={s.block}>
@@ -324,7 +318,7 @@ export default function RegisterPage() {
                             </div>
                             <h3>Who Can Join?</h3>
                             <p className={s.muted}>
-                                This free workshop is open to kids ages 5 to 15, anywhere in Canada. No experience needed — all levels welcome!
+                                This free workshop is open to kids ages 5 to 15, anywhere in the world. No experience needed — all levels welcome!
                             </p>
                         </div>
 
@@ -344,7 +338,7 @@ export default function RegisterPage() {
                             </div>
                             <h3>What to Expect</h3>
                             <p className={s.muted}>
-                                Two 1-hour live sessions online — Tuesday, August 4 & Wednesday, August 5. Come to one or both days. We'll send your join link and reminders before the workshop begins.
+                                Short, hands-on live sessions with plenty of practice. Once you're registered, we'll send all the details and reminders before the workshop begins.
                             </p>
                         </div>
                     </aside>
@@ -746,7 +740,7 @@ export default function RegisterPage() {
                             </>
                         )}
                     </form>
-                </section>
+                </section>}
 
             </div>
 
