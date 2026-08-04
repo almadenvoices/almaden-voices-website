@@ -146,6 +146,49 @@
     transform: translateX(3px);
 }
 
+/* Highlighted variant — used for the open session so it reads as the primary
+   action. Declared after the base rules so it wins at equal specificity. */
+.chooseBtnYellow {
+    background: #FDE047;
+    border-color: #EAB308;
+    box-shadow: 0 2px 12px rgba(234, 179, 8, 0.25);
+}
+
+.chooseBtnYellow:hover {
+    border-color: #CA8A04;
+    box-shadow: 0 6px 22px rgba(234, 179, 8, 0.4);
+}
+
+.chooseBtnYellow.chooseBtnActive {
+    background: #FACC15;
+    border-color: #A16207;
+    box-shadow: 0 6px 22px rgba(161, 98, 7, 0.35);
+}
+
+.chooseBtnYellow .chooseIcon {
+    background: #FFFFFF;
+    color: #A16207;
+}
+
+.chooseBtnYellow.chooseBtnActive .chooseIcon {
+    background: #A16207;
+    color: #FFFFFF;
+}
+
+/* Darker than the default grey so it stays readable on yellow. */
+.chooseBtnYellow .chooseSub {
+    color: #713F12;
+}
+
+.chooseBtnYellow .chooseArrow {
+    color: #A16207;
+}
+
+.chooseBtnYellow:hover .chooseArrow,
+.chooseBtnYellow.chooseBtnActive .chooseArrow {
+    color: #713F12;
+}
+
 @media (max-width: 560px) {
     .chooseBtn {
         padding: 18px 18px;
