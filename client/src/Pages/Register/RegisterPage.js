@@ -52,7 +52,26 @@ const SHOW_COACHING = false;
 //     status: "Open",  // "Open" or "Full"
 // }
 // ============================================================
-const upcomingSessions = [];
+const upcomingSessions = [
+    {
+        id: "intro-workshop-aug-2026",
+        title: "Introductory Public Speaking Workshop",
+        date: "August 14, 2026",
+        time: "6–7 PM",
+        location: "To be announced",
+        grades: "Ages 5–15",
+        // capacity: null means no limit — no seat count and it never shows as full.
+        capacity: null,
+        enrolled: 0,
+        description: "A free one-hour introduction to public speaking for kids. We cover the fundamentals — speaking clearly, standing with confidence, and settling the nerves that come with presenting to a group. No experience needed. Runs Friday, August 14 from 6–7 PM; we'll email you the location as soon as it's confirmed.",
+        status: "Open",
+        online: false,
+    },
+];
+
+// A session with no capacity set takes unlimited registrations.
+const hasSeatLimit = (ses) => ses && ses.capacity != null;
+const isSessionFull = (ses) => hasSeatLimit(ses) && ses.enrolled >= ses.capacity;
 
 const emptyStudent = () => ({ firstName: "", lastName: "", age: "" });
 
@@ -121,7 +140,11 @@ export default function RegisterPage() {
         enrolled: ses.enrolled + (enrollmentCounts[ses.id] || 0),
     }));
     const selectedSession = sessions.find(ses => ses.id === selectedSessionId);
-    const spotsRemaining = selectedSession ? selectedSession.capacity - selectedSession.enrolled : 0;
+    const spotsRemaining = !selectedSession
+        ? 0
+        : hasSeatLimit(selectedSession)
+            ? selectedSession.capacity - selectedSession.enrolled
+            : Infinity;
 
     // With no session open and coaching off there's only one thing to do, so
     // the chooser is skipped and the interest form shows on its own.
@@ -318,7 +341,7 @@ export default function RegisterPage() {
                             </div>
                             <h3>Who Can Join?</h3>
                             <p className={s.muted}>
-                                This free workshop is open to kids ages 5 to 15, anywhere in the world. No experience needed — all levels welcome!
+                                This free workshop is open to kids ages 5 to 15. No experience needed — all levels welcome!
                             </p>
                         </div>
 
@@ -372,8 +395,8 @@ export default function RegisterPage() {
                                 >
                                     <option value="">Select a session...</option>
                                     {sessions.map(ses => (
-                                        <option key={ses.id} value={ses.id} disabled={ses.enrolled >= ses.capacity}>
-                                            {ses.title} — {ses.date}{ses.enrolled >= ses.capacity ? " (Full)" : ""}
+                                        <option key={ses.id} value={ses.id} disabled={isSessionFull(ses)}>
+                                            {ses.title} — {ses.date}{isSessionFull(ses) ? " (Full)" : ""}
                                         </option>
                                     ))}
                                 </select>
