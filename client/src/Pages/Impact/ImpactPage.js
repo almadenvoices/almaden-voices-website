@@ -237,8 +237,15 @@ export default function ImpactPage() {
                                     }}
                                 >
                                     <Typography
-                                        variant="h3"
-                                        sx={{ fontWeight: "bold", color: "#2563EB", mb: 0.5 }}
+                                        sx={{
+                                            fontFamily: "'Playfair Display', Georgia, serif",
+                                            fontSize: { xs: "1.9rem", md: "2.1rem" },
+                                            fontWeight: 700,
+                                            letterSpacing: "-0.02em",
+                                            lineHeight: 1.1,
+                                            color: "#2563EB",
+                                            mb: 0.75,
+                                        }}
                                     >
                                         {metric.number}
                                     </Typography>
@@ -249,8 +256,7 @@ export default function ImpactPage() {
                                         {metric.label}
                                     </Typography>
                                     <Typography
-                                        variant="caption"
-                                        sx={{ color: "#6B7280" }}
+                                        sx={{ color: "#6B7280", fontSize: "0.88rem", lineHeight: 1.6, display: "block" }}
                                     >
                                         {metric.description}
                                     </Typography>
@@ -339,10 +345,10 @@ export default function ImpactPage() {
                                 <Box sx={{ display: "flex", flexWrap: "wrap", gap: { xs: 2, md: 4 } }}>
                                     {featuredWork.stats.map(stat => (
                                         <Box key={stat.label}>
-                                            <Typography sx={{ fontSize: "1.65rem", fontWeight: 800, color: "#FFFFFF", lineHeight: 1 }}>
+                                            <Typography sx={{ fontSize: "1.4rem", fontWeight: 800, color: "#FFFFFF", lineHeight: 1 }}>
                                                 {stat.value}
                                             </Typography>
-                                            <Typography sx={{ fontSize: "0.9rem", color: "#CBD5E1", mt: 0.75, lineHeight: 1.5 }}>
+                                            <Typography sx={{ fontSize: "0.95rem", color: "#CBD5E1", mt: 0.75, lineHeight: 1.5 }}>
                                                 {stat.label}
                                             </Typography>
                                         </Box>
@@ -373,7 +379,7 @@ export default function ImpactPage() {
                                 >
                                     <Typography
                                         sx={{
-                                            fontSize: { xs: "3.2rem", md: "4.2rem" },
+                                            fontSize: { xs: "2.5rem", md: "3.1rem" },
                                             fontWeight: 800,
                                             color: "#FBBF24",
                                             lineHeight: 1,
@@ -388,9 +394,9 @@ export default function ImpactPage() {
                                             fontWeight: 600,
                                             textAlign: "center",
                                             mt: 1.5,
-                                            fontSize: "1.05rem",
+                                            fontSize: "1.15rem",
                                             lineHeight: 1.5,
-                                            maxWidth: 220,
+                                            maxWidth: 240,
                                         }}
                                     >
                                         {featuredWork.bigNumberLabel}
