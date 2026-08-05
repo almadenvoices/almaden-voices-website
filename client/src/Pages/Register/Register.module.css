@@ -52,6 +52,57 @@
     margin-bottom: 20px;
 }
 
+/* ====== Language toggle ====== */
+.langBar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin: 0 auto 24px;
+}
+
+.langLabel {
+    font-size: var(--r-font-sm);
+    color: #6B7280;
+    font-weight: 600;
+}
+
+.langGroup {
+    display: inline-flex;
+    background: #F3F4F6;
+    border: 1px solid #E5E7EB;
+    border-radius: 999px;
+    padding: 4px;
+    gap: 2px;
+}
+
+.langBtn {
+    border: none;
+    background: transparent;
+    color: #4B5563;
+    font-family: inherit;
+    font-size: var(--r-font-sm);
+    font-weight: 600;
+    padding: 7px 18px;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.langBtn:hover {
+    color: #111827;
+}
+
+.langBtnActive {
+    background: #2563EB;
+    color: #FFFFFF;
+}
+
+.langBtnActive:hover {
+    color: #FFFFFF;
+}
+
 /* ====== "What would you like to do?" chooser ====== */
 .chooser {
     display: flex;
