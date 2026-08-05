@@ -22,6 +22,7 @@ import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import RecordVoiceOverIcon from "@mui/icons-material/RecordVoiceOver";
 import WorkshopInterestForm from "../../components/WorkshopInterestForm";
 import CoachingSlots from "../../components/CoachingSlots";
+import { T, t, Bi, LANG_STORAGE_KEY, DEFAULT_LANG } from "../../i18n/registerText";
 
 // Which panel each chooser button opens, and the id it scrolls to.
 const PANEL_IDS = {
@@ -90,6 +91,23 @@ export default function RegisterPage() {
     const [parentLastName, setParentLastName] = useState("");
     // Which of the chooser buttons is open: "" | "interest" | "workshop"
     const [choice, setChoice] = useState("");
+    // Display language: "en" | "es" | "both". Remembered between visits.
+    const [lang, setLang] = useState(() => {
+        try {
+            return localStorage.getItem(LANG_STORAGE_KEY) || DEFAULT_LANG;
+        } catch {
+            return DEFAULT_LANG;
+        }
+    });
+
+    function chooseLang(next) {
+        setLang(next);
+        try {
+            localStorage.setItem(LANG_STORAGE_KEY, next);
+        } catch {
+            /* Safari private mode blocks writes — the choice just won't persist. */
+        }
+    }
 
     // Google Apps Script web app URL — replace with your deployed URL
     const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxrbVWSjMpAB4Ru1mm_DSywPdfFS3KfMMA07Ie_e1VbXGeW_ILtNQ-vE8rQrIYubjFI/exec";
@@ -172,12 +190,12 @@ export default function RegisterPage() {
         setError("");
 
         if (hasNameConflict) {
-            setError("The parent/guardian name cannot be the same as the child's name. Please enter the parent's actual name.");
+            setError(t(T.errNameConflict, lang));
             return;
         }
 
         if (!agreed) {
-            setError("Please agree to the Privacy Policy to continue.");
+            setError(t(T.errAgree, lang));
             return;
         }
 
@@ -239,11 +257,11 @@ export default function RegisterPage() {
                     }, 2500);
                 }
             } else {
-                setError((result && result.error) || "Failed to submit registration. Please try again.");
+                setError((result && result.error) || t(T.errSubmit, lang));
             }
         } catch (err) {
             console.error("Registration form error:", err);
-            setError("Network error. Please check your connection and try again.");
+            setError(t(T.errNetwork, lang));
         } finally {
             setIsSubmitting(false);
         }
@@ -255,16 +273,38 @@ export default function RegisterPage() {
             <section className={s.hero}>
                 <div className="container">
                     <div className={s.heroBadge}>
-                        <EventIcon fontSize="small" /> Limited Spots Available
+                        <EventIcon fontSize="small" /> <Bi entry={T.heroBadge} lang={lang} />
                     </div>
-                    <h1 className={s.heroTitle}>Register for a Session</h1>
+                    <h1 className={s.heroTitle}><Bi entry={T.heroTitle} lang={lang} block /></h1>
                     <p className={s.heroSub}>
-                        Choose an option below to get started, and watch your child grow into a confident communicator.
+                        <Bi entry={T.heroSub} lang={lang} block />
                     </p>
                 </div>
             </section>
 
             <div className="container">
+                {/* Language toggle */}
+                <div className={s.langBar}>
+                    <span className={s.langLabel}>{t(T.langLabel, lang)}:</span>
+                    <div className={s.langGroup} role="group" aria-label={t(T.langLabel, lang)}>
+                        {[
+                            { key: "en", label: "English" },
+                            { key: "es", label: "Español" },
+                            { key: "both", label: "Both / Ambos" },
+                        ].map(opt => (
+                            <button
+                                key={opt.key}
+                                type="button"
+                                onClick={() => chooseLang(opt.key)}
+                                aria-pressed={lang === opt.key}
+                                className={`${s.langBtn} ${lang === opt.key ? s.langBtnActive : ""}`}
+                            >
+                                {opt.label}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+
                 {/* Chooser — pick what you're here to do. Only worth showing when
                     there's more than one thing to pick; with no session open and
                     coaching off, the interest form renders on its own below. */}
@@ -280,7 +320,9 @@ export default function RegisterPage() {
                     >
                         <span className={s.chooseIcon}><HowToRegIcon /></span>
                         <span className={s.chooseText}>
-                            <span className={s.chooseTitle}>Click here to sign up for our {sessions[0].title.replace(/^Free\s+/i, "")}</span>
+                            <span className={s.chooseTitle}>
+                                <Bi entry={T.chooseWorkshopPrefix} lang={lang} block /> {sessions[0].title.replace(/^Free\s+/i, "")}
+                            </span>
                             <span className={s.chooseSub}>{sessions[0].date} · {sessions[0].time}</span>
                         </span>
                         <ChevronRightIcon className={s.chooseArrow} />
@@ -295,9 +337,9 @@ export default function RegisterPage() {
                     >
                         <span className={s.chooseIcon}><NotificationsActiveIcon /></span>
                         <span className={s.chooseText}>
-                            <span className={s.chooseTitle}>Click here if you&apos;re interested in an upcoming workshop</span>
-                            <span className={s.chooseSub}>Leave your info and we&apos;ll email you as soon as the next one opens.</span>
-                            <span className={s.chooseSubEs}>Deje su información y le avisaremos cuando abra el próximo taller.</span>
+                            <span className={s.chooseTitle}><Bi entry={T.chooseInterestTitle} lang={lang} block /></span>
+                            {lang !== "es" && <span className={s.chooseSub}>{T.chooseInterestSub.en}</span>}
+                            {lang !== "en" && <span className={s.chooseSubEs}>{T.chooseInterestSub.es}</span>}
                         </span>
                         <ChevronRightIcon className={s.chooseArrow} />
                     </button>
@@ -311,8 +353,8 @@ export default function RegisterPage() {
                     >
                         <span className={s.chooseIcon}><RecordVoiceOverIcon /></span>
                         <span className={s.chooseText}>
-                            <span className={s.chooseTitle}>Click here to book a 1-on-1 coaching session</span>
-                            <span className={s.chooseSub}>One hour of personal coaching · $20 online or $30 in person · Funds our free workshops</span>
+                            <span className={s.chooseTitle}><Bi entry={T.chooseCoachingTitle} lang={lang} block /></span>
+                            <span className={s.chooseSub}><Bi entry={T.chooseCoachingSub} lang={lang} block /></span>
                         </span>
                         <ChevronRightIcon className={s.chooseArrow} />
                     </button>}
@@ -329,7 +371,7 @@ export default function RegisterPage() {
                     chooser above it there's nothing to click, so it renders open. */}
                 {(!showChooser || choice === "interest") && (
                     <section id="workshop-signup" style={{ padding: "8px 0 40px", scrollMarginTop: "90px" }}>
-                        <WorkshopInterestForm />
+                        <WorkshopInterestForm lang={lang} />
                     </section>
                 )}
 
@@ -341,9 +383,9 @@ export default function RegisterPage() {
                             <div className={s.iconCircle}>
                                 <PersonIcon />
                             </div>
-                            <h3>Who Can Join?</h3>
+                            <h3><Bi entry={T.whoTitle} lang={lang} block /></h3>
                             <p className={s.muted}>
-                                This free workshop is open to kids ages 5 to 15. No experience needed — all levels welcome!
+                                <Bi entry={T.whoBody} lang={lang} block />
                             </p>
                         </div>
 
@@ -351,9 +393,9 @@ export default function RegisterPage() {
                             <div className={s.iconCircle}>
                                 <SchoolIcon />
                             </div>
-                            <h3>What You'll Learn</h3>
+                            <h3><Bi entry={T.learnTitle} lang={lang} block /></h3>
                             <p className={s.muted}>
-                                The fundamentals of public speaking — how to speak clearly and confidently, overcome nervousness, and present in front of others.
+                                <Bi entry={T.learnBody} lang={lang} block />
                             </p>
                         </div>
 
@@ -361,9 +403,9 @@ export default function RegisterPage() {
                             <div className={s.iconCircle}>
                                 <EventIcon />
                             </div>
-                            <h3>What to Expect</h3>
+                            <h3><Bi entry={T.expectTitle} lang={lang} block /></h3>
                             <p className={s.muted}>
-                                Short, hands-on live sessions with plenty of practice. Once you're registered, we'll send all the details and reminders before the workshop begins.
+                                <Bi entry={T.expectBody} lang={lang} block />
                             </p>
                         </div>
                     </aside>
@@ -379,13 +421,13 @@ export default function RegisterPage() {
                         )}
 
                         {/* Step 1: Choose a session FIRST */}
-                        <h2 className={s.formTitle}><EventIcon /> Choose a Session</h2>
+                        <h2 className={s.formTitle}><EventIcon /> <Bi entry={T.chooseSession} lang={lang} /></h2>
 
                         {sessions.length > 0 ? (
                             <div className={s.field}>
-                                <label>Which session are you registering for? <span className={s.req}>*</span></label>
+                                <label><Bi entry={T.whichSession} lang={lang} block /> <span className={s.req}>*</span></label>
                                 <p style={{ fontSize: "0.85rem", color: "#6B7280", margin: "0 0 8px" }}>
-                                    Not sure which session is right? <a href="/courses1" style={{ color: "#2563EB", fontWeight: 600, textDecoration: "none" }}>Browse our upcoming sessions</a> to learn more.
+                                    <Bi entry={T.notSurePrefix} lang={lang} /> <a href="/courses1" style={{ color: "#2563EB", fontWeight: 600, textDecoration: "none" }}>{t(T.browseSessions, lang)}</a> {t(T.notSureSuffix, lang)}
                                 </p>
                                 <select
                                     name="sessionType"
@@ -395,10 +437,10 @@ export default function RegisterPage() {
                                     value={selectedSessionId}
                                     onChange={(e) => setSelectedSessionId(e.target.value)}
                                 >
-                                    <option value="">Select a session...</option>
+                                    <option value="">{t(T.selectSession, lang)}</option>
                                     {sessions.map(ses => (
                                         <option key={ses.id} value={ses.id} disabled={isSessionFull(ses)}>
-                                            {ses.title} — {ses.date}{isSessionFull(ses) ? " (Full)" : ""}
+                                            {ses.title} — {ses.date}{isSessionFull(ses) ? " " + t(T.fullTag, lang) : ""}
                                         </option>
                                     ))}
                                 </select>
@@ -412,10 +454,10 @@ export default function RegisterPage() {
                                 border: "2px dashed #E5E7EB",
                             }}>
                                 <p style={{ fontWeight: 600, color: "#374151", marginBottom: "8px" }}>
-                                    No sessions are open for registration right now
+                                    <Bi entry={T.noSessionsTitle} lang={lang} block />
                                 </p>
                                 <p style={{ color: "#6B7280", fontSize: "0.9rem", lineHeight: 1.7, margin: "0 auto", maxWidth: "380px" }}>
-                                    New sessions are announced regularly. Leave your info in the form below and we&apos;ll email you as soon as the next workshop opens!
+                                    <Bi entry={T.noSessionsBody} lang={lang} block />
                                 </p>
                             </div>
                         )}
@@ -450,7 +492,7 @@ export default function RegisterPage() {
                                 </div>
                                 {selectedSession.status !== "Open" && (
                                     <p style={{ margin: "12px 0 0", fontSize: "0.85rem", color: "#DC2626", fontWeight: 600 }}>
-                                        This session is full — submit your form to join the waitlist
+                                        <Bi entry={T.waitlistNote} lang={lang} block />
                                     </p>
                                 )}
                             </div>
@@ -459,12 +501,12 @@ export default function RegisterPage() {
                         {/* Step 2: Only show the rest of the form after a session is selected */}
                         {selectedSession && (
                             <>
-                                <h2 className={s.formTitle}><SchoolIcon /> Student Information</h2>
+                                <h2 className={s.formTitle}><SchoolIcon /> <Bi entry={T.studentInfo} lang={lang} /></h2>
 
                                 <div className={s.field}>
-                                    <label>How many children are you registering? <span className={s.req}>*</span></label>
+                                    <label><Bi entry={T.howMany} lang={lang} block /> <span className={s.req}>*</span></label>
                                     <p style={{ fontSize: "0.85rem", color: "#6B7280", margin: "0 0 8px" }}>
-                                        Registering multiple children? Add them all here — no need to fill out the form again!
+                                        <Bi entry={T.howManyHint} lang={lang} block />
                                     </p>
                                     <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
                                         <button
@@ -493,22 +535,22 @@ export default function RegisterPage() {
                                     <div key={index} className={s.studentBlock}>
                                         {students.length > 1 && (
                                             <div className={s.studentHeader}>
-                                                <span className={s.studentLabel}>Child {index + 1}</span>
+                                                <span className={s.studentLabel}>{t(T.childN, lang, { n: index + 1 })}</span>
                                                 <button
                                                     type="button"
                                                     onClick={() => removeStudent(index)}
                                                     disabled={isSubmitting}
                                                     className={s.removeBtn}
                                                 >
-                                                    Remove
+                                                    {t(T.remove, lang)}
                                                 </button>
                                             </div>
                                         )}
                                         <div className={s.grid}>
                                             <div className={s.field}>
-                                                <label>{students.length > 1 ? "First Name" : "Student First Name"} <span className={s.req}>*</span></label>
+                                                <label><Bi entry={students.length > 1 ? T.firstName : T.studentFirstName} lang={lang} block /> <span className={s.req}>*</span></label>
                                                 <input
-                                                    placeholder="First name"
+                                                    placeholder={t(T.phFirstName, lang)}
                                                     required
                                                     disabled={isSubmitting}
                                                     value={student.firstName}
@@ -517,9 +559,9 @@ export default function RegisterPage() {
                                             </div>
 
                                             <div className={s.field}>
-                                                <label>{students.length > 1 ? "Last Name" : "Student Last Name"} <span className={s.req}>*</span></label>
+                                                <label><Bi entry={students.length > 1 ? T.lastName : T.studentLastName} lang={lang} block /> <span className={s.req}>*</span></label>
                                                 <input
-                                                    placeholder="Last name"
+                                                    placeholder={t(T.phLastName, lang)}
                                                     required
                                                     disabled={isSubmitting}
                                                     value={student.lastName}
@@ -529,7 +571,7 @@ export default function RegisterPage() {
                                         </div>
 
                                         <div className={s.field}>
-                                            <label>Age <span className={s.req}>*</span></label>
+                                            <label><Bi entry={T.age} lang={lang} /> <span className={s.req}>*</span></label>
                                             <select
                                                 required
                                                 disabled={isSubmitting}
@@ -537,9 +579,9 @@ export default function RegisterPage() {
                                                 value={student.age}
                                                 onChange={(e) => updateStudent(index, "age", e.target.value)}
                                             >
-                                                <option value="">Select age...</option>
+                                                <option value="">{t(T.selectAge, lang)}</option>
                                                 {[5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15].map(age => (
-                                                    <option key={age} value={String(age)}>{age} years old</option>
+                                                    <option key={age} value={String(age)}>{t(T.yearsOld, lang, { n: age })}</option>
                                                 ))}
                                             </select>
                                         </div>
@@ -553,18 +595,18 @@ export default function RegisterPage() {
                                         disabled={isSubmitting}
                                         className={s.addChildBtn}
                                     >
-                                        <AddIcon style={{ fontSize: 18 }} /> Add Another Child
+                                        <AddIcon style={{ fontSize: 18 }} /> {t(T.addAnotherChild, lang)}
                                     </button>
                                 )}
 
-                                <h2 className={s.formTitle}><PersonIcon /> Parent/Guardian Information</h2>
+                                <h2 className={s.formTitle}><PersonIcon /> <Bi entry={T.parentInfo} lang={lang} /></h2>
 
                                 <div className={s.grid}>
                                     <div className={s.field}>
-                                        <label>Parent/Guardian First Name <span className={s.req}>*</span></label>
+                                        <label><Bi entry={T.parentFirstName} lang={lang} block /> <span className={s.req}>*</span></label>
                                         <input
                                             name="parentFirstName"
-                                            placeholder="First name"
+                                            placeholder={t(T.phFirstName, lang)}
                                             required
                                             disabled={isSubmitting}
                                             value={parentFirstName}
@@ -574,10 +616,10 @@ export default function RegisterPage() {
                                     </div>
 
                                     <div className={s.field}>
-                                        <label>Parent/Guardian Last Name <span className={s.req}>*</span></label>
+                                        <label><Bi entry={T.parentLastName} lang={lang} block /> <span className={s.req}>*</span></label>
                                         <input
                                             name="parentLastName"
-                                            placeholder="Last name"
+                                            placeholder={t(T.phLastName, lang)}
                                             required
                                             disabled={isSubmitting}
                                             value={parentLastName}
@@ -601,71 +643,71 @@ export default function RegisterPage() {
                                         gap: "8px",
                                     }}>
                                         <InfoOutlinedIcon style={{ fontSize: 16 }} />
-                                        Parent/guardian name cannot be the same as the child's name. Please enter the parent's actual name.
+                                        <span><Bi entry={T.nameConflict} lang={lang} block /></span>
                                     </div>
                                 )}
 
                                 <div className={s.grid}>
                                     <div className={s.field}>
-                                        <label>Email <span className={s.req}>*</span></label>
+                                        <label><Bi entry={T.email} lang={lang} block /> <span className={s.req}>*</span></label>
                                         <input name="email" type="email" placeholder="you@email.com" required disabled={isSubmitting} />
                                     </div>
                                 </div>
 
                                 <div className={s.grid}>
                                     <div className={s.field}>
-                                        <label>Phone Number <span className={s.req}>*</span></label>
+                                        <label><Bi entry={T.phone} lang={lang} block /> <span className={s.req}>*</span></label>
                                         <input name="phone" type="tel" placeholder="+1 (000) 000-0000" required disabled={isSubmitting} />
                                     </div>
                                 </div>
 
                                 <div className={s.grid}>
                                     <div className={s.field}>
-                                        <label>School Name <span className={s.req}>*</span></label>
-                                        <input name="schoolName" placeholder="e.g. Graystone Elementary" required disabled={isSubmitting} />
+                                        <label><Bi entry={T.schoolName} lang={lang} block /> <span className={s.req}>*</span></label>
+                                        <input name="schoolName" placeholder={t(T.phSchool, lang)} required disabled={isSubmitting} />
                                     </div>
                                 </div>
 
                                 {selectedSession.online ? (
                                     <div className={s.grid}>
                                         <div className={s.field}>
-                                            <label>Country <span className={s.req}>*</span></label>
-                                            <input name="country" placeholder="e.g. Canada, India, United States" required disabled={isSubmitting} />
+                                            <label><Bi entry={T.country} lang={lang} block /> <span className={s.req}>*</span></label>
+                                            <input name="country" placeholder={t(T.phCountry, lang)} required disabled={isSubmitting} />
                                         </div>
                                         <div className={s.field}>
-                                            <label>Home ZIP / Postal Code <span className={s.req}>*</span></label>
-                                            <input name="zipCode" placeholder="e.g. V6B 1A1 or 95120" required disabled={isSubmitting} />
+                                            <label><Bi entry={T.homeZip} lang={lang} block /> <span className={s.req}>*</span></label>
+                                            <input name="zipCode" placeholder={t(T.phHomeZip, lang)} required disabled={isSubmitting} />
                                         </div>
                                     </div>
                                 ) : (
                                     <>
                                         <h2 className={s.formTitle}>
-                                            <HomeIcon /> Mailing Address
+                                            <HomeIcon /> <Bi entry={T.mailingAddress} lang={lang} />
                                         </h2>
                                         <p style={{ fontSize: "0.85rem", color: "#6B7280", margin: "-4px 0 16px", lineHeight: 1.5 }}>
                                             <InfoOutlinedIcon style={{ fontSize: 14, color: "#9CA3AF", verticalAlign: "middle", marginRight: "4px" }} />
-                                            We send personalized welcome letters and certificates to our students by mail. Your address is never shared with third parties.
+                                            <Bi entry={T.mailingNote} lang={lang} block />
                                         </p>
 
                                         <div className={s.field}>
-                                            <label>Street Address <span className={s.req}>*</span></label>
+                                            <label><Bi entry={T.streetAddress} lang={lang} block /> <span className={s.req}>*</span></label>
                                             <input name="streetAddress" placeholder="123 Main St" required disabled={isSubmitting} />
                                         </div>
 
                                         <div className={s.grid}>
                                             <div className={s.field}>
-                                                <label>City <span className={s.req}>*</span></label>
+                                                <label><Bi entry={T.city} lang={lang} block /> <span className={s.req}>*</span></label>
                                                 <input name="city" placeholder="San Jose" required disabled={isSubmitting} />
                                             </div>
                                             <div className={s.field}>
-                                                <label>State <span className={s.req}>*</span></label>
+                                                <label><Bi entry={T.state} lang={lang} block /> <span className={s.req}>*</span></label>
                                                 <input name="state" placeholder="CA" required disabled={isSubmitting} />
                                             </div>
                                         </div>
 
                                         <div className={s.grid}>
                                             <div className={s.field}>
-                                                <label>ZIP Code <span className={s.req}>*</span></label>
+                                                <label><Bi entry={T.zipCode} lang={lang} block /> <span className={s.req}>*</span></label>
                                                 <input name="zipCode" placeholder="95120" required disabled={isSubmitting} />
                                             </div>
                                         </div>
@@ -673,11 +715,11 @@ export default function RegisterPage() {
                                 )}
 
                                 <div className={s.field}>
-                                    <label>Additional Information</label>
+                                    <label><Bi entry={T.additionalInfo} lang={lang} block /></label>
                                     <textarea
                                         name="additionalInfo"
                                         rows="4"
-                                        placeholder="Any special requirements, allergies, or information we should know..."
+                                        placeholder={t(T.phAdditional, lang)}
                                         disabled={isSubmitting}
                                     />
                                 </div>
@@ -691,12 +733,11 @@ export default function RegisterPage() {
                                     marginTop: "8px",
                                 }}>
                                     <h2 className={s.formTitle} style={{ marginTop: 0, borderBottomColor: "#F59E0B" }}>
-                                        <VolunteerActivismIcon style={{ color: "#F59E0B" }} /> Support Our Workshop
+                                        <VolunteerActivismIcon style={{ color: "#F59E0B" }} /> <Bi entry={T.supportTitle} lang={lang} />
                                     </h2>
                                     <p style={{ fontSize: "0.9rem", color: "#6B7280", lineHeight: 1.7, margin: "0 0 16px" }}>
-                                        This workshop is <strong>completely free</strong> — no donation is required to register. {selectedSession.online
-                                            ? "However, a small $5–$10 contribution helps us cover the cost of hosting the workshop online. Every bit helps us keep these workshops free and accessible for families around the world!"
-                                            : "However, a small $5–$10 contribution helps us cover the cost of the library room, materials, and supplies. Every bit helps us keep these workshops accessible for all families!"}
+                                        {t(T.supportLeadEn, lang)} <strong>{t(T.supportFree, lang)}</strong> {t(T.supportNoDonation, lang)}{" "}
+                                        <Bi entry={selectedSession.online ? T.supportOnline : T.supportInPerson} lang={lang} block />
                                     </p>
                                     <div style={{ display: "flex", flexWrap: "wrap", gap: "10px", marginBottom: "12px" }}>
                                         {[0, 5, 10].map(amt => (
@@ -719,14 +760,12 @@ export default function RegisterPage() {
                                                     fontFamily: "inherit",
                                                 }}
                                             >
-                                                {amt === 0 ? "No thanks" : `$${amt}`}
+                                                {amt === 0 ? t(T.noThanks, lang) : `$${amt}`}
                                             </button>
                                         ))}
                                     </div>
                                     <p style={{ fontSize: "0.8rem", color: "#9CA3AF", margin: 0, textAlign: "center" }}>
-                                        {donationAmount > 0
-                                            ? "Thank you for your generosity! You'll be directed to complete your donation after registering."
-                                            : "No worries at all — your spot is secured either way!"}
+                                        <Bi entry={donationAmount > 0 ? T.donateThanks : T.donateSkip} lang={lang} block />
                                     </p>
                                 </div>
 
@@ -740,7 +779,7 @@ export default function RegisterPage() {
                                             disabled={isSubmitting}
                                         />
                                         <span>
-                                            I would like to be contacted about future Almaden Voices sessions and events.
+                                            <Bi entry={T.futureContact} lang={lang} block />
                                         </span>
                                     </label>
 
@@ -753,12 +792,16 @@ export default function RegisterPage() {
                                             disabled={isSubmitting}
                                         />
                                         <span>
-                                            I have read and agree to the Almaden Voices <a className={s.link} href="/docs/privacy-policy.html" target="_blank" rel="noopener noreferrer">Privacy Policy <OpenInNewIcon style={{ fontSize: 14, verticalAlign: 'middle' }} /></a> and <a className={s.link} href="/docs/terms-of-service.html" target="_blank" rel="noopener noreferrer">Terms of Service <OpenInNewIcon style={{ fontSize: 14, verticalAlign: 'middle' }} /></a>. <span className={s.req}>*</span>
+                                            {t(T.agreePrefix, lang)} <a className={s.link} href="/docs/privacy-policy.html" target="_blank" rel="noopener noreferrer">{t(T.privacyPolicy, lang)} <OpenInNewIcon style={{ fontSize: 14, verticalAlign: 'middle' }} /></a> {t(T.and, lang)} <a className={s.link} href="/docs/terms-of-service.html" target="_blank" rel="noopener noreferrer">{t(T.termsOfService, lang)} <OpenInNewIcon style={{ fontSize: 14, verticalAlign: 'middle' }} /></a>{lang === "en" ? "." : lang === "es" ? " de Almaden Voices." : " (Almaden Voices)."} <span className={s.req}>*</span>
                                         </span>
                                     </label>
 
                                     <button className={s.btn} disabled={!agreed || isSubmitting || hasNameConflict}>
-                                        <span>{isSubmitting ? "Submitting..." : students.length > 1 ? `Register ${students.length} Children` : "Register Now"}</span>
+                                        <span>{isSubmitting
+                                            ? t(T.submitting, lang)
+                                            : students.length > 1
+                                                ? t(T.registerCount, lang, { n: students.length })
+                                                : t(T.registerNow, lang)}</span>
                                         <SendIcon fontSize="small" />
                                     </button>
                                 </div>
@@ -782,7 +825,7 @@ export default function RegisterPage() {
                         <button
                             type="button"
                             className={s.modalClose}
-                            aria-label="Close"
+                            aria-label={t(T.close, lang)}
                             onClick={() => setSubmitted(false)}
                         >
                             <CloseIcon />
@@ -790,15 +833,15 @@ export default function RegisterPage() {
                         <div className={s.modalIcon}>
                             <CheckCircleIcon style={{ fontSize: 56 }} />
                         </div>
-                        <h2 id="register-success-title">Registration Confirmed!</h2>
-                        <p>Thank you for registering! Your spot is confirmed. A confirmation email with workshop details has been sent to your email.</p>
+                        <h2 id="register-success-title"><Bi entry={T.successTitle} lang={lang} block /></h2>
+                        <p><Bi entry={T.successBody} lang={lang} block /></p>
                     </div>
                 </div>
             )}
 
             {/* Toast */}
             <div className={`${s.toast} ${showToast ? s.toastShow : ""}`} onAnimationEnd={() => setShowToast(false)}>
-                Registration submitted! Check your email for confirmation.
+                {t(T.toast, lang)}
             </div>
         </div>
     );
