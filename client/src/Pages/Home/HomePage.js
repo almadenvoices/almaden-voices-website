@@ -357,7 +357,7 @@ export default function HomePage(){
                                 <Box sx={{ textAlign: "center" }}>
                                     <Typography
                                         sx={{
-                                            fontSize: { xs: "2.4rem", md: "3rem" },
+                                            fontSize: { xs: "2.1rem", md: "2.6rem" },
                                             fontWeight: "bold",
                                             color: "#FBBF24",
                                             lineHeight: 1.1,
@@ -365,10 +365,10 @@ export default function HomePage(){
                                     >
                                         {stat.number}
                                     </Typography>
-                                    <Typography sx={{ fontWeight: 700, color: "#FFFFFF", mt: 1 }}>
+                                    <Typography sx={{ fontWeight: 700, color: "#FFFFFF", mt: 1.25, fontSize: "1rem", lineHeight: 1.4 }}>
                                         {stat.label}
                                     </Typography>
-                                    <Typography sx={{ fontSize: "0.85rem", color: "#9CA3AF", mt: 0.5, lineHeight: 1.6 }}>
+                                    <Typography sx={{ fontSize: "0.9rem", color: "#CBD5E1", mt: 0.75, lineHeight: 1.6 }}>
                                         {stat.note}
                                     </Typography>
                                 </Box>
