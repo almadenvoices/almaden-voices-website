@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Box, Typography, Container, Select, MenuItem, FormControl } from "@mui/material";
 import { motion, AnimatePresence } from "framer-motion";
-import { ourWork } from "../../data/ourWork";
+import { ourWork, featuredWork } from "../../data/ourWork";
 
 
 const studentVideos = [
@@ -252,86 +252,226 @@ export default function ImpactPage() {
                 </Container>
             </Box>
 
-            {/* Where We've Worked — programs, community events and partnerships */}
-            <Box id="our-work" sx={{ py: 10, bgcolor: "#FFFFFF" }}>
+            {/* Where We've Worked — a lead story, then the rest as cards */}
+            <Box id="our-work" sx={{ py: { xs: 8, md: 12 }, bgcolor: "#FFFFFF" }}>
                 <Container maxWidth="lg">
                     <Typography
-                        variant="h3"
-                        align="center"
-                        sx={{ fontWeight: "bold", mb: 1, color: "#111827" }}
+                        sx={{
+                            fontSize: "0.8rem",
+                            letterSpacing: "0.14em",
+                            textTransform: "uppercase",
+                            fontWeight: 800,
+                            color: "#2563EB",
+                            mb: 1.5,
+                        }}
                     >
-                        Where We've Worked
+                        Our Work
                     </Typography>
-                    <Box sx={{ width: 80, height: 4, bgcolor: "#2563EB", borderRadius: 2, mx: "auto", mb: 2 }} />
                     <Typography
-                        align="center"
-                        sx={{ color: "#6B7280", maxWidth: 640, mx: "auto", mb: 6 }}
+                        sx={{
+                            fontSize: { xs: "2rem", md: "2.75rem" },
+                            fontWeight: 800,
+                            color: "#111827",
+                            lineHeight: 1.15,
+                            letterSpacing: "-0.02em",
+                            maxWidth: 760,
+                            mb: 2,
+                        }}
                     >
-                        From summer camps in East San José to classrooms across four countries.
+                        From a summer camp in East San José to classrooms in four countries.
                     </Typography>
 
-                    <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
+                    {/* Lead story */}
+                    <motion.div
+                        initial={{ opacity: 0, y: 28 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 0.5 }}
+                    >
+                        <Box
+                            sx={{
+                                mt: 5,
+                                borderRadius: 5,
+                                overflow: "hidden",
+                                background: "linear-gradient(135deg, #111827 0%, #1E3A5F 100%)",
+                                display: "grid",
+                                gridTemplateColumns: { xs: "1fr", md: "1.15fr 1fr" },
+                            }}
+                        >
+                            <Box sx={{ p: { xs: 3.5, md: 6 } }}>
+                                <Typography
+                                    sx={{
+                                        fontSize: "0.78rem",
+                                        letterSpacing: "0.12em",
+                                        textTransform: "uppercase",
+                                        fontWeight: 700,
+                                        color: "#FBBF24",
+                                        mb: 2,
+                                    }}
+                                >
+                                    {featuredWork.kicker}
+                                </Typography>
+                                <Typography
+                                    sx={{
+                                        fontSize: { xs: "1.6rem", md: "2.1rem" },
+                                        fontWeight: 800,
+                                        color: "#FFFFFF",
+                                        lineHeight: 1.2,
+                                        letterSpacing: "-0.01em",
+                                        mb: 2,
+                                    }}
+                                >
+                                    {featuredWork.title}
+                                </Typography>
+                                <Typography sx={{ color: "#CBD5E1", lineHeight: 1.8, fontSize: "1.02rem", mb: 4 }}>
+                                    {featuredWork.body}
+                                </Typography>
+
+                                <Box sx={{ display: "flex", flexWrap: "wrap", gap: { xs: 2, md: 4 } }}>
+                                    {featuredWork.stats.map(stat => (
+                                        <Box key={stat.label}>
+                                            <Typography sx={{ fontSize: "1.9rem", fontWeight: 800, color: "#FFFFFF", lineHeight: 1 }}>
+                                                {stat.value}
+                                            </Typography>
+                                            <Typography sx={{ fontSize: "0.82rem", color: "#94A3B8", mt: 0.5 }}>
+                                                {stat.label}
+                                            </Typography>
+                                        </Box>
+                                    ))}
+                                </Box>
+                            </Box>
+
+                            {/* The headline number, or the photo once there is one */}
+                            {featuredWork.photo ? (
+                                <Box
+                                    component="img"
+                                    src={featuredWork.photo}
+                                    alt={featuredWork.photoAlt || featuredWork.title}
+                                    sx={{ width: "100%", height: "100%", minHeight: 260, objectFit: "cover" }}
+                                />
+                            ) : (
+                                <Box
+                                    sx={{
+                                        display: "flex",
+                                        flexDirection: "column",
+                                        alignItems: "center",
+                                        justifyContent: "center",
+                                        p: { xs: 4, md: 6 },
+                                        bgcolor: "rgba(251, 191, 36, 0.08)",
+                                        borderLeft: { xs: "none", md: "1px solid rgba(255,255,255,0.08)" },
+                                        borderTop: { xs: "1px solid rgba(255,255,255,0.08)", md: "none" },
+                                    }}
+                                >
+                                    <Typography
+                                        sx={{
+                                            fontSize: { xs: "4.5rem", md: "6.5rem" },
+                                            fontWeight: 800,
+                                            color: "#FBBF24",
+                                            lineHeight: 1,
+                                            letterSpacing: "-0.03em",
+                                        }}
+                                    >
+                                        {featuredWork.bigNumber}
+                                    </Typography>
+                                    <Typography
+                                        sx={{
+                                            color: "#E2E8F0",
+                                            fontWeight: 600,
+                                            textAlign: "center",
+                                            mt: 1.5,
+                                            fontSize: "1rem",
+                                        }}
+                                    >
+                                        {featuredWork.bigNumberLabel}
+                                    </Typography>
+                                </Box>
+                            )}
+                        </Box>
+                    </motion.div>
+
+                    {/* Everything else */}
+                    <Box
+                        sx={{
+                            mt: 3,
+                            display: "grid",
+                            gap: 3,
+                            gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" },
+                        }}
+                    >
                         {ourWork.map((item, index) => (
                             <motion.div
                                 key={item.id}
                                 initial={{ opacity: 0, y: 24 }}
                                 whileInView={{ opacity: 1, y: 0 }}
                                 viewport={{ once: true }}
-                                transition={{ duration: 0.45, delay: Math.min(index, 3) * 0.08 }}
+                                transition={{ duration: 0.45, delay: Math.min(index, 3) * 0.07 }}
+                                style={{ height: "100%" }}
                             >
                                 <Box
                                     sx={{
+                                        height: "100%",
                                         display: "flex",
-                                        flexDirection: { xs: "column", md: item.photo ? "row" : "column" },
-                                        gap: { xs: 2, md: 3 },
-                                        p: { xs: 2.5, md: 3 },
-                                        bgcolor: "#F9FAFB",
+                                        flexDirection: "column",
+                                        borderRadius: 4,
+                                        overflow: "hidden",
                                         border: "1px solid #E5E7EB",
-                                        borderRadius: 3,
+                                        bgcolor: "#FFFFFF",
+                                        transition: "transform 0.25s ease, box-shadow 0.25s ease",
+                                        "&:hover": {
+                                            transform: "translateY(-4px)",
+                                            boxShadow: "0 14px 34px rgba(17, 24, 39, 0.12)",
+                                        },
                                     }}
                                 >
-                                    {item.photo && (
+                                    {item.photo ? (
                                         <Box
                                             component="img"
                                             src={item.photo}
                                             alt={item.photoAlt || item.title}
-                                            sx={{
-                                                width: { xs: "100%", md: 300 },
-                                                height: { xs: 200, md: 200 },
-                                                objectFit: "cover",
-                                                borderRadius: 2,
-                                                flex: "none",
-                                            }}
+                                            sx={{ width: "100%", height: 180, objectFit: "cover" }}
                                         />
+                                    ) : (
+                                        <Box sx={{ height: 6, bgcolor: item.accent }} />
                                     )}
-                                    <Box sx={{ minWidth: 0 }}>
-                                        <Typography
-                                            sx={{
-                                                fontSize: "0.78rem",
-                                                letterSpacing: "0.08em",
-                                                textTransform: "uppercase",
-                                                fontWeight: 700,
-                                                color: "#2563EB",
-                                                mb: 0.5,
-                                            }}
-                                        >
-                                            {item.date} · {item.place}
-                                        </Typography>
-                                        <Typography
-                                            variant="h6"
-                                            sx={{ fontWeight: "bold", color: "#111827", mb: 1 }}
-                                        >
+
+                                    <Box sx={{ p: 3.5, display: "flex", flexDirection: "column", flex: 1 }}>
+                                        <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, mb: 1.5, flexWrap: "wrap" }}>
+                                            <Box
+                                                sx={{
+                                                    px: 1.5,
+                                                    py: 0.4,
+                                                    borderRadius: 999,
+                                                    bgcolor: item.accent + "1A",
+                                                    color: item.accent,
+                                                    fontSize: "0.72rem",
+                                                    fontWeight: 800,
+                                                    letterSpacing: "0.06em",
+                                                    textTransform: "uppercase",
+                                                }}
+                                            >
+                                                {item.category}
+                                            </Box>
+                                            <Typography sx={{ fontSize: "0.8rem", color: "#9CA3AF", fontWeight: 600 }}>
+                                                {item.date} · {item.place}
+                                            </Typography>
+                                        </Box>
+
+                                        <Typography sx={{ fontSize: "1.15rem", fontWeight: 800, color: "#111827", mb: 1, letterSpacing: "-0.01em" }}>
                                             {item.title}
                                         </Typography>
-                                        <Typography sx={{ color: "#4B5563", lineHeight: 1.75 }}>
+                                        <Typography sx={{ color: "#4B5563", lineHeight: 1.7, fontSize: "0.95rem" }}>
                                             {item.body}
                                         </Typography>
-                                        {item.captions && item.captions.length > 0 && (
-                                            <Box component="ul" sx={{ m: "12px 0 0", pl: 2.5, color: "#6B7280" }}>
+
+                                        {item.captions && (
+                                            <Box sx={{ mt: "auto", pt: 2.5 }}>
                                                 {item.captions.map(caption => (
-                                                    <Box component="li" key={caption} sx={{ fontSize: "0.85rem", lineHeight: 1.7 }}>
+                                                    <Typography
+                                                        key={caption}
+                                                        sx={{ fontSize: "0.8rem", color: "#9CA3AF", lineHeight: 1.7 }}
+                                                    >
                                                         {caption}
-                                                    </Box>
+                                                    </Typography>
                                                 ))}
                                             </Box>
                                         )}
@@ -342,6 +482,7 @@ export default function ImpactPage() {
                     </Box>
                 </Container>
             </Box>
+
 
             {/* Student Video Testimonials Section */}
             <Box id="testimonials" sx={{ py: 10, bgcolor: "#FFFFFF" }}>
