@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Box, Typography, Container, Select, MenuItem, FormControl } from "@mui/material";
 import { motion, AnimatePresence } from "framer-motion";
+import { ourWork } from "../../data/ourWork";
 
 
 const studentVideos = [
@@ -15,6 +16,7 @@ const studentVideos = [
 ];
 
 const metrics = [
+    { number: "300", label: "Audience Reached", description: "Our students MC'd a two-hour show" },
     { number: "12", label: "Sessions Completed", description: "Beginner through advanced" },
     { number: "150", label: "Students Served", description: "Across multiple levels" },
     { number: "K–9", label: "Grades Served", description: "Kindergarten through 9th grade" },
@@ -203,9 +205,11 @@ export default function ImpactPage() {
                     <Box
                         sx={{
                             display: "flex",
-                            flexWrap: { xs: "wrap", md: "nowrap" },
+                            // Seven cards is too many for one row on a laptop, so
+                            // they wrap instead of being squeezed.
+                            flexWrap: "wrap",
                             justifyContent: "center",
-                            gap: { xs: 2, md: 1 },
+                            gap: { xs: 2, md: 2 },
                         }}
                     >
                         {metrics.map((metric, index) => (
@@ -214,7 +218,7 @@ export default function ImpactPage() {
                                 initial={{ opacity: 0, y: 20 }}
                                 whileInView={{ opacity: 1, y: 0 }}
                                 transition={{ duration: 0.4, delay: index * 0.08 }}
-                                style={{ flex: "1 1 0" }}
+                                style={{ flex: "1 1 170px", maxWidth: 260 }}
                             >
                                 <Box
                                     sx={{
@@ -241,6 +245,97 @@ export default function ImpactPage() {
                                     >
                                         {metric.description}
                                     </Typography>
+                                </Box>
+                            </motion.div>
+                        ))}
+                    </Box>
+                </Container>
+            </Box>
+
+            {/* Where We've Worked — programs, community events and partnerships */}
+            <Box id="our-work" sx={{ py: 10, bgcolor: "#FFFFFF" }}>
+                <Container maxWidth="lg">
+                    <Typography
+                        variant="h3"
+                        align="center"
+                        sx={{ fontWeight: "bold", mb: 1, color: "#111827" }}
+                    >
+                        Where We've Worked
+                    </Typography>
+                    <Box sx={{ width: 80, height: 4, bgcolor: "#2563EB", borderRadius: 2, mx: "auto", mb: 2 }} />
+                    <Typography
+                        align="center"
+                        sx={{ color: "#6B7280", maxWidth: 640, mx: "auto", mb: 6 }}
+                    >
+                        From summer camps in East San José to classrooms across four countries.
+                    </Typography>
+
+                    <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
+                        {ourWork.map((item, index) => (
+                            <motion.div
+                                key={item.id}
+                                initial={{ opacity: 0, y: 24 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                viewport={{ once: true }}
+                                transition={{ duration: 0.45, delay: Math.min(index, 3) * 0.08 }}
+                            >
+                                <Box
+                                    sx={{
+                                        display: "flex",
+                                        flexDirection: { xs: "column", md: item.photo ? "row" : "column" },
+                                        gap: { xs: 2, md: 3 },
+                                        p: { xs: 2.5, md: 3 },
+                                        bgcolor: "#F9FAFB",
+                                        border: "1px solid #E5E7EB",
+                                        borderRadius: 3,
+                                    }}
+                                >
+                                    {item.photo && (
+                                        <Box
+                                            component="img"
+                                            src={item.photo}
+                                            alt={item.photoAlt || item.title}
+                                            sx={{
+                                                width: { xs: "100%", md: 300 },
+                                                height: { xs: 200, md: 200 },
+                                                objectFit: "cover",
+                                                borderRadius: 2,
+                                                flex: "none",
+                                            }}
+                                        />
+                                    )}
+                                    <Box sx={{ minWidth: 0 }}>
+                                        <Typography
+                                            sx={{
+                                                fontSize: "0.78rem",
+                                                letterSpacing: "0.08em",
+                                                textTransform: "uppercase",
+                                                fontWeight: 700,
+                                                color: "#2563EB",
+                                                mb: 0.5,
+                                            }}
+                                        >
+                                            {item.date} · {item.place}
+                                        </Typography>
+                                        <Typography
+                                            variant="h6"
+                                            sx={{ fontWeight: "bold", color: "#111827", mb: 1 }}
+                                        >
+                                            {item.title}
+                                        </Typography>
+                                        <Typography sx={{ color: "#4B5563", lineHeight: 1.75 }}>
+                                            {item.body}
+                                        </Typography>
+                                        {item.captions && item.captions.length > 0 && (
+                                            <Box component="ul" sx={{ m: "12px 0 0", pl: 2.5, color: "#6B7280" }}>
+                                                {item.captions.map(caption => (
+                                                    <Box component="li" key={caption} sx={{ fontSize: "0.85rem", lineHeight: 1.7 }}>
+                                                        {caption}
+                                                    </Box>
+                                                ))}
+                                            </Box>
+                                        )}
+                                    </Box>
                                 </Box>
                             </motion.div>
                         ))}
