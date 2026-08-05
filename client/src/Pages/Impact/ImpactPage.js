@@ -184,22 +184,31 @@ export default function ImpactPage() {
             <Box sx={{ py: { xs: 4, md: 5 }, bgcolor: "#F9FAFB" }}>
                 <Container maxWidth="lg">
                     <Typography
-                        variant="h4"
+                        sx={{
+                            fontSize: "0.8rem",
+                            letterSpacing: "0.14em",
+                            textTransform: "uppercase",
+                            fontWeight: 800,
+                            color: "#2563EB",
+                            mb: 1.5,
+                            textAlign: "center",
+                        }}
+                    >
+                        By The Numbers
+                    </Typography>
+                    <Typography
                         align="center"
-                        sx={{ fontWeight: "bold", mb: 1, color: "#111827" }}
+                        sx={{
+                            fontSize: { xs: "1.9rem", md: "2.5rem" },
+                            fontWeight: 800,
+                            color: "#111827",
+                            letterSpacing: "-0.02em",
+                            lineHeight: 1.15,
+                            mb: 6,
+                        }}
                     >
                         Our Impact
                     </Typography>
-                    <Box
-                        sx={{
-                            width: 60,
-                            height: 3,
-                            bgcolor: "#2563EB",
-                            borderRadius: 2,
-                            mx: "auto",
-                            mb: 4
-                        }}
-                    />
 
                     {/* Metrics Grid */}
                     <Box
@@ -305,7 +314,7 @@ export default function ImpactPage() {
                                         letterSpacing: "0.12em",
                                         textTransform: "uppercase",
                                         fontWeight: 700,
-                                        color: "#FBBF24",
+                                        color: "#FCD34D",
                                         mb: 2,
                                     }}
                                 >
@@ -323,17 +332,17 @@ export default function ImpactPage() {
                                 >
                                     {featuredWork.title}
                                 </Typography>
-                                <Typography sx={{ color: "#CBD5E1", lineHeight: 1.8, fontSize: "1.02rem", mb: 4 }}>
+                                <Typography sx={{ color: "#E2E8F0", lineHeight: 1.75, fontSize: "1.02rem", mb: 4 }}>
                                     {featuredWork.body}
                                 </Typography>
 
                                 <Box sx={{ display: "flex", flexWrap: "wrap", gap: { xs: 2, md: 4 } }}>
                                     {featuredWork.stats.map(stat => (
                                         <Box key={stat.label}>
-                                            <Typography sx={{ fontSize: "1.9rem", fontWeight: 800, color: "#FFFFFF", lineHeight: 1 }}>
+                                            <Typography sx={{ fontSize: "1.65rem", fontWeight: 800, color: "#FFFFFF", lineHeight: 1 }}>
                                                 {stat.value}
                                             </Typography>
-                                            <Typography sx={{ fontSize: "0.82rem", color: "#94A3B8", mt: 0.5 }}>
+                                            <Typography sx={{ fontSize: "0.9rem", color: "#CBD5E1", mt: 0.75, lineHeight: 1.5 }}>
                                                 {stat.label}
                                             </Typography>
                                         </Box>
@@ -364,7 +373,7 @@ export default function ImpactPage() {
                                 >
                                     <Typography
                                         sx={{
-                                            fontSize: { xs: "4.5rem", md: "6.5rem" },
+                                            fontSize: { xs: "3.2rem", md: "4.2rem" },
                                             fontWeight: 800,
                                             color: "#FBBF24",
                                             lineHeight: 1,
@@ -375,11 +384,13 @@ export default function ImpactPage() {
                                     </Typography>
                                     <Typography
                                         sx={{
-                                            color: "#E2E8F0",
+                                            color: "#F1F5F9",
                                             fontWeight: 600,
                                             textAlign: "center",
                                             mt: 1.5,
-                                            fontSize: "1rem",
+                                            fontSize: "1.05rem",
+                                            lineHeight: 1.5,
+                                            maxWidth: 220,
                                         }}
                                     >
                                         {featuredWork.bigNumberLabel}
@@ -488,22 +499,31 @@ export default function ImpactPage() {
             <Box id="testimonials" sx={{ py: 10, bgcolor: "#FFFFFF" }}>
                 <Container maxWidth="lg">
                     <Typography
-                        variant="h3"
+                        sx={{
+                            fontSize: "0.8rem",
+                            letterSpacing: "0.14em",
+                            textTransform: "uppercase",
+                            fontWeight: 800,
+                            color: "#2563EB",
+                            mb: 1.5,
+                            textAlign: "center",
+                        }}
+                    >
+                        In Their Words
+                    </Typography>
+                    <Typography
                         align="center"
-                        sx={{ fontWeight: "bold", mb: 2, color: "#111827" }}
+                        sx={{
+                            fontSize: { xs: "1.9rem", md: "2.5rem" },
+                            fontWeight: 800,
+                            color: "#111827",
+                            letterSpacing: "-0.02em",
+                            lineHeight: 1.15,
+                            mb: 6,
+                        }}
                     >
                         Student Testimonials
                     </Typography>
-                    <Box
-                        sx={{
-                            width: 80,
-                            height: 4,
-                            bgcolor: "#2563EB",
-                            borderRadius: 2,
-                            mx: "auto",
-                            mb: 2
-                        }}
-                    />
                     <Typography
                         variant="body1"
                         align="center"
@@ -571,22 +591,31 @@ export default function ImpactPage() {
                 <Container maxWidth="lg">
                     {/* Centered Header */}
                     <Typography
-                        variant="h3"
+                        sx={{
+                            fontSize: "0.8rem",
+                            letterSpacing: "0.14em",
+                            textTransform: "uppercase",
+                            fontWeight: 800,
+                            color: "#2563EB",
+                            mb: 1.5,
+                            textAlign: "center",
+                        }}
+                    >
+                        Our History
+                    </Typography>
+                    <Typography
                         align="center"
-                        sx={{ fontWeight: "bold", mb: 1, color: "#111827" }}
+                        sx={{
+                            fontSize: { xs: "1.9rem", md: "2.5rem" },
+                            fontWeight: 800,
+                            color: "#111827",
+                            letterSpacing: "-0.02em",
+                            lineHeight: 1.15,
+                            mb: 6,
+                        }}
                     >
                         Past Sessions
                     </Typography>
-                    <Box
-                        sx={{
-                            width: 80,
-                            height: 4,
-                            bgcolor: "#2563EB",
-                            borderRadius: 2,
-                            mx: "auto",
-                            mb: 2,
-                        }}
-                    />
                     <Typography
                         variant="body1"
                         align="center"
