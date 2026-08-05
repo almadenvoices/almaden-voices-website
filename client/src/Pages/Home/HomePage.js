@@ -8,6 +8,7 @@ import StarIcon from '@mui/icons-material/Star';
 import HeroVideo from "../../components/HeroVideo/HeroVideo";
 import VisionMission from "../../components/Sections/VisionMission";
 import TestimonialsGridSlider from '../../components/Testimonial/TestimonialsGridSlider';
+import { headlineStats } from '../../data/ourWork';
 // const images = [
 //     "https://source.unsplash.com/1600x900/?speech,debate,stage",
 //     "https://source.unsplash.com/1600x900/?students,speaking",
@@ -330,6 +331,73 @@ export default function HomePage(){
         <>
             <HeroVideo config={heroConfig} />
             <Box id="more-section" ref={moreRef} />
+
+            {/* Proof band — the headline numbers, straight under the hero.
+                Figures come from src/data/ourWork.js so this and the Impact
+                page can't fall out of step. */}
+            <Box sx={{ py: { xs: 6, md: 8 }, bgcolor: "#111827" }}>
+                <Container maxWidth="lg">
+                    <Box
+                        sx={{
+                            display: "flex",
+                            flexWrap: "wrap",
+                            justifyContent: "center",
+                            gap: { xs: 3, md: 4 },
+                        }}
+                    >
+                        {headlineStats.map((stat, index) => (
+                            <motion.div
+                                key={stat.label}
+                                initial={{ opacity: 0, y: 20 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                viewport={{ once: true }}
+                                transition={{ duration: 0.4, delay: index * 0.08 }}
+                                style={{ flex: "1 1 200px", maxWidth: 280 }}
+                            >
+                                <Box sx={{ textAlign: "center" }}>
+                                    <Typography
+                                        sx={{
+                                            fontSize: { xs: "2.4rem", md: "3rem" },
+                                            fontWeight: "bold",
+                                            color: "#FBBF24",
+                                            lineHeight: 1.1,
+                                        }}
+                                    >
+                                        {stat.number}
+                                    </Typography>
+                                    <Typography sx={{ fontWeight: 700, color: "#FFFFFF", mt: 1 }}>
+                                        {stat.label}
+                                    </Typography>
+                                    <Typography sx={{ fontSize: "0.85rem", color: "#9CA3AF", mt: 0.5, lineHeight: 1.6 }}>
+                                        {stat.note}
+                                    </Typography>
+                                </Box>
+                            </motion.div>
+                        ))}
+                    </Box>
+
+                    <Box sx={{ textAlign: "center", mt: 5 }}>
+                        <Button
+                            variant="outlined"
+                            endIcon={<ArrowForwardIcon />}
+                            onClick={() => navigate("/impact")}
+                            sx={{
+                                color: "#FFFFFF",
+                                borderColor: "rgba(255,255,255,0.4)",
+                                borderRadius: 999,
+                                px: 3.5,
+                                py: 1.2,
+                                fontWeight: 700,
+                                textTransform: "none",
+                                "&:hover": { borderColor: "#FFFFFF", bgcolor: "rgba(255,255,255,0.08)" },
+                            }}
+                        >
+                            See where we've worked
+                        </Button>
+                    </Box>
+                </Container>
+            </Box>
+
             <VisionMission />
 
             {/* Average rating summary */}
