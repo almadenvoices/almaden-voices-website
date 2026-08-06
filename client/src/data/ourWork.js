@@ -47,8 +47,8 @@ export const ourWork = [
         place: "San José, CA",
         title: "National Night Out",
         body: "Our first community table — meeting neighbourhood families and talking with parents in English and Spanish.",
-        photo: null,
-        photoAlt: "",
+        photo: "/images/nno-with-mayor-mahan.jpg",
+        photoAlt: "Anjika Bansal at the Almaden Voices table at National Night Out with San José Mayor Matt Mahan",
         // Factual captions. Being photographed with someone is not an
         // endorsement, and we don't print titles we can't verify.
         captions: [
