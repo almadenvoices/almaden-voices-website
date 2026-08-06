@@ -203,10 +203,12 @@ const CoursesPage = () => {
             {sessions.length > 0 && (
                 <>
                     <div style={{ backgroundColor: '#F9FAFB', padding: '48px 20px 0' }}>
-                        <h2 style={{ fontSize: 'clamp(1.5rem, 3vw, 2rem)', fontWeight: 700, color: '#111827', textAlign: 'center', marginBottom: '8px' }}>
+                        <p style={{ fontSize: '0.8rem', letterSpacing: '0.14em', textTransform: 'uppercase', fontWeight: 800, color: '#2563EB', textAlign: 'center', margin: '0 0 12px' }}>
+                            Now Enrolling
+                        </p>
+                        <h2 style={{ fontSize: 'clamp(1.9rem, 3.6vw, 2.5rem)', fontWeight: 800, color: '#111827', textAlign: 'center', letterSpacing: '-0.02em', lineHeight: 1.15, margin: '0 0 16px' }}>
                             Free Public Speaking Workshop
                         </h2>
-                        <div style={{ width: '80px', height: '4px', backgroundColor: '#2563EB', borderRadius: '2px', margin: '0 auto 8px' }}></div>
                         <p style={{ textAlign: 'center', color: '#6B7280', fontSize: '1rem', marginBottom: '0' }}>
                             A free one-hour introduction to public speaking for kids on Friday, August 14, 2026. Register below and we&apos;ll email you the location and all the details before the workshop.
                         </p>
@@ -227,10 +229,12 @@ const CoursesPage = () => {
             {/* Our Approach Section */}
             <div style={{ backgroundColor: '#F9FAFB', padding: '64px 20px' }}>
                 <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
-                    <h2 style={{ fontSize: 'clamp(1.5rem, 3vw, 2rem)', fontWeight: 700, marginBottom: '8px', color: '#111827', textAlign: 'center' }}>
+                    <p style={{ fontSize: '0.8rem', letterSpacing: '0.14em', textTransform: 'uppercase', fontWeight: 800, color: '#2563EB', textAlign: 'center', margin: '0 0 12px' }}>
+                        How We Teach
+                    </p>
+                    <h2 style={{ fontSize: 'clamp(1.9rem, 3.6vw, 2.5rem)', fontWeight: 800, color: '#111827', textAlign: 'center', letterSpacing: '-0.02em', lineHeight: 1.15, margin: '0 0 24px' }}>
                         Our Approach
                     </h2>
-                    <div style={{ width: '80px', height: '4px', backgroundColor: '#2563EB', borderRadius: '2px', margin: '0 auto 24px' }}></div>
                     <p style={{ fontSize: '1.05rem', lineHeight: 1.8, color: '#6B7280', marginBottom: '24px', textAlign: 'center' }}>
                         We are different because we emphasize:
                     </p>
