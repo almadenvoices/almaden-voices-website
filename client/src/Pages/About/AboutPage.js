@@ -50,22 +50,31 @@ function MeetTheTeam() {
             }}
         >
             <Typography
-                variant="h3"
+                sx={{
+                    fontSize: "0.8rem",
+                    letterSpacing: "0.14em",
+                    textTransform: "uppercase",
+                    fontWeight: 800,
+                    color: "#2563EB",
+                    textAlign: "center",
+                    mb: 1.5,
+                }}
+            >
+                Who We Are
+            </Typography>
+            <Typography
                 align="center"
-                sx={{ fontWeight: "bold", mb: 2, color: "#111827" }}
+                sx={{
+                    fontSize: { xs: "1.9rem", md: "2.5rem" },
+                    fontWeight: 800,
+                    color: "#111827",
+                    letterSpacing: "-0.02em",
+                    lineHeight: 1.15,
+                    mb: 8,
+                }}
             >
                 Meet the Team
             </Typography>
-            <Box
-                sx={{
-                    width: 80,
-                    height: 4,
-                    bgcolor: "#2563EB",
-                    borderRadius: 2,
-                    mx: "auto",
-                    mb: 8
-                }}
-            />
 
             {/* Founder Section - Image on left, text on right */}
             <Container maxWidth="lg" sx={{ mb: 8 }}>
@@ -129,22 +138,31 @@ function MeetTheTeam() {
             {/* Board of Directors - 3 columns side by side */}
             <Container id="board" maxWidth="lg">
                 <Typography
-                    variant="h4"
-                    align="center"
-                    sx={{ fontWeight: "bold", mb: 2, color: "#111827" }}
-                >
-                    Board of Directors
-                </Typography>
-                <Box
-                    sx={{
-                        width: 80,
-                        height: 4,
-                        bgcolor: "#2563EB",
-                        borderRadius: 2,
-                        mx: "auto",
-                        mb: 6
-                    }}
-                />
+                sx={{
+                    fontSize: "0.8rem",
+                    letterSpacing: "0.14em",
+                    textTransform: "uppercase",
+                    fontWeight: 800,
+                    color: "#2563EB",
+                    textAlign: "center",
+                    mb: 1.5,
+                }}
+            >
+                Governance
+            </Typography>
+            <Typography
+                align="center"
+                sx={{
+                    fontSize: { xs: "1.9rem", md: "2.5rem" },
+                    fontWeight: 800,
+                    color: "#111827",
+                    letterSpacing: "-0.02em",
+                    lineHeight: 1.15,
+                    mb: 6,
+                }}
+            >
+                Board of Directors
+            </Typography>
                 <Box
                     sx={{
                         display: "flex",

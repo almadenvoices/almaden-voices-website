@@ -17,11 +17,21 @@
 
 /* Header above card */
 .hero{ padding: clamp(20px, 3vw, 36px) 0 clamp(12px, 2vw, 20px); }
+.heroEyebrow{
+    font-size: 0.8rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    font-weight: 800;
+    color: #2563EB;
+    text-align: center;
+    margin: 0 0 12px;
+}
 .heroTitle{
     font-family: 'Playfair Display', Georgia, serif;
     font-size: var(--c-h1);
-    font-weight: 700;
-    letter-spacing: -.01em;
+    font-weight: 800;
+    letter-spacing: -.022em;
+    line-height: 1.15;
     margin: 0 0 12px;
     text-align: center;
     color: #111827;

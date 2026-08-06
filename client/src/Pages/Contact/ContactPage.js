@@ -87,6 +87,7 @@ export default function ContactPage() {
             {/* Header (optional; hide if you want the pure card view) */}
             <section className={s.hero}>
                 <div className="container">
+                    <p className={s.heroEyebrow}>Contact Us</p>
                     <h1 className={s.heroTitle}>Get in touch</h1>
                     <p className={s.heroSub}>
                         We&apos;d love to hear from you. Our friendly team is always here to chat.
@@ -222,7 +223,7 @@ export default function ContactPage() {
                             <label className={s.check}>
                                 <input type="checkbox" checked={agreed} onChange={(e)=>setAgreed(e.target.checked)} disabled={isSubmitting} />
                                 <span>
-                  You agree to our friendly <a className={s.link} href="/docs/privacy-policy.html" target="_blank" rel="noopener noreferrer">privacy policy <OpenInNewIcon style={{ fontSize: 14, verticalAlign: 'middle' }} /></a>.
+                  You agree to our <a className={s.link} href="/docs/terms-of-service.html" target="_blank" rel="noopener noreferrer">terms of service <OpenInNewIcon style={{ fontSize: 14, verticalAlign: 'middle' }} /></a> and <a className={s.link} href="/docs/privacy-policy.html" target="_blank" rel="noopener noreferrer">privacy policy <OpenInNewIcon style={{ fontSize: 14, verticalAlign: 'middle' }} /></a>.
                 </span>
                             </label>
                             <button className={`${s.btn} ${s.btnPrimary}`} disabled={!agreed || isSubmitting}>
