@@ -137,7 +137,7 @@ const CoursesPage = () => {
     return (
         <main className={s.page}>
             {/* What We Teach Hero Banner */}
-            <div style={{ position: 'relative', width: '100%', height: '340px', overflow: 'hidden' }}>
+            <div style={{ position: 'relative', width: '100%', height: 'clamp(180px, 26vw, 240px)', overflow: 'hidden' }}>
                 <img
                     src="/images/teaching-beginner.JPG"
                     alt="What We Teach"
@@ -147,11 +147,53 @@ const CoursesPage = () => {
                     position: 'absolute', inset: 0,
                     background: 'linear-gradient(transparent 20%, rgba(0,0,0,0.55))',
                     display: 'flex', alignItems: 'flex-end', justifyContent: 'center',
-                    padding: '32px 20px',
+                    padding: '24px 20px',
                 }}>
-                    <h1 style={{ color: '#fff', fontWeight: 800, fontSize: 'clamp(2rem, 5vw, 3rem)', margin: 0, textAlign: 'center' }}>
+                    <h1 style={{ color: '#fff', fontWeight: 800, fontSize: 'clamp(1.7rem, 4vw, 2.4rem)', margin: 0, textAlign: 'center', letterSpacing: '-0.02em' }}>
                         What We Teach
                     </h1>
+                </div>
+            </div>
+
+            {/* Our Approach Section */}
+            <div style={{ backgroundColor: '#F9FAFB', padding: '64px 20px' }}>
+                <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
+                    <p style={{ fontSize: '0.8rem', letterSpacing: '0.14em', textTransform: 'uppercase', fontWeight: 800, color: '#2563EB', textAlign: 'center', margin: '0 0 12px' }}>
+                        How We Teach
+                    </p>
+                    <h2 style={{ fontSize: 'clamp(1.9rem, 3.6vw, 2.5rem)', fontWeight: 800, color: '#111827', textAlign: 'center', letterSpacing: '-0.02em', lineHeight: 1.15, margin: '0 0 24px' }}>
+                        Our Approach
+                    </h2>
+                    <p style={{ fontSize: '1.05rem', lineHeight: 1.8, color: '#6B7280', marginBottom: '24px', textAlign: 'center' }}>
+                        We are different because we emphasize:
+                    </p>
+                    <ul style={{ paddingLeft: '20px', marginBottom: '32px' }}>
+                        {[
+                            'Final Showcase — real practice in front of an audience',
+                            'Accessibility — low-cost or free programming for families',
+                            'Inclusivity — welcoming students of all skill levels',
+                            'Hands-on learning — real practice, not just lectures',
+                            'Small groups — personalized feedback for every student',
+                            'Community focus — supporting families and underserved students',
+                            'Leadership development — encouraging students to speak with purpose',
+                        ].map((item, i) => (
+                            <li key={i} style={{ fontSize: '1rem', lineHeight: 1.8, color: '#6B7280', marginBottom: '6px' }}>
+                                {item}
+                            </li>
+                        ))}
+                    </ul>
+                    <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
+                        <img
+                            src="/images/our-approach.JPG"
+                            alt="Our Approach"
+                            style={{ flex: '1 1 300px', height: '300px', objectFit: 'cover', boxShadow: '0 4px 16px rgba(0,0,0,0.1)', borderRadius: '8px' }}
+                        />
+                        <img
+                            src="/images/teaching-glasses.jpg"
+                            alt="Working one-on-one with a student"
+                            style={{ flex: '1 1 300px', height: '300px', objectFit: 'cover', boxShadow: '0 4px 16px rgba(0,0,0,0.1)', borderRadius: '8px' }}
+                        />
+                    </div>
                 </div>
             </div>
 
@@ -225,48 +267,6 @@ const CoursesPage = () => {
                     </section>
                 </>
             )}
-
-            {/* Our Approach Section */}
-            <div style={{ backgroundColor: '#F9FAFB', padding: '64px 20px' }}>
-                <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
-                    <p style={{ fontSize: '0.8rem', letterSpacing: '0.14em', textTransform: 'uppercase', fontWeight: 800, color: '#2563EB', textAlign: 'center', margin: '0 0 12px' }}>
-                        How We Teach
-                    </p>
-                    <h2 style={{ fontSize: 'clamp(1.9rem, 3.6vw, 2.5rem)', fontWeight: 800, color: '#111827', textAlign: 'center', letterSpacing: '-0.02em', lineHeight: 1.15, margin: '0 0 24px' }}>
-                        Our Approach
-                    </h2>
-                    <p style={{ fontSize: '1.05rem', lineHeight: 1.8, color: '#6B7280', marginBottom: '24px', textAlign: 'center' }}>
-                        We are different because we emphasize:
-                    </p>
-                    <ul style={{ paddingLeft: '20px', marginBottom: '32px' }}>
-                        {[
-                            'Final Showcase — real practice in front of an audience',
-                            'Accessibility — low-cost or free programming for families',
-                            'Inclusivity — welcoming students of all skill levels',
-                            'Hands-on learning — real practice, not just lectures',
-                            'Small groups — personalized feedback for every student',
-                            'Community focus — supporting families and underserved students',
-                            'Leadership development — encouraging students to speak with purpose',
-                        ].map((item, i) => (
-                            <li key={i} style={{ fontSize: '1rem', lineHeight: 1.8, color: '#6B7280', marginBottom: '6px' }}>
-                                {item}
-                            </li>
-                        ))}
-                    </ul>
-                    <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
-                        <img
-                            src="/images/our-approach.JPG"
-                            alt="Our Approach"
-                            style={{ flex: '1 1 300px', height: '300px', objectFit: 'cover', boxShadow: '0 4px 16px rgba(0,0,0,0.1)', borderRadius: '8px' }}
-                        />
-                        <img
-                            src="/images/teaching-glasses.jpg"
-                            alt="Working one-on-one with a student"
-                            style={{ flex: '1 1 300px', height: '300px', objectFit: 'cover', boxShadow: '0 4px 16px rgba(0,0,0,0.1)', borderRadius: '8px' }}
-                        />
-                    </div>
-                </div>
-            </div>
 
             {/* CTA Section */}
             <section className={s.ctaBand}>
