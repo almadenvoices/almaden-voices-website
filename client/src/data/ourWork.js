@@ -3,9 +3,11 @@
  * homepage numbers band and the "Where We've Worked" section on the Impact
  * page, so the two can't drift apart.
  *
- * ADDING A PHOTO: drop the file in client/public/images/ and set `photo` to
- * "/images/your-file.jpg". Cards without a photo fall back to a coloured
- * gradient panel, so the layout never looks broken while images are pending.
+ * ADDING A PHOTO: drop the file in client/public/images/ and add an entry to
+ * that item's `photos` array — { src, alt, caption }. Photos are shown whole,
+ * never cropped to fit a card, so nobody ends up with their head cut off.
+ * Items with no photos render as a text-only card, so the layout never looks
+ * broken while images are pending.
  *
  * A NOTE ON WORDING: we describe what we did rather than claiming an
  * institutional relationship. No "partner", no logos, no implied endorsement.
@@ -47,13 +49,24 @@ export const ourWork = [
         place: "San José, CA",
         title: "National Night Out",
         body: "Our first community table — meeting neighbourhood families and talking with parents in English and Spanish.",
-        photo: "/images/nno-with-mayor-mahan.jpg",
-        photoAlt: "Anjika Bansal at the Almaden Voices table at National Night Out with San José Mayor Matt Mahan",
         // Factual captions. Being photographed with someone is not an
         // endorsement, and we don't print titles we can't verify.
-        captions: [
-            "With San José Mayor Matt Mahan",
-            "With Jose Salcido, City of San José",
+        photos: [
+            {
+                src: "/images/nno-mayor-mahan-full.jpg",
+                alt: "Anjika Bansal and San José Mayor Matt Mahan behind the Almaden Voices table at National Night Out",
+                caption: "With San José Mayor Matt Mahan",
+            },
+            {
+                src: "/images/nno-mahan-and-salcido-full.jpg",
+                alt: "Anjika Bansal with Mayor Matt Mahan and Jose Salcido at the Almaden Voices table",
+                caption: "With Mayor Matt Mahan and Jose Salcido",
+            },
+            {
+                src: "/images/nno-with-emily-full.jpg",
+                alt: "Anjika Bansal with Emily at the Almaden Voices table at National Night Out",
+                caption: "With Emily at the Almaden Voices table",
+            },
         ],
     },
     {
@@ -64,8 +77,13 @@ export const ourWork = [
         place: "Online · Canada",
         title: "Canada Public Speaking Workshop",
         body: "A free two-day workshop for kids across Canada on speaking clearly and confidently to a group.",
-        photo: null,
-        photoAlt: "",
+        photos: [
+            {
+                src: "/images/canada-workshop.jpg",
+                alt: "Video call grid of students taking part in the Almaden Voices Canada public speaking workshop",
+                caption: "Day one of the Canada workshop",
+            },
+        ],
     },
     {
         id: "intl-workshop-2026",
@@ -75,8 +93,13 @@ export const ourWork = [
         place: "Online · Singapore & India",
         title: "Singapore & India Workshop",
         body: "A free two-day workshop run across time zones for about 15 students — our first program taught outside North America.",
-        photo: null,
-        photoAlt: "",
+        photos: [
+            {
+                src: "/images/singapore-india-workshop.jpg",
+                alt: "Video call grid of students joining the Almaden Voices international public speaking workshop from Singapore and India",
+                caption: "Students joining from Singapore and India",
+            },
+        ],
     },
     {
         id: "kenya-mentoring-2026",
@@ -86,7 +109,6 @@ export const ourWork = [
         place: "Remote · Kenya",
         title: "One-on-One Interview Coaching",
         body: "One-on-one sessions with a college student preparing for job interviews — remote, free, and on their schedule.",
-        photo: null,
-        photoAlt: "",
+        photos: [],
     },
 ];

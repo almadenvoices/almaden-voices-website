@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Box, Typography, Container, Select, MenuItem, FormControl } from "@mui/material";
 import { motion, AnimatePresence } from "framer-motion";
 import { ourWork, featuredWork } from "../../data/ourWork";
+import SessionOutcomes from "./SessionOutcomes";
 
 
 const studentVideos = [
@@ -268,7 +269,7 @@ export default function ImpactPage() {
             </Box>
 
             {/* Where We've Worked — a lead story, then the rest as cards */}
-            <Box id="our-work" sx={{ py: { xs: 8, md: 12 }, bgcolor: "#FFFFFF" }}>
+            <Box id="our-work" sx={{ pt: { xs: 8, md: 12 }, pb: { xs: 5, md: 7 }, bgcolor: "#FFFFFF" }}>
                 <Container maxWidth="lg">
                     <Typography
                         sx={{
@@ -406,103 +407,168 @@ export default function ImpactPage() {
                         </Box>
                     </motion.div>
 
-                    {/* Everything else */}
-                    <Box
-                        sx={{
-                            mt: 3,
-                            display: "grid",
-                            gap: 3,
-                            gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" },
-                        }}
-                    >
-                        {ourWork.map((item, index) => (
-                            <motion.div
-                                key={item.id}
-                                initial={{ opacity: 0, y: 24 }}
-                                whileInView={{ opacity: 1, y: 0 }}
-                                viewport={{ once: true }}
-                                transition={{ duration: 0.45, delay: Math.min(index, 3) * 0.07 }}
-                                style={{ height: "100%" }}
-                            >
-                                <Box
-                                    sx={{
-                                        height: "100%",
-                                        display: "flex",
-                                        flexDirection: "column",
-                                        borderRadius: 4,
-                                        overflow: "hidden",
-                                        border: "1px solid #E5E7EB",
-                                        bgcolor: "#FFFFFF",
-                                        transition: "transform 0.25s ease, box-shadow 0.25s ease",
-                                        "&:hover": {
-                                            transform: "translateY(-4px)",
-                                            boxShadow: "0 14px 34px rgba(17, 24, 39, 0.12)",
-                                        },
-                                    }}
-                                >
-                                    {item.photo ? (
+                    {/* Everything else — one row per programme. Photos are shown
+                        whole (object-fit: contain) rather than cropped to a
+                        fixed card header, so no one loses the top of their head. */}
+                    <Box sx={{ mt: 4, display: "grid", gap: { xs: 3, md: 4 } }}>
+                        {ourWork.map((item, index) => {
+                            const photos = item.photos || [];
+                            // Items with a set of photos get the full-width gallery
+                            // treatment; a single photo sits beside its text.
+                            const isGallery = photos.length > 1;
+                            const photoFirst = index % 2 === 0;
+
+                            const details = (
+                                <>
+                                    <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, mb: 1.5, flexWrap: "wrap" }}>
+                                        <Box
+                                            sx={{
+                                                px: 1.5,
+                                                py: 0.4,
+                                                borderRadius: 999,
+                                                bgcolor: item.accent + "1A",
+                                                color: item.accent,
+                                                fontSize: "0.72rem",
+                                                fontWeight: 800,
+                                                letterSpacing: "0.06em",
+                                                textTransform: "uppercase",
+                                            }}
+                                        >
+                                            {item.category}
+                                        </Box>
+                                        <Typography sx={{ fontSize: "0.8rem", color: "#9CA3AF", fontWeight: 600 }}>
+                                            {item.date} · {item.place}
+                                        </Typography>
+                                    </Box>
+
+                                    <Typography
+                                        sx={{
+                                            fontSize: { xs: "1.25rem", md: "1.45rem" },
+                                            fontWeight: 800,
+                                            color: "#111827",
+                                            mb: 1,
+                                            letterSpacing: "-0.01em",
+                                        }}
+                                    >
+                                        {item.title}
+                                    </Typography>
+                                    <Typography sx={{ color: "#4B5563", lineHeight: 1.75, fontSize: "1rem", maxWidth: 620 }}>
+                                        {item.body}
+                                    </Typography>
+                                </>
+                            );
+
+                            const figure = (photo, sx = {}) => (
+                                <Box key={photo.src} component="figure" sx={{ m: 0 }}>
+                                    <Box
+                                        sx={{
+                                            bgcolor: "#F3F4F6",
+                                            display: "flex",
+                                            alignItems: "center",
+                                            justifyContent: "center",
+                                            overflow: "hidden",
+                                            ...sx,
+                                        }}
+                                    >
                                         <Box
                                             component="img"
-                                            src={item.photo}
-                                            alt={item.photoAlt || item.title}
-                                            sx={{ width: "100%", height: 180, objectFit: "cover" }}
+                                            src={photo.src}
+                                            alt={photo.alt || item.title}
+                                            loading="lazy"
+                                            sx={{ width: "100%", height: "100%", objectFit: "contain", display: "block" }}
                                         />
-                                    ) : (
-                                        <Box sx={{ height: 6, bgcolor: item.accent }} />
+                                    </Box>
+                                    {photo.caption && (
+                                        <Typography
+                                            component="figcaption"
+                                            sx={{ fontSize: "0.82rem", color: "#6B7280", mt: 1, lineHeight: 1.6 }}
+                                        >
+                                            {photo.caption}
+                                        </Typography>
                                     )}
+                                </Box>
+                            );
 
-                                    <Box sx={{ p: 3.5, display: "flex", flexDirection: "column", flex: 1 }}>
-                                        <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, mb: 1.5, flexWrap: "wrap" }}>
-                                            <Box
-                                                sx={{
-                                                    px: 1.5,
-                                                    py: 0.4,
-                                                    borderRadius: 999,
-                                                    bgcolor: item.accent + "1A",
-                                                    color: item.accent,
-                                                    fontSize: "0.72rem",
-                                                    fontWeight: 800,
-                                                    letterSpacing: "0.06em",
-                                                    textTransform: "uppercase",
-                                                }}
-                                            >
-                                                {item.category}
-                                            </Box>
-                                            <Typography sx={{ fontSize: "0.8rem", color: "#9CA3AF", fontWeight: 600 }}>
-                                                {item.date} · {item.place}
-                                            </Typography>
-                                        </Box>
-
-                                        <Typography sx={{ fontSize: "1.15rem", fontWeight: 800, color: "#111827", mb: 1, letterSpacing: "-0.01em" }}>
-                                            {item.title}
-                                        </Typography>
-                                        <Typography sx={{ color: "#4B5563", lineHeight: 1.7, fontSize: "0.95rem" }}>
-                                            {item.body}
-                                        </Typography>
-
-                                        {item.captions && (
-                                            <Box sx={{ mt: "auto", pt: 2.5 }}>
-                                                {item.captions.map(caption => (
-                                                    <Typography
-                                                        key={caption}
-                                                        sx={{ fontSize: "0.8rem", color: "#9CA3AF", lineHeight: 1.7 }}
-                                                    >
-                                                        {caption}
-                                                    </Typography>
-                                                ))}
-                                            </Box>
+                            return (
+                                <motion.div
+                                    key={item.id}
+                                    initial={{ opacity: 0, y: 24 }}
+                                    whileInView={{ opacity: 1, y: 0 }}
+                                    viewport={{ once: true }}
+                                    transition={{ duration: 0.45, delay: Math.min(index, 3) * 0.06 }}
+                                >
+                                    <Box
+                                        sx={{
+                                            borderRadius: 4,
+                                            overflow: "hidden",
+                                            border: "1px solid #E5E7EB",
+                                            borderTop: `4px solid ${item.accent}`,
+                                            bgcolor: "#FFFFFF",
+                                            transition: "box-shadow 0.25s ease",
+                                            "&:hover": { boxShadow: "0 14px 34px rgba(17, 24, 39, 0.10)" },
+                                            ...(isGallery || photos.length === 0
+                                                ? {}
+                                                : {
+                                                      display: "grid",
+                                                      alignItems: "center",
+                                                      gridTemplateColumns: { xs: "1fr", md: "1.05fr 1fr" },
+                                                  }),
+                                        }}
+                                    >
+                                        {isGallery ? (
+                                            <>
+                                                <Box sx={{ px: { xs: 3, md: 4.5 }, pt: { xs: 3, md: 4 }, pb: 2.5 }}>{details}</Box>
+                                                <Box
+                                                    sx={{
+                                                        px: { xs: 3, md: 4.5 },
+                                                        pb: { xs: 3, md: 4 },
+                                                        display: "grid",
+                                                        gap: { xs: 2.5, md: 3 },
+                                                        gridTemplateColumns: {
+                                                            xs: "1fr",
+                                                            sm: "1fr 1fr",
+                                                            md: "repeat(3, 1fr)",
+                                                        },
+                                                    }}
+                                                >
+                                                    {photos.map(photo =>
+                                                        figure(photo, { aspectRatio: "16 / 9", borderRadius: 3 })
+                                                    )}
+                                                </Box>
+                                            </>
+                                        ) : photos.length === 1 ? (
+                                            <>
+                                                <Box
+                                                    sx={{
+                                                        order: { xs: 0, md: photoFirst ? 0 : 1 },
+                                                        p: { xs: 2.5, md: 3 },
+                                                    }}
+                                                >
+                                                    {figure(photos[0], { aspectRatio: "16 / 9", borderRadius: 3 })}
+                                                </Box>
+                                                <Box sx={{ px: { xs: 3, md: 4.5 }, pb: { xs: 3.5, md: 4 }, pt: { xs: 0, md: 4 } }}>
+                                                    {details}
+                                                </Box>
+                                            </>
+                                        ) : (
+                                            <Box sx={{ px: { xs: 3, md: 4.5 }, py: { xs: 3, md: 3.5 } }}>{details}</Box>
                                         )}
                                     </Box>
-                                </Box>
-                            </motion.div>
-                        ))}
+                                </motion.div>
+                            );
+                        })}
                     </Box>
                 </Container>
             </Box>
 
 
+            {/* Survey results from the June 2026 Mexican Heritage Plaza camp */}
+            <Box id="session-outcomes">
+                <SessionOutcomes />
+            </Box>
+
             {/* Student Video Testimonials Section */}
-            <Box id="testimonials" sx={{ py: 10, bgcolor: "#FFFFFF" }}>
+            <Box id="testimonials" sx={{ pt: { xs: 5, md: 7 }, pb: 10, bgcolor: "#FFFFFF" }}>
                 <Container maxWidth="lg">
                     <Typography
                         sx={{
@@ -525,7 +591,7 @@ export default function ImpactPage() {
                             color: "#111827",
                             letterSpacing: "-0.02em",
                             lineHeight: 1.15,
-                            mb: 6,
+                            mb: 2,
                         }}
                     >
                         Student Testimonials
