@@ -352,7 +352,7 @@ const Footer = () => {
                             </a>
 
                             <a
-                                href="/contact"
+                                href="/volunteer"
                                 style={{
                                     display: 'inline-block',
                                     padding: '16px 24px',

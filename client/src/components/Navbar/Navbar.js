@@ -24,6 +24,7 @@ const LINKS = [
     { label: "Events", to: "/events" },
     { label: "FAQ", to: "/faq" },
     { label: "Contact", to: "/contact" },
+    { label: "Volunteer", to: "/volunteer" },
     { label: "Register", to: "/register" }
 ];
 
