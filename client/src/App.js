@@ -11,6 +11,7 @@ import DonatePage from './Pages/Donate/DonatePage';
 import RegisterPage from './Pages/Register/RegisterPage';
 import ImpactPage from './Pages/Impact/ImpactPage';
 import EventsPage from './Pages/Events/EventsPage';
+import VolunteerPage from './Pages/Volunteer/VolunteerPage';
 
 export default function App() {
     return (
@@ -28,6 +29,7 @@ export default function App() {
                         <Route path="/impact" element={<ImpactPage />} />
                         <Route path="/register" element={<RegisterPage />} />
                         <Route path="/events" element={<EventsPage />} />
+                        <Route path="/volunteer" element={<VolunteerPage />} />
                         <Route path="*" element={<Navigate to="/home" replace />} />
                     </Route>
                 </Routes>

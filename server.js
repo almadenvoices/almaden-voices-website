@@ -385,6 +385,113 @@ app.post("/api/contact", async (req, res) => {
     }
 });
 
+// Volunteer application endpoint — the "Volunteer With Us" page posts here.
+// Sends the application to EMAIL_TO and a receipt to the applicant, the same
+// way the contact form does.
+app.post("/api/volunteer", async (req, res) => {
+    try {
+        const {
+            applyingAs, parentName, parentEmail, parentPhone,
+            fullName, email, phone, ageOrGrade,
+            positions, why, availability,
+            mediaConsent, guardianConsent,
+        } = req.body;
+
+        if (!fullName || !email || !phone || !ageOrGrade || !positions || !why || !availability) {
+            return res.status(400).json({ error: "Missing required fields" });
+        }
+        if (!mediaConsent) {
+            return res.status(400).json({ error: "The photo and video consent box is required" });
+        }
+
+        if (!emailTransporter) {
+            console.error("Email transporter not configured");
+            return res.status(500).json({ error: "Email service not configured" });
+        }
+
+        // Applications land in an inbox as HTML, so escape anything typed in.
+        const esc = (v) => String(v == null ? "" : v)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;");
+
+        const confirmationNumber = generateConfirmationNumber();
+        const appliedFor = applyingAs === "parent"
+            ? "Parent/guardian applying on behalf of their child"
+            : "Applying for themselves";
+
+        const guardianRow = parentName || parentEmail || parentPhone
+            ? `<p><strong>Parent/guardian:</strong> ${esc(parentName)}${parentEmail ? ` &lt;${esc(parentEmail)}&gt;` : ""}${parentPhone ? ` — ${esc(parentPhone)}` : ""}</p>`
+            : "";
+
+        const adminEmailHtml = `
+            <div style="font-family: Arial, sans-serif; max-width: 640px; margin: 0 auto;">
+                <h2 style="color: #333;">New Volunteer Application</h2>
+                <p><strong>Confirmation Number:</strong> ${confirmationNumber}</p>
+                <hr style="border: 1px solid #eee;" />
+                <p><strong>Applying for:</strong> ${esc(positions)}</p>
+                <p><strong>Who is applying:</strong> ${appliedFor}</p>
+                <hr style="border: 1px solid #eee;" />
+                <p><strong>Volunteer:</strong> ${esc(fullName)}</p>
+                <p><strong>Email:</strong> ${esc(email)}</p>
+                <p><strong>Phone:</strong> ${esc(phone)}</p>
+                <p><strong>Age / grade:</strong> ${esc(ageOrGrade)}</p>
+                ${guardianRow}
+                <hr style="border: 1px solid #eee;" />
+                <p><strong>Why this role, and what they'd bring:</strong></p>
+                <p style="background: #f5f5f5; padding: 15px; border-radius: 5px; white-space: pre-wrap;">${esc(why)}</p>
+                <p><strong>Availability (2–3 hrs/week, Sept–Dec):</strong></p>
+                <p style="background: #f5f5f5; padding: 15px; border-radius: 5px; white-space: pre-wrap;">${esc(availability)}</p>
+                <hr style="border: 1px solid #eee;" />
+                <p><strong>Photo/video consent:</strong> ${mediaConsent ? "Yes" : "No"}</p>
+                ${guardianConsent === null || guardianConsent === undefined
+                    ? ""
+                    : `<p><strong>Parent/guardian aware (under 18):</strong> ${guardianConsent ? "Yes" : "No"}</p>`}
+                <p style="color: #666; font-size: 12px;">Received: ${new Date().toLocaleString()}</p>
+            </div>
+        `;
+
+        const applicantEmailHtml = `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                <h2 style="color: #333;">Thanks for applying to volunteer with Almaden Voices!</h2>
+                <p>Hi ${esc(fullName)},</p>
+                <p>We've received your application for: <strong>${esc(positions)}</strong>.</p>
+                <p>Applications close August 31 at 9 PM PT. We'll be in touch the first week of September to schedule interviews.</p>
+                <p><strong>Confirmation Number:</strong> <span style="background: #f0f0f0; padding: 5px 10px; border-radius: 3px; font-family: monospace;">${confirmationNumber}</span></p>
+                <hr style="border: 1px solid #eee;" />
+                <p style="color: #666;">Best regards,<br/>Almaden Voices Team</p>
+            </div>
+        `;
+
+        await emailTransporter.sendMail({
+            from: `"Almaden Voices Volunteer Form" <${EMAIL_USER}>`,
+            replyTo: `"${fullName}" <${email}>`,
+            to: EMAIL_TO,
+            subject: `Volunteer Application: ${fullName} — ${positions}`,
+            html: adminEmailHtml
+        });
+
+        // A bad applicant address shouldn't lose us the application itself.
+        try {
+            await emailTransporter.sendMail({
+                from: `"Almaden Voices" <${EMAIL_USER}>`,
+                to: email,
+                subject: `We got your volunteer application — ${confirmationNumber}`,
+                html: applicantEmailHtml
+            });
+        } catch (receiptErr) {
+            console.error("Volunteer receipt email failed:", receiptErr.message);
+        }
+
+        res.json({ success: true, confirmationNumber });
+
+    } catch (err) {
+        console.error("Volunteer form error:", err);
+        res.status(500).json({ error: "Error sending your application. Please try again." });
+    }
+});
+
 // Newsletter subscription endpoint
 app.post("/api/subscribe", async (req, res) => {
     try {
