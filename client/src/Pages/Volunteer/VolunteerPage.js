@@ -209,6 +209,11 @@ export default function VolunteerPage() {
                         <span className={s.bannerLine1}>{DEADLINE_LINE}</span>
                         <span className={s.bannerLine2}>{COMMITMENT_LINE}</span>
                     </div>
+                    {APPLICATIONS_OPEN && (
+                        <button type="button" className={s.bannerBtn} onClick={() => openApplication("")}>
+                            Apply now
+                        </button>
+                    )}
                 </div>
             </div>
 

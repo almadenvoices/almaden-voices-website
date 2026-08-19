@@ -99,14 +99,45 @@
     line-height: 1.5;
 }
 
-@media (max-width: 560px) {
+.bannerBtn {
+    flex: none;
+    margin-left: auto;
+    padding: 11px 24px;
+    background: #713F12;
+    color: #FFFFFF;
+    border: 0;
+    border-radius: 999px;
+    font-family: inherit;
+    font-size: 0.95rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
+}
+
+.bannerBtn:hover {
+    background: #57310E;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(113, 63, 18, 0.35);
+}
+
+@media (max-width: 700px) {
+    /* Stack on a phone so the button gets a full-width tap target instead of
+       squeezing the deadline text into two words per line. */
     .banner {
+        flex-wrap: wrap;
         gap: 14px;
         text-align: left;
     }
     .bannerIcon {
         width: 40px;
         height: 40px;
+    }
+    .bannerText {
+        flex: 1;
+    }
+    .bannerBtn {
+        width: 100%;
+        margin-left: 0;
     }
 }
 
@@ -183,7 +214,7 @@
     gap: 10px;
     width: 100%;
     text-align: left;
-    padding: clamp(20px, 2.4vw, 26px);
+    padding: clamp(16px, 2.4vw, 26px);
     border-radius: 16px;
     border: 2px solid #E5E7EB;
     background: #FFFFFF;
@@ -740,4 +771,24 @@
     margin: 0 auto;
     max-width: 60ch;
     line-height: 1.7;
+}
+
+@media (max-width: 639px) {
+    .cardGrid {
+        gap: 12px;
+    }
+    .roleCard {
+        gap: 8px;
+    }
+    .roleIcon {
+        width: 38px;
+        height: 38px;
+        border-radius: 10px;
+    }
+    .roleTitle {
+        font-size: 16px;
+    }
+    .roleSummary {
+        font-size: 14px;
+    }
 }
