@@ -18,18 +18,6 @@
     text-align: center;
 }
 
-.heroBadge {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    background: #EFF6FF;
-    padding: 8px 20px;
-    border-radius: 999px;
-    font-size: var(--v-font-sm);
-    color: #2563EB;
-    font-weight: 600;
-    margin-bottom: 20px;
-}
 
 .heroTitle {
     font-family: 'Playfair Display', Georgia, serif;
@@ -54,29 +42,18 @@
     margin: 0 auto;
 }
 
-/* ====== Deadline banner ====== */
+/* ====== Deadline note ====== */
 .banner {
-    max-width: 900px;
+    max-width: 820px;
     margin: 0 auto clamp(32px, 5vw, 56px);
-    background: #FDE047;
-    border: 2px solid #EAB308;
-    border-radius: 16px;
-    padding: clamp(18px, 2.4vw, 24px) clamp(20px, 3vw, 32px);
+    background: #FFFBEB;
+    border: 1px solid #FCD34D;
+    border-left: 4px solid #EAB308;
+    border-radius: 10px;
+    padding: clamp(16px, 2.2vw, 22px) clamp(18px, 2.6vw, 26px);
     display: flex;
     align-items: center;
-    gap: 18px;
-    box-shadow: 0 4px 16px rgba(234, 179, 8, 0.25);
-}
-
-.bannerIcon {
-    flex: none;
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    display: grid;
-    place-items: center;
-    background: #FFFFFF;
-    color: #A16207;
+    gap: 20px;
 }
 
 .bannerText {
@@ -85,39 +62,36 @@
 
 .bannerLine1 {
     display: block;
-    font-size: var(--v-font-lg);
+    font-size: clamp(16px, 1.1vw, 18px);
     font-weight: 700;
     color: #713F12;
-    line-height: 1.35;
+    line-height: 1.4;
 }
 
 .bannerLine2 {
     display: block;
     font-size: var(--v-font-sm);
-    color: #713F12;
-    margin-top: 4px;
-    line-height: 1.5;
+    color: #854D0E;
+    line-height: 1.55;
 }
 
 .bannerBtn {
     flex: none;
     margin-left: auto;
-    padding: 11px 24px;
+    padding: 10px 22px;
     background: #713F12;
     color: #FFFFFF;
     border: 0;
-    border-radius: 999px;
+    border-radius: 8px;
     font-family: inherit;
-    font-size: 0.95rem;
+    font-size: 0.92rem;
     font-weight: 700;
     cursor: pointer;
-    transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
+    transition: background 0.2s;
 }
 
 .bannerBtn:hover {
     background: #57310E;
-    transform: translateY(-1px);
-    box-shadow: 0 6px 18px rgba(113, 63, 18, 0.35);
 }
 
 @media (max-width: 700px) {
@@ -126,14 +100,9 @@
     .banner {
         flex-wrap: wrap;
         gap: 14px;
-        text-align: left;
-    }
-    .bannerIcon {
-        width: 40px;
-        height: 40px;
     }
     .bannerText {
-        flex: 1;
+        flex: 1 1 100%;
     }
     .bannerBtn {
         width: 100%;
@@ -211,65 +180,52 @@
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    gap: 10px;
+    gap: 8px;
     width: 100%;
     text-align: left;
-    padding: clamp(16px, 2.4vw, 26px);
-    border-radius: 16px;
-    border: 2px solid #E5E7EB;
+    padding: clamp(18px, 2.2vw, 24px);
+    border-radius: 10px;
+    border: 1px solid #E5E7EB;
+    border-top: 3px solid #E5E7EB;
     background: #FFFFFF;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
     cursor: pointer;
     font-family: inherit;
-    transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+    transition: border-color 0.15s, background-color 0.15s;
 }
 
 .roleCard:hover {
-    border-color: #93B4F5;
-    box-shadow: 0 6px 20px rgba(37, 99, 235, 0.12);
-    transform: translateY(-2px);
+    border-color: #C7D2FE;
+    border-top-color: #2563EB;
+    background: #FCFDFF;
 }
 
 .roleCardOpen {
-    border-color: #2563EB;
-    box-shadow: 0 6px 20px rgba(37, 99, 235, 0.15);
+    border-color: #BFDBFE;
+    border-top-color: #2563EB;
+    background: #F8FAFF;
 }
 
 .roleTop {
     display: flex;
-    align-items: center;
-    gap: 12px;
+    align-items: baseline;
+    gap: 10px;
     width: 100%;
-}
-
-.roleIcon {
-    flex: none;
-    width: 44px;
-    height: 44px;
-    border-radius: 12px;
-    display: grid;
-    place-items: center;
-    background: #EFF6FF;
-    color: #2563EB;
-}
-
-.roleCardOpen .roleIcon {
-    background: #2563EB;
-    color: #FFFFFF;
 }
 
 .roleTitle {
     flex: 1;
     min-width: 0;
-    font-size: clamp(17px, 1.15vw, 20px);
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: clamp(18px, 1.2vw, 21px);
     font-weight: 700;
     color: #111827;
-    line-height: 1.3;
+    line-height: 1.25;
 }
 
 .roleChevron {
     flex: none;
     color: #9CA3AF;
+    font-size: 20px;
     transition: transform 0.2s, color 0.2s;
 }
 
@@ -282,48 +238,29 @@
     transform: rotate(180deg);
 }
 
-.roleTags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-}
-
-.tag {
-    font-size: 0.76rem;
-    font-weight: 700;
-    letter-spacing: 0.01em;
-    padding: 3px 10px;
-    border-radius: 999px;
-    background: #EFF6FF;
-    color: #1D4ED8;
-}
-
-.tagInPerson {
-    background: #FEF3C7;
-    color: #92400E;
+/* "2 volunteers · In person" — a plain meta line reads calmer than a row of
+   coloured pills, and it wraps properly on a narrow phone. */
+.roleMeta {
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: #2563EB;
 }
 
 .roleSummary {
     font-size: var(--v-font-sm);
-    color: #6B7280;
+    color: #4B5563;
     margin: 0;
     line-height: 1.6;
-}
-
-.roleMore {
-    font-size: 0.85rem;
-    font-weight: 700;
-    color: #2563EB;
-    margin-top: auto;
-    padding-top: 4px;
 }
 
 /* ====== Expanded detail panel ====== */
 .detail {
     grid-column: 1 / -1;
-    background: #F0F6FF;
-    border: 2px solid #BFDBFE;
-    border-radius: 16px;
+    background: #F8FAFF;
+    border: 1px solid #BFDBFE;
+    border-radius: 10px;
     padding: clamp(22px, 3vw, 32px);
     animation: detailIn 0.22s ease forwards;
 }
@@ -423,7 +360,7 @@
     background: #2563EB;
     color: #FFFFFF;
     border: 0;
-    border-radius: 999px;
+    border-radius: 8px;
     font-family: inherit;
     font-size: 0.95rem;
     font-weight: 700;
@@ -433,16 +370,13 @@
 
 .detailApply:hover {
     background: #1D4ED8;
-    transform: translateY(-1px);
-    box-shadow: 0 6px 18px rgba(37, 99, 235, 0.3);
 }
 
 /* ====== Application form card ====== */
 .formCard {
     background: #FFFFFF;
     border: 1px solid #E5E7EB;
-    border-radius: 24px;
-    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+    border-radius: 12px;
     margin: 0 auto clamp(40px, 6vw, 72px);
     padding: clamp(24px, 4vw, 48px);
     max-width: 820px;
@@ -708,8 +642,7 @@
 }
 
 .btn:hover:not(:disabled) {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(37, 99, 235, 0.35);
+    background: #1D4ED8;
 }
 
 .btn:disabled {
@@ -778,15 +711,10 @@
         gap: 12px;
     }
     .roleCard {
-        gap: 8px;
-    }
-    .roleIcon {
-        width: 38px;
-        height: 38px;
-        border-radius: 10px;
+        gap: 6px;
     }
     .roleTitle {
-        font-size: 16px;
+        font-size: 17px;
     }
     .roleSummary {
         font-size: 14px;

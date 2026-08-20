@@ -1,4 +1,32 @@
 // ============================================================
+//  VOLUNTEER PAGE — ALL THE TEXT LIVES IN THIS FILE
+// ============================================================
+//
+//  You can change any wording on the Volunteer page by editing this file.
+//  Everything between "quotation marks" is text that shows up on the site.
+//  Edit what's inside the quotes, keep the quotes and the commas.
+//
+//  Where things are, top to bottom:
+//    POSITIONS ............ the six roles and their bullet lists
+//    MIN_GRADE ............ the grade floor (currently 8th)
+//    APPLICATIONS_OPEN .... true = form showing, false = "closed" message
+//    The banner lines, closed message, and confirmation message
+//
+//  To add a role, copy one whole { ... } block inside POSITIONS, paste it,
+//  and change the text. Give it an "id" no other role uses.
+//  To remove a role, delete its whole { ... } block.
+//
+//  Two things to be careful with:
+//    - Don't change an "id" once applications are coming in. It's what
+//      shows up in the application emails.
+//    - Apostrophes inside text need a backslash: 'you\'ll' or use "you'll".
+//
+//  When you're done, tell me and I'll put it live. Nothing changes on the
+//  real site until it's deployed.
+//
+// ============================================================
+
+// ============================================================
 // VOLUNTEER POSITIONS — edit here to change the cards
 // ============================================================
 // `id` is what gets stored in the application form's checkbox list and shown
@@ -9,7 +37,7 @@ export const POSITIONS = [
         id: "outreach",
         title: "Outreach & Partnerships",
         openings: "2 volunteers",
-        summary: "Find and email the nonprofits, libraries, and community centers that could host a free workshop.",
+        summary: "You'll be how Almaden Voices meets the rest of San José.",
         intro: "You'll be how Almaden Voices meets the rest of San José. This role is for someone who isn't afraid to send the email or make the call, and who can keep track of a lot of conversations at once.",
         doing: [
             "Research nonprofits, community centers, libraries, and youth organizations that could host a free workshop",
@@ -27,7 +55,7 @@ export const POSITIONS = [
     {
         id: "grants",
         title: "Grants Researcher",
-        summary: "Track down the grants and corporate giving programs that fund a year of free workshops.",
+        summary: "Funding is what turns free workshops into something we can run all year. This role finds the money.",
         intro: "Funding is what turns free workshops from something we can do a few times into something we can do all year. This role finds the money.",
         doing: [
             "Search for grant opportunities that fit a small youth-education nonprofit in Santa Clara County",
@@ -46,7 +74,7 @@ export const POSITIONS = [
     {
         id: "events",
         title: "Events Coordinator",
-        summary: "Own the logistics for our one-year anniversary gala in late October, plus fundraisers after it.",
+        summary: "Our one-year anniversary gala is in late October, and there are fundraisers after it.",
         intro: "We're planning our one-year anniversary gala for late October, plus fundraisers through the year. This role owns the logistics so the events actually happen.",
         doing: [
             "Plan and run fundraising events, starting with the one-year anniversary gala",
@@ -64,7 +92,7 @@ export const POSITIONS = [
     {
         id: "schools",
         title: "School Partnerships Lead",
-        summary: "Build the relationships that get our workshops onto school campuses, starting with SJUSD.",
+        summary: "Getting into schools is our single biggest goal this year.",
         intro: "Getting into schools is our single biggest goal this year. This role builds and holds those relationships, starting with San José Unified.",
         doing: [
             "Build and maintain our relationship with SJUSD and other districts",
@@ -83,7 +111,7 @@ export const POSITIONS = [
         id: "instructor",
         title: "Instructor",
         inPerson: true,
-        summary: "Be in the room with the kids, teaching public speaking to grades K–9 in person.",
+        summary: "You'll be the person in the room with the kids.",
         intro: "You'll be the person in the room with the kids. This is the role that makes everything else worth doing.",
         doing: [
             "Teach public speaking and confidence skills to students in grades K–9, in person",
@@ -103,7 +131,7 @@ export const POSITIONS = [
     {
         id: "bilingual",
         title: "Bilingual Communications Volunteer",
-        summary: "Translate our flyers, forms, and outreach into Spanish, and interpret at in-person workshops.",
+        summary: "Several of the communities we serve are primarily Spanish-speaking.",
         intro: "Several communities we serve are primarily Spanish-speaking. Right now our flyers, forms, and outreach are English-only, which limits who can find us.",
         doing: [
             "Translate flyers, registration forms, and outreach emails into Spanish",
@@ -130,7 +158,7 @@ export const GRADE_REQUIREMENT_LINE =
     "Volunteers must be in 8th grade or higher.";
 
 export const DEADLINE_LINE = "Applications close Monday, August 31 at 9:00 PM PT";
-export const COMMITMENT_LINE = "About 2–3 hours per week, September through December";
+export const COMMITMENT_LINE = "About 2–3 hours a week, for at least 3 months";
 
 export const CLOSED_MESSAGE = {
     title: "Applications are closed",

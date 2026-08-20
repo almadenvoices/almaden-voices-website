@@ -441,7 +441,7 @@ app.post("/api/volunteer", async (req, res) => {
                 <hr style="border: 1px solid #eee;" />
                 <p><strong>Why this role, and what they'd bring:</strong></p>
                 <p style="background: #f5f5f5; padding: 15px; border-radius: 5px; white-space: pre-wrap;">${esc(why)}</p>
-                <p><strong>Availability (2–3 hrs/week, Sept–Dec):</strong></p>
+                <p><strong>Availability (2–3 hrs/week, 3-month minimum):</strong></p>
                 <p style="background: #f5f5f5; padding: 15px; border-radius: 5px; white-space: pre-wrap;">${esc(availability)}</p>
                 <hr style="border: 1px solid #eee;" />
                 <p><strong>Photo/video consent:</strong> ${mediaConsent ? "Yes" : "No"}</p>
