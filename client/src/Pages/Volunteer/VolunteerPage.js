@@ -1,7 +1,5 @@
 import React, { useState, useRef } from "react";
 import s from "./Volunteer.module.css";
-import VolunteerActivismIcon from "@mui/icons-material/VolunteerActivism";
-import ScheduleIcon from "@mui/icons-material/Schedule";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import CloseIcon from "@mui/icons-material/Close";
 import SendIcon from "@mui/icons-material/Send";
@@ -9,12 +7,6 @@ import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import LockClockIcon from "@mui/icons-material/LockClock";
 import PersonIcon from "@mui/icons-material/Person";
 import HowToRegIcon from "@mui/icons-material/HowToReg";
-import ConnectWithoutContactIcon from "@mui/icons-material/ConnectWithoutContact";
-import SavingsIcon from "@mui/icons-material/Savings";
-import CelebrationIcon from "@mui/icons-material/Celebration";
-import SchoolIcon from "@mui/icons-material/School";
-import RecordVoiceOverIcon from "@mui/icons-material/RecordVoiceOver";
-import TranslateIcon from "@mui/icons-material/Translate";
 import {
     POSITIONS,
     APPLICATIONS_OPEN,
@@ -26,14 +18,6 @@ import {
     CONFIRMATION_MESSAGE,
 } from "./volunteerData";
 
-const ROLE_ICONS = {
-    outreach: ConnectWithoutContactIcon,
-    grants: SavingsIcon,
-    events: CelebrationIcon,
-    schools: SchoolIcon,
-    instructor: RecordVoiceOverIcon,
-    bilingual: TranslateIcon,
-};
 
 // The age box takes "16", "10th grade", "Grade 11" — anything with a number in
 // it. The first number decides whether the under-18 fields appear; a grade
@@ -218,21 +202,18 @@ export default function VolunteerPage() {
             {/* ---------- Header ---------- */}
             <section className={s.hero}>
                 <div className="container">
-                    <div className={s.heroBadge}>
-                        <VolunteerActivismIcon fontSize="small" /> Volunteer With Us
-                    </div>
                     <h1 className={s.heroTitle}>Join the Almaden Voices Team</h1>
                     <p className={s.heroSub}>
                         Almaden Voices is a San José 501(c)(3) that has taught free public speaking to more than
-                        140 students since March 2025. We&apos;re growing — and we&apos;re looking for volunteers
+                        140 students since March 2025. We&apos;re growing, and we&apos;re looking for volunteers
                         who want to help more kids find their voices.
                     </p>
                     <p className={s.heroNote}>
-                        All roles are volunteer and unpaid. Most are remote and flexible; the Instructor role is
-                        in person. We&apos;ll work around school and work schedules. Volunteers who stay committed
-                        and do great work are welcome to continue beyond December — several of these roles are
-                        ones we&apos;d love someone to grow into. Interviews begin the first week of September.{" "}
-                        <strong>{GRADE_REQUIREMENT_LINE}</strong>
+                        All roles are volunteer and unpaid. Most are remote and flexible. The Instructor role is
+                        in person. We&apos;ll work around school and work schedules, and we ask that you plan to
+                        stay with us for at least 3 months. Plenty of our volunteers stay far longer, and several
+                        of these roles are ones we&apos;d love someone to grow into. Interviews begin the first
+                        week of September. <strong>{GRADE_REQUIREMENT_LINE}</strong>
                     </p>
                 </div>
             </section>
@@ -240,9 +221,6 @@ export default function VolunteerPage() {
             {/* ---------- Deadline banner ---------- */}
             <div className="container">
                 <div className={s.banner}>
-                    <div className={s.bannerIcon}>
-                        <ScheduleIcon />
-                    </div>
                     <div className={s.bannerText}>
                         <span className={s.bannerLine1}>{DEADLINE_LINE}</span>
                         <span className={s.bannerLine2}>{COMMITMENT_LINE}</span>
@@ -261,13 +239,12 @@ export default function VolunteerPage() {
                 <div className={s.sectionHead}>
                     <h2 className={s.sectionTitle}>Open positions</h2>
                     <p className={s.sectionSub}>
-                        Tap a role to see the full description. You can apply for more than one.
+                        Tap a role to read the whole thing. You can apply for more than one.
                     </p>
                 </div>
 
                 <div className={s.cardGrid}>
                     {POSITIONS.map((position) => {
-                        const Icon = ROLE_ICONS[position.id] || VolunteerActivismIcon;
                         const isOpen = openRole === position.id;
                         // The open role's detail panel is a full-width grid item
                         // dropped in right after its card, so it reads as an
@@ -282,20 +259,17 @@ export default function VolunteerPage() {
                                     aria-controls={`role-detail-${position.id}`}
                                 >
                                     <div className={s.roleTop}>
-                                        <span className={s.roleIcon}><Icon /></span>
                                         <span className={s.roleTitle}>{position.title}</span>
                                         <ExpandMoreIcon className={s.roleChevron} />
                                     </div>
                                     {(position.openings || position.inPerson) && (
-                                        <div className={s.roleTags}>
-                                            {position.openings && <span className={s.tag}>{position.openings}</span>}
-                                            {position.inPerson && (
-                                                <span className={`${s.tag} ${s.tagInPerson}`}>In person</span>
-                                            )}
-                                        </div>
+                                        <span className={s.roleMeta}>
+                                            {[position.openings, position.inPerson && "In person"]
+                                                .filter(Boolean)
+                                                .join(" · ")}
+                                        </span>
                                     )}
                                     <p className={s.roleSummary}>{position.summary}</p>
-                                    <span className={s.roleMore}>{isOpen ? "Hide details" : "See the full role"}</span>
                                 </button>
 
                                 {isOpen && (
@@ -350,6 +324,10 @@ export default function VolunteerPage() {
                     <h3>A few things that apply to every role</h3>
                     <ul>
                         <li>{GRADE_REQUIREMENT_LINE} This applies to every role, including the remote ones.</li>
+                        <li>
+                            We ask for a commitment of at least 3 months. These roles take a while to get good
+                            at, and the people we&apos;re reaching out to need to see the same name twice.
+                        </li>
                         <li>Any email you send on behalf of Almaden Voices must cc almadenvoices@gmail.com</li>
                         <li>
                             For your first month, send drafts to us for a quick look before they go out. Once
@@ -590,7 +568,6 @@ export default function VolunteerPage() {
                                 <label>
                                     Which position(s) are you applying for? <span className={s.req}>*</span>
                                 </label>
-                                <p className={s.hint}>Pick as many as you&apos;d like.</p>
                                 <div className={s.optionGrid}>
                                     {POSITIONS.map((position) => (
                                         <label
@@ -617,7 +594,7 @@ export default function VolunteerPage() {
                                 <label htmlFor="why">
                                     Why this role, and what would you bring to it? <span className={s.req}>*</span>
                                 </label>
-                                <p className={s.hint}>About 150 words is plenty.</p>
+                                <p className={s.hint}>A short paragraph is plenty, around 150 words.</p>
                                 <textarea
                                     id="why"
                                     value={why}
@@ -629,9 +606,9 @@ export default function VolunteerPage() {
 
                             <div className={`${s.field} ${errors.availability ? s.fieldError : ""}`}>
                                 <label htmlFor="availability">
-                                    This role asks for about 2–3 hours per week from September through December. Can
-                                    you commit to that, and is there anything about your schedule we should know?{" "}
-                                    <span className={s.req}>*</span>
+                                    This role asks for about 2–3 hours a week, and we&apos;re looking for people who
+                                    can stay with us at least 3 months. Can you commit to that, and is there anything
+                                    about your schedule we should know? <span className={s.req}>*</span>
                                 </label>
                                 <input
                                     id="availability"
