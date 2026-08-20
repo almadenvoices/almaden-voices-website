@@ -20,6 +20,8 @@ import {
     APPLICATIONS_OPEN,
     DEADLINE_LINE,
     COMMITMENT_LINE,
+    MIN_GRADE,
+    GRADE_REQUIREMENT_LINE,
     CLOSED_MESSAGE,
     CONFIRMATION_MESSAGE,
 } from "./volunteerData";
@@ -41,6 +43,36 @@ function isUnder18(ageText) {
     const match = String(ageText || "").match(/\d+/);
     if (!match) return false;
     return Number(match[0]) < 18;
+}
+
+// Work out whether what someone typed is a grade or an age, so the 8th-grade
+// floor can be enforced without rejecting an adult who wrote "34".
+// Returns "ok" | "too-young" | "unknown" — "unknown" is let through, because a
+// human reading "college sophomore" will sort it out faster than a regex.
+function checkGradeFloor(text) {
+    const raw = String(text || "").trim().toLowerCase();
+    if (!raw) return "unknown";
+
+    // Kindergarten and pre-K never carry a usable number.
+    if (/\b(pre-?k|prek|kinder\w*|\bk\b)/.test(raw)) return "too-young";
+
+    // Anything that reads as past high school clears the bar outright.
+    if (/(college|university|undergrad|graduate|adult|parent|profession|working|teacher|retired)/.test(raw)) {
+        return "ok";
+    }
+
+    const num = raw.match(/\d+/);
+    if (!num) return "unknown";
+    const value = Number(num[0]);
+
+    // "9th grade", "grade 9", "9th" — treat the number as a grade level.
+    const readsAsGrade = /grade|\d+\s*(st|nd|rd|th)\b/.test(raw);
+    if (readsAsGrade) return value >= MIN_GRADE ? "ok" : "too-young";
+
+    // A bare number is an age. 13 is the youngest an 8th grader normally is, so
+    // that's the floor — better to let a 13-year-old 7th grader through and
+    // catch it at interview than to turn away an eligible 8th grader.
+    return value >= 13 ? "ok" : "too-young";
 }
 
 const emailLooksValid = (value) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(value || "").trim());
@@ -104,6 +136,11 @@ export default function VolunteerPage() {
         else if (!emailLooksValid(email)) next.email = "Please enter a valid email address.";
         if (!phone.trim()) next.phone = "Required.";
         if (!ageOrGrade.trim()) next.ageOrGrade = "Required.";
+        else if (checkGradeFloor(ageOrGrade) === "too-young") {
+            // A bare "8" reads as age 8 and gets caught here, so the message
+            // spells out how to write a grade.
+            next.ageOrGrade = "Volunteers need to be in 8th grade or higher. If you meant a grade level, write it like \"8th grade\".";
+        }
 
         if (showUnder18Block) {
             if (!parentName.trim()) next.parentName = "Required.";
@@ -194,7 +231,8 @@ export default function VolunteerPage() {
                         All roles are volunteer and unpaid. Most are remote and flexible; the Instructor role is
                         in person. We&apos;ll work around school and work schedules. Volunteers who stay committed
                         and do great work are welcome to continue beyond December — several of these roles are
-                        ones we&apos;d love someone to grow into. Interviews begin the first week of September.
+                        ones we&apos;d love someone to grow into. Interviews begin the first week of September.{" "}
+                        <strong>{GRADE_REQUIREMENT_LINE}</strong>
                     </p>
                 </div>
             </section>
@@ -208,6 +246,7 @@ export default function VolunteerPage() {
                     <div className={s.bannerText}>
                         <span className={s.bannerLine1}>{DEADLINE_LINE}</span>
                         <span className={s.bannerLine2}>{COMMITMENT_LINE}</span>
+                        <span className={s.bannerLine2}>{GRADE_REQUIREMENT_LINE}</span>
                     </div>
                     {APPLICATIONS_OPEN && (
                         <button type="button" className={s.bannerBtn} onClick={() => openApplication("")}>
@@ -310,6 +349,7 @@ export default function VolunteerPage() {
                 <div className={s.groundRules}>
                     <h3>A few things that apply to every role</h3>
                     <ul>
+                        <li>{GRADE_REQUIREMENT_LINE} This applies to every role, including the remote ones.</li>
                         <li>Any email you send on behalf of Almaden Voices must cc almadenvoices@gmail.com</li>
                         <li>
                             For your first month, send drafts to us for a quick look before they go out. Once
@@ -490,6 +530,7 @@ export default function VolunteerPage() {
                                     <label htmlFor="ageOrGrade">
                                         Age or grade level <span className={s.req}>*</span>
                                     </label>
+                                    <p className={s.hint}>Must be in 8th grade or higher.</p>
                                     <input
                                         id="ageOrGrade"
                                         type="text"

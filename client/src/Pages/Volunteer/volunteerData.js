@@ -123,6 +123,12 @@ export const POSITIONS = [
 // ============================================================
 export const APPLICATIONS_OPEN = true;
 
+// Minimum grade level for every role. The form checks what's typed into the
+// age/grade box against this and blocks anything clearly below it.
+export const MIN_GRADE = 8;
+export const GRADE_REQUIREMENT_LINE =
+    "Volunteers must be in 8th grade or higher.";
+
 export const DEADLINE_LINE = "Applications close Monday, August 31 at 9:00 PM PT";
 export const COMMITMENT_LINE = "About 2–3 hours per week, September through December";
 
