@@ -51,6 +51,29 @@ const REG_HEADERS = [
   "Future Contact Opt-In"
 ];
 
+// Desired column order for the "Volunteer Applications" sheet. Same rules as
+// REG_HEADERS: columns are matched by name, and new ones are appended to an
+// existing sheet rather than shifting what's already there.
+const VOL_HEADERS = [
+  "Timestamp",
+  "Confirmation Number",
+  "Applicant Name",
+  "Email",
+  "Phone",
+  "Age / Grade",
+  "Positions Applied For",
+  "Who Is Applying",
+  "Parent/Guardian Name",
+  "Parent/Guardian Email",
+  "Parent/Guardian Phone",
+  "Why This Role",
+  "Availability",
+  "Photo/Video Consent",
+  "Parent/Guardian Aware",
+  "Status",
+  "Notes"
+];
+
 // ============================================================
 // WORKSHOPS — keyed by the session "id" used on the website.
 // Any registration whose sessionType matches a key here gets the detailed
@@ -99,6 +122,11 @@ const DAY = 24 * HOUR;
 function doPost(e) {
   try {
     const data = JSON.parse(e.postData.contents);
+
+    // The Volunteer With Us page posts here too, tagged with formType.
+    if (data.formType === "volunteer") {
+      return handleVolunteerApplication(data);
+    }
 
     const ss = SpreadsheetApp.getActiveSpreadsheet();
     const sheet = getRegistrationsSheet(ss);
@@ -170,16 +198,27 @@ function doPost(e) {
 // SHEET HELPERS (column-name based, safe for existing sheets)
 // ============================================================
 function getRegistrationsSheet(ss) {
-  let sheet = ss.getSheetByName("Registrations");
+  return getSheetWithHeaders(ss, "Registrations", REG_HEADERS);
+}
+
+// The volunteer applications land on their own tab in the same spreadsheet.
+function getVolunteerSheet(ss) {
+  const sheet = getSheetWithHeaders(ss, "Volunteer Applications", VOL_HEADERS);
+  sheet.setFrozenRows(1);
+  return sheet;
+}
+
+function getSheetWithHeaders(ss, name, wantedHeaders) {
+  let sheet = ss.getSheetByName(name);
   if (!sheet) {
-    sheet = ss.insertSheet("Registrations");
-    sheet.appendRow(REG_HEADERS);
-    sheet.getRange(1, 1, 1, REG_HEADERS.length).setFontWeight("bold");
+    sheet = ss.insertSheet(name);
+    sheet.appendRow(wantedHeaders);
+    sheet.getRange(1, 1, 1, wantedHeaders.length).setFontWeight("bold");
     return sheet;
   }
   // Migrate: make sure every desired header exists; append any that are missing.
   const headers = sheet.getRange(1, 1, 1, Math.max(1, sheet.getLastColumn())).getValues()[0];
-  const missing = REG_HEADERS.filter(function(h) { return headers.indexOf(h) === -1; });
+  const missing = wantedHeaders.filter(function(h) { return headers.indexOf(h) === -1; });
   if (missing.length) {
     const startCol = headers.length + 1;
     sheet.getRange(1, startCol, 1, missing.length).setValues([missing]).setFontWeight("bold");
@@ -457,6 +496,227 @@ function buildAdminHtml(data, students, studentListHtml, childWord, timestamp) {
       '<hr style="border: 1px solid #eee;" />' +
       '<p style="color: #666; font-size: 12px;">Registered: ' + timestamp.toLocaleString() + '</p>' +
     '</div>';
+}
+
+// ============================================================
+// VOLUNTEER APPLICATIONS
+//
+// The "Volunteer With Us" page (almadenvoices.org/volunteer) posts here with
+// formType: "volunteer". Each application becomes one row on the
+// "Volunteer Applications" tab, and two emails go out: a branded confirmation
+// to the applicant and a notification to ADMIN_EMAIL.
+//
+// The two lines below are the only wording you normally need to change --
+// they appear in the applicant's confirmation email.
+// ============================================================
+const VOLUNTEER_DEADLINE_TEXT = "Applications close August 31 at 9 PM PT.";
+const VOLUNTEER_NEXT_STEP_TEXT =
+  "We read every application ourselves. We'll be in touch the first week of September to schedule interviews.";
+
+function handleVolunteerApplication(data) {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = getVolunteerSheet(ss);
+
+  const timestamp = new Date();
+  const confirmationNumber = makeConfirmationNumber();
+  const whoIsApplying = data.applyingAs === "parent"
+    ? "Parent/guardian, on behalf of their child"
+    : "Applying for themselves";
+
+  appendMappedRow(sheet, {
+    "Timestamp": timestamp,
+    "Confirmation Number": confirmationNumber,
+    "Applicant Name": data.fullName || "",
+    "Email": data.email || "",
+    "Phone": data.phone || "",
+    "Age / Grade": data.ageOrGrade || "",
+    "Positions Applied For": data.positions || "",
+    "Who Is Applying": whoIsApplying,
+    "Parent/Guardian Name": data.parentName || "",
+    "Parent/Guardian Email": data.parentEmail || "",
+    "Parent/Guardian Phone": data.parentPhone || "",
+    "Why This Role": data.why || "",
+    "Availability": data.availability || "",
+    "Photo/Video Consent": data.mediaConsent ? "Yes" : "No",
+    "Parent/Guardian Aware": data.guardianConsent === null || data.guardianConsent === undefined
+      ? ""
+      : (data.guardianConsent ? "Yes" : "No"),
+    "Status": "New",
+    "Notes": ""
+  });
+
+  // Admin notification -- reply goes straight to the applicant.
+  GmailApp.sendEmail(ADMIN_EMAIL,
+    "Volunteer application: " + (data.fullName || "") + " - " + (data.positions || ""),
+    "New volunteer application received. See the HTML version for details.",
+    {
+      htmlBody: buildVolunteerAdminHtml(data, whoIsApplying, confirmationNumber, timestamp, ss.getUrl()),
+      name: ORG_NAME + " Volunteer Form",
+      replyTo: data.email || ADMIN_EMAIL
+    }
+  );
+
+  // Applicant confirmation. A bad address here shouldn't lose the application,
+  // which is already safely on the sheet.
+  try {
+    GmailApp.sendEmail(data.email,
+      "We got your volunteer application - " + confirmationNumber,
+      "Thanks for applying to volunteer with Almaden Voices. See the HTML version of this email for details.",
+      {
+        htmlBody: buildVolunteerApplicantHtml(data, confirmationNumber),
+        name: ORG_NAME,
+        bcc: ADMIN_EMAIL
+      }
+    );
+  } catch (mailErr) {
+    Logger.log("Volunteer confirmation email failed: " + mailErr.message);
+  }
+
+  return jsonOut({ success: true, confirmationNumber: confirmationNumber });
+}
+
+// Applications are typed in by hand, so escape anything that lands in HTML.
+function esc(value) {
+  return String(value == null ? "" : value)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+// Escape, then keep the applicant's line breaks in the email.
+function escMultiline(value) {
+  return esc(value).replace(/\r\n|\r|\n/g, "<br/>");
+}
+
+function makeConfirmationNumber() {
+  const stamp = Date.now().toString(36).toUpperCase();
+  let random = "";
+  for (let i = 0; i < 4; i++) {
+    random += "ABCDEFGHJKMNPQRSTUVWXYZ23456789".charAt(Math.floor(Math.random() * 31));
+  }
+  return "AV-" + stamp + "-" + random;
+}
+
+// Soft card used for the longer, free-text answers.
+function quoteBlockHtml(label, text) {
+  return '' +
+    '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" ' +
+      'style="background:' + C_SOFT + ';border:1px solid ' + C_LINE + ';border-radius:12px;margin:0 0 16px;">' +
+      '<tr><td style="padding:18px 20px;font-family:' + FONT_BODY + ';">' +
+        sectionTitle(label) +
+        '<p style="margin:0;font-size:15px;line-height:1.65;color:' + C_BODY + ';">' + escMultiline(text) + '</p>' +
+      '</td></tr>' +
+    '</table>';
+}
+
+// The "here's what you sent us" / "here's who applied" detail table.
+function volunteerDetailsHtml(rows) {
+  const body = rows.filter(function(r) { return r && r[1]; })
+    .map(function(r) { return detailRow(r[0], esc(r[1])); })
+    .join('');
+
+  return '' +
+    '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" ' +
+      'style="background:#FFFFFF;border:1px solid ' + C_LINE + ';border-radius:12px;margin:0 0 24px;">' +
+      '<tr><td style="padding:6px 22px 18px;">' +
+        '<p style="margin:16px 0 2px;font-family:' + FONT_BODY + ';font-size:12px;letter-spacing:1.2px;' +
+          'text-transform:uppercase;color:' + C_MUTED + ';font-weight:700;">Your application</p>' +
+        '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">' + body + '</table>' +
+      '</td></tr>' +
+    '</table>';
+}
+
+function buildVolunteerApplicantHtml(data, confirmationNumber) {
+  const firstName = String(data.fullName || "").trim().split(/\s+/)[0] || "there";
+
+  const steps = [
+    ["1. We review your application", VOLUNTEER_DEADLINE_TEXT],
+    ["2. Interviews", VOLUNTEER_NEXT_STEP_TEXT],
+    ["3. Getting started", "If it's a fit, we'll walk you through onboarding and pair you with someone on the team."]
+  ].map(function(step, i) {
+    return '<tr><td style="padding:14px 0;' + (i ? 'border-top:1px solid ' + C_LINE + ';' : '') +
+      'font-family:' + FONT_BODY + ';">' +
+      '<p style="margin:0 0 4px;font-size:15px;font-weight:700;color:' + C_TEXT + ';">' + step[0] + '</p>' +
+      '<p style="margin:0;font-size:15px;line-height:1.6;color:' + C_BODY + ';">' + step[1] + '</p>' +
+      '</td></tr>';
+  }).join('');
+
+  const inner = '' +
+    '<p style="margin:0 0 16px;">Hi ' + esc(firstName) + ',</p>' +
+    '<p style="margin:0 0 24px;">Thank you for applying to volunteer with ' + ORG_NAME + '. Your application is in, ' +
+      'and nothing more is needed from you right now.</p>' +
+
+    volunteerDetailsHtml([
+      ["Applying for", data.positions],
+      ["Name", data.fullName],
+      ["Email", data.email],
+      ["Phone", data.phone],
+      ["Age / grade", data.ageOrGrade],
+      ["Confirmation number", confirmationNumber]
+    ]) +
+
+    '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" ' +
+      'style="background:' + C_SOFT + ';border:1px solid ' + C_LINE + ';border-radius:12px;margin:0 0 24px;">' +
+      '<tr><td style="padding:20px 22px;">' +
+        sectionTitle('What happens next') +
+        '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">' + steps + '</table>' +
+      '</td></tr>' +
+    '</table>' +
+
+    '<p style="margin:0 0 16px;">Every one of our volunteers helps a kid stand up and speak with confidence. ' +
+      'We\'re glad you want to be part of that.</p>' +
+    '<p style="margin:0;">Questions in the meantime? Just reply to this email.</p>';
+
+  return emailShell("Application received", data.positions ? esc(data.positions) : "", inner);
+}
+
+function buildVolunteerAdminHtml(data, whoIsApplying, confirmationNumber, timestamp, sheetUrl) {
+  const guardian = (data.parentName || data.parentEmail || data.parentPhone)
+    ? esc(data.parentName) +
+      (data.parentEmail ? ' &middot; ' + esc(data.parentEmail) : '') +
+      (data.parentPhone ? ' &middot; ' + esc(data.parentPhone) : '')
+    : '';
+
+  const consent = 'Photo/video: ' + (data.mediaConsent ? 'Yes' : 'No') +
+    (data.guardianConsent === null || data.guardianConsent === undefined
+      ? ''
+      : ' &middot; Parent/guardian aware: ' + (data.guardianConsent ? 'Yes' : 'No'));
+
+  // Third slot marks a value that is already HTML, so it isn't escaped twice.
+  const rows = [
+    ["Applying for", data.positions],
+    ["Who is applying", whoIsApplying],
+    ["Email", data.email],
+    ["Phone", data.phone],
+    ["Age / grade", data.ageOrGrade],
+    ["Parent/guardian", guardian, true],
+    ["Consent", consent, true],
+    ["Confirmation number", confirmationNumber],
+    ["Received", timestamp.toLocaleString()]
+  ].filter(function(r) { return r[1]; })
+   .map(function(r) { return detailRow(r[0], r[2] ? r[1] : esc(r[1])); })
+   .join('');
+
+  const inner = '' +
+    '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" ' +
+      'style="background:#FFFFFF;border:1px solid ' + C_LINE + ';border-radius:12px;margin:0 0 24px;">' +
+      '<tr><td style="padding:6px 22px 18px;">' +
+        '<p style="margin:16px 0 2px;font-family:' + FONT_BODY + ';font-size:12px;letter-spacing:1.2px;' +
+          'text-transform:uppercase;color:' + C_MUTED + ';font-weight:700;">Applicant</p>' +
+        '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">' + rows + '</table>' +
+      '</td></tr>' +
+    '</table>' +
+    quoteBlockHtml('Why this role, and what they\'d bring', data.why) +
+    quoteBlockHtml('Availability (2-3 hrs/week, 3-month minimum)', data.availability) +
+    '<p style="margin:24px 0 0;font-size:14px;color:' + C_MUTED + ';">Reply to this email to answer ' +
+      esc(data.fullName) + ' directly.' +
+      (sheetUrl ? ' &middot; <a href="' + sheetUrl + '" style="color:' + C_ACCENT + ';text-decoration:none;">Open the applications sheet</a>' : '') +
+    '</p>';
+
+  return emailShell("New volunteer application",
+    esc(data.fullName) + (data.positions ? ' &mdash; ' + esc(data.positions) : ''),
+    inner);
 }
 
 // ============================================================

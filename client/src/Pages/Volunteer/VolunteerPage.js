@@ -17,6 +17,7 @@ import {
     CLOSED_MESSAGE,
     CONFIRMATION_MESSAGE,
 } from "./volunteerData";
+import { APPS_SCRIPT_URL } from "../../data/appsScript";
 
 
 // The age box takes "16", "10th grade", "Grade 11" — anything with a number in
@@ -160,34 +161,58 @@ export default function VolunteerPage() {
             .map((id) => POSITIONS.find((p) => p.id === id)?.title || id)
             .join(", ");
 
+        const application = {
+            formType: "volunteer",
+            applyingAs,
+            parentName: showParentBlock || showUnder18Block ? parentName : "",
+            parentEmail: showParentBlock || showUnder18Block ? parentEmail : "",
+            parentPhone: showParentBlock ? parentPhone : "",
+            fullName,
+            email,
+            phone,
+            ageOrGrade,
+            positions: roleTitles,
+            why,
+            availability,
+            mediaConsent,
+            guardianConsent: showGuardianConsent ? guardianConsent : null,
+        };
+
         try {
-            const response = await fetch("/api/volunteer", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    applyingAs,
-                    parentName: showParentBlock || showUnder18Block ? parentName : "",
-                    parentEmail: showParentBlock || showUnder18Block ? parentEmail : "",
-                    parentPhone: showParentBlock ? parentPhone : "",
-                    fullName,
-                    email,
-                    phone,
-                    ageOrGrade,
-                    positions: roleTitles,
-                    why,
-                    availability,
-                    mediaConsent,
-                    guardianConsent: showGuardianConsent ? guardianConsent : null,
-                }),
-            });
+            // First choice: the Google Apps Script, which adds a row to the
+            // volunteer spreadsheet and sends the confirmation emails.
+            // text/plain avoids a CORS preflight so we can read the response.
+            let ok = false;
+            try {
+                const response = await fetch(APPS_SCRIPT_URL, {
+                    method: "POST",
+                    headers: { "Content-Type": "text/plain;charset=utf-8" },
+                    body: JSON.stringify(application),
+                });
+                const result = response.ok ? await response.json().catch(() => null) : null;
+                ok = Boolean(result && result.success);
+            } catch (scriptErr) {
+                console.error("Volunteer form: Apps Script submit failed", scriptErr);
+            }
 
-            const result = await response.json().catch(() => null);
+            // If Google is unreachable, fall back to our own server so the
+            // application still reaches the inbox rather than being lost.
+            if (!ok) {
+                const response = await fetch("/api/volunteer", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(application),
+                });
+                const result = await response.json().catch(() => null);
+                ok = Boolean(response.ok && result && result.success);
+                if (!ok) {
+                    setFormError((result && result.error) || "Something went wrong sending your application. Please try again.");
+                }
+            }
 
-            if (response.ok && result && result.success) {
+            if (ok) {
                 setSubmitted(true);
                 formRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-            } else {
-                setFormError((result && result.error) || "Something went wrong sending your application. Please try again.");
             }
         } catch (err) {
             console.error("Volunteer form error:", err);

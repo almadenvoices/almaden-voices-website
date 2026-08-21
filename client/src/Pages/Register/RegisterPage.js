@@ -23,6 +23,7 @@ import RecordVoiceOverIcon from "@mui/icons-material/RecordVoiceOver";
 import WorkshopInterestForm from "../../components/WorkshopInterestForm";
 import CoachingSlots from "../../components/CoachingSlots";
 import { T, t, Bi, LANG_STORAGE_KEY, DEFAULT_LANG } from "../../i18n/registerText";
+import { APPS_SCRIPT_URL } from "../../data/appsScript";
 
 // Which panel each chooser button opens, and the id it scrolls to.
 const PANEL_IDS = {
@@ -109,8 +110,6 @@ export default function RegisterPage() {
         }
     }
 
-    // Google Apps Script web app URL — replace with your deployed URL
-    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxrbVWSjMpAB4Ru1mm_DSywPdfFS3KfMMA07Ie_e1VbXGeW_ILtNQ-vE8rQrIYubjFI/exec";
 
     // Detect when the parent's full name matches any student's full name
     // (a common mistake where parents type their child's name in the parent field, or vice versa)
