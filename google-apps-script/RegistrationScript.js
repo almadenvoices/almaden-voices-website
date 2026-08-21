@@ -56,7 +56,6 @@ const REG_HEADERS = [
 // existing sheet rather than shifting what's already there.
 const VOL_HEADERS = [
   "Timestamp",
-  "Confirmation Number",
   "Applicant Name",
   "Email",
   "Phone",
@@ -553,14 +552,12 @@ function handleVolunteerApplication(data) {
   const sheet = getVolunteerSheet(ss);
 
   const timestamp = new Date();
-  const confirmationNumber = makeConfirmationNumber();
   const whoIsApplying = data.applyingAs === "parent"
     ? "Parent/guardian, on behalf of their child"
     : "Applying for themselves";
 
   appendMappedRow(sheet, {
     "Timestamp": timestamp,
-    "Confirmation Number": confirmationNumber,
     "Applicant Name": data.fullName || "",
     "Email": data.email || "",
     "Phone": data.phone || "",
@@ -585,7 +582,7 @@ function handleVolunteerApplication(data) {
     "Volunteer application: " + (data.fullName || "") + " - " + (data.positions || ""),
     "New volunteer application received. See the HTML version for details.",
     {
-      htmlBody: buildVolunteerAdminHtml(data, whoIsApplying, confirmationNumber, timestamp, ss.getUrl()),
+      htmlBody: buildVolunteerAdminHtml(data, whoIsApplying, timestamp, ss.getUrl()),
       name: ORG_NAME + " Volunteer Form",
       replyTo: data.email || ADMIN_EMAIL
     }
@@ -595,10 +592,10 @@ function handleVolunteerApplication(data) {
   // which is already safely on the sheet.
   try {
     GmailApp.sendEmail(data.email,
-      "We got your volunteer application - " + confirmationNumber,
+      "We got your volunteer application",
       "Thanks for applying to volunteer with Almaden Voices. See the HTML version of this email for details.",
       {
-        htmlBody: buildVolunteerApplicantHtml(data, confirmationNumber),
+        htmlBody: buildVolunteerApplicantHtml(data),
         name: ORG_NAME,
         bcc: ADMIN_EMAIL
       }
@@ -607,7 +604,7 @@ function handleVolunteerApplication(data) {
     Logger.log("Volunteer confirmation email failed: " + mailErr.message);
   }
 
-  return jsonOut({ success: true, confirmationNumber: confirmationNumber });
+  return jsonOut({ success: true });
 }
 
 // Run this once from the Apps Script editor (pick it in the function dropdown
@@ -648,15 +645,6 @@ function escMultiline(value) {
   return esc(value).replace(/\r\n|\r|\n/g, "<br/>");
 }
 
-function makeConfirmationNumber() {
-  const stamp = Date.now().toString(36).toUpperCase();
-  let random = "";
-  for (let i = 0; i < 4; i++) {
-    random += "ABCDEFGHJKMNPQRSTUVWXYZ23456789".charAt(Math.floor(Math.random() * 31));
-  }
-  return "AV-" + stamp + "-" + random;
-}
-
 // Soft card used for the longer, free-text answers.
 function quoteBlockHtml(label, text) {
   return '' +
@@ -686,7 +674,7 @@ function volunteerDetailsHtml(rows) {
     '</table>';
 }
 
-function buildVolunteerApplicantHtml(data, confirmationNumber) {
+function buildVolunteerApplicantHtml(data) {
   const firstName = String(data.fullName || "").trim().split(/\s+/)[0] || "there";
 
   const steps = [
@@ -711,8 +699,7 @@ function buildVolunteerApplicantHtml(data, confirmationNumber) {
       ["Name", data.fullName],
       ["Email", data.email],
       ["Phone", data.phone],
-      ["Age / grade", data.ageOrGrade],
-      ["Confirmation number", confirmationNumber]
+      ["Age / grade", data.ageOrGrade]
     ]) +
 
     '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" ' +
@@ -730,7 +717,7 @@ function buildVolunteerApplicantHtml(data, confirmationNumber) {
   return emailShell("Application received", data.positions ? esc(data.positions) : "", inner);
 }
 
-function buildVolunteerAdminHtml(data, whoIsApplying, confirmationNumber, timestamp, sheetUrl) {
+function buildVolunteerAdminHtml(data, whoIsApplying, timestamp, sheetUrl) {
   const guardian = (data.parentName || data.parentEmail || data.parentPhone)
     ? esc(data.parentName) +
       (data.parentEmail ? ' &middot; ' + esc(data.parentEmail) : '') +
@@ -751,7 +738,6 @@ function buildVolunteerAdminHtml(data, whoIsApplying, confirmationNumber, timest
     ["Age / grade", data.ageOrGrade],
     ["Parent/guardian", guardian, true],
     ["Consent", consent, true],
-    ["Confirmation number", confirmationNumber],
     ["Received", timestamp.toLocaleString()]
   ].filter(function(r) { return r[1]; })
    .map(function(r) { return detailRow(r[0], r[2] ? r[1] : esc(r[1])); })

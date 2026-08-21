@@ -129,7 +129,6 @@ The spreadsheet has one row per applicant:
 | Column | Description |
 |--------|-------------|
 | Timestamp | When the application came in |
-| Confirmation Number | Same number shown in the applicant's email |
 | Applicant Name / Email / Phone / Age / Grade | Who applied |
 | Positions Applied For | The role titles they checked |
 | Who Is Applying | Themselves, or a parent on behalf of their child |
