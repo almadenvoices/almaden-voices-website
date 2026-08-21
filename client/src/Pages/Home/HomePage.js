@@ -320,6 +320,8 @@ export default function HomePage(){
     const moreRef = useRef(null);
     const videoRef = useRef(null);
     const [videoPlaying, setVideoPlaying] = useState(false);
+    const missionVideoRef = useRef(null);
+    const [missionVideoPlaying, setMissionVideoPlaying] = useState(false);
     const navigate = useNavigate();
 
     const reviewCount = testimonials.length;
@@ -399,6 +401,107 @@ export default function HomePage(){
             </Box>
 
             <VisionMission />
+
+            {/* Who We Are — the students and Anjika saying it in their own voices.
+                Sits right under the written mission so you hear it after reading it.
+                Click to play: the whole point is the sound, so it can't autoplay. */}
+            <Box sx={{ py: 10, bgcolor: "#F9FAFB" }}>
+                <Container maxWidth="md">
+                    <motion.div
+                        initial={{ opacity: 0, y: 30 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 0.5 }}
+                    >
+                        <Typography
+                            variant="h3"
+                            align="center"
+                            sx={{ fontWeight: "bold", mb: 2, color: "#111827" }}
+                        >
+                            Who We Are
+                        </Typography>
+                        <Box
+                            sx={{
+                                width: 80,
+                                height: 4,
+                                bgcolor: "#2563EB",
+                                borderRadius: 2,
+                                mx: "auto",
+                                mb: 2,
+                            }}
+                        />
+                        <Typography
+                            variant="body1"
+                            align="center"
+                            sx={{ color: "#6B7280", mb: 5, lineHeight: 1.8 }}
+                        >
+                            Our students say it better than we can. Turn your sound on.
+                        </Typography>
+
+                        <Box
+                            sx={{
+                                position: "relative",
+                                width: "100%",
+                                aspectRatio: "16/9",
+                                borderRadius: 3,
+                                overflow: "hidden",
+                                boxShadow: "0 8px 30px rgba(0,0,0,0.12)",
+                                bgcolor: "#000",
+                            }}
+                        >
+                            <Box
+                                component="video"
+                                ref={missionVideoRef}
+                                src="/who-are-we.mp4"
+                                poster="/images/who-are-we-poster.jpg"
+                                controls={missionVideoPlaying}
+                                preload="metadata"
+                                playsInline
+                                onEnded={() => setMissionVideoPlaying(false)}
+                                sx={{
+                                    width: "100%",
+                                    height: "100%",
+                                    objectFit: "cover",
+                                    display: "block",
+                                }}
+                            />
+                            {!missionVideoPlaying && (
+                                <Box
+                                    onClick={() => {
+                                        setMissionVideoPlaying(true);
+                                        missionVideoRef.current?.play();
+                                    }}
+                                    sx={{
+                                        position: "absolute",
+                                        inset: 0,
+                                        display: "flex",
+                                        alignItems: "center",
+                                        justifyContent: "center",
+                                        bgcolor: "rgba(0,0,0,0.3)",
+                                        transition: "background-color 0.2s",
+                                        cursor: "pointer",
+                                        "&:hover": { bgcolor: "rgba(0,0,0,0.15)" },
+                                    }}
+                                >
+                                    <Box
+                                        sx={{
+                                            width: 72,
+                                            height: 72,
+                                            borderRadius: "50%",
+                                            bgcolor: "rgba(255,255,255,0.9)",
+                                            display: "flex",
+                                            alignItems: "center",
+                                            justifyContent: "center",
+                                        }}
+                                    >
+                                        <PlayArrowIcon sx={{ fontSize: 40, color: "#2563EB" }} />
+                                    </Box>
+                                </Box>
+                            )}
+                        </Box>
+                    </motion.div>
+                </Container>
+            </Box>
 
             {/* Average rating summary */}
             <Box sx={{ pt: 8, pb: 2, bgcolor: "#FFFFFF", textAlign: "center" }}>

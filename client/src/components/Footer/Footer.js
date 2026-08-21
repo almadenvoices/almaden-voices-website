@@ -257,7 +257,7 @@ const Footer = () => {
                         <div style={{ textAlign: 'center', marginBottom: '20px' }}>
                             <a href="/home" style={{ display: 'inline-block' }}>
                                 <img
-                                    src="/almaden_voices_logo_text.png"
+                                    src="/almaden_voices_logo_transparent.png"
                                     alt="Almaden Voices"
                                     style={{ height: '120px', width: 'auto' }}
                                 />

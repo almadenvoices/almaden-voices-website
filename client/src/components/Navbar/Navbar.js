@@ -38,7 +38,7 @@ function MobileDrawer({ open, onClose }) {
                     <RouterLink to="/home" onClick={onClose} style={{ display: 'inline-flex', alignItems: 'center' }}>
                         <Box
                             component="img"
-                            src="/almaden_voices_logo_text.png"
+                            src="/almaden_voices_logo_transparent.png"
                             alt="Almaden Voices"
                             sx={{ height: 56, width: 'auto' }}
                         />
@@ -245,7 +245,7 @@ export default function Navbar() {
                             <RouterLink to="/home" style={{ display: 'inline-flex', alignItems: 'center', marginRight: 24 }}>
                                 <Box
                                     component="img"
-                                    src="/almaden_voices_logo_text.png"
+                                    src="/almaden_voices_logo_transparent.png"
                                     alt="Almaden Voices"
                                     sx={{ height: { xs: 48, md: 60 }, width: 'auto', display: 'block' }}
                                 />

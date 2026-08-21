@@ -44,3 +44,6 @@ yarn-error.log*
 *.swp
 *.swo
 *~
+
+# Full-size camera originals kept locally; the web-sized copies live in client/public
+/media-originals
