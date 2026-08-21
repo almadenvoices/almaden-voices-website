@@ -102,9 +102,29 @@ gcloud run deploy almaden-voices \
 ## Volunteer Applications
 
 The same script also handles the **Volunteer With Us** form
-(almadenvoices.org/volunteer). Nothing extra to set up — the first application
-creates a second tab in the same spreadsheet called **Volunteer Applications**,
-with one row per applicant:
+(almadenvoices.org/volunteer), but applications go into their **own separate
+spreadsheet** — not the registrations one.
+
+You don't have to create it. The script makes a spreadsheet called **Almaden
+Voices Volunteer Applications** in the almadenvoices@gmail.com Google Drive the
+first time someone applies, and uses it from then on.
+
+To see it right away instead of waiting for the first application:
+
+1. In the Apps Script editor, pick **createVolunteerSheetNow** from the function
+   dropdown at the top
+2. Click **Run**
+3. If Google asks you to authorize the script again, click through and
+   **Allow** — creating a new spreadsheet needs a permission the script didn't
+   need before
+4. A link to the new spreadsheet is emailed to almadenvoices@gmail.com
+
+(Running it twice is fine — it reuses the spreadsheet it already made. If you'd
+rather use a spreadsheet you created yourself, paste its ID into
+`VOLUNTEER_SHEET_ID` near the top of the volunteer section of the script. The ID
+is the long code in the sheet's web address, between `/d/` and `/edit`.)
+
+The spreadsheet has one row per applicant:
 
 | Column | Description |
 |--------|-------------|

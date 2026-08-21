@@ -208,6 +208,32 @@ function getVolunteerSheet(ss) {
   return sheet;
 }
 
+// Volunteer applications live in their OWN spreadsheet, separate from the
+// registrations one. The first application creates it automatically in the
+// almadenvoices@gmail.com Drive and the script remembers its ID from then on.
+// To use a spreadsheet you made yourself instead, put its ID in
+// VOLUNTEER_SHEET_ID near the top of the volunteer section below.
+function getVolunteerSpreadsheet() {
+  if (VOLUNTEER_SHEET_ID) return SpreadsheetApp.openById(VOLUNTEER_SHEET_ID);
+
+  const props = PropertiesService.getScriptProperties();
+  const savedId = props.getProperty(VOLUNTEER_SHEET_PROP);
+  if (savedId) {
+    try {
+      return SpreadsheetApp.openById(savedId);
+    } catch (err) {
+      // Deleted or moved to the trash — fall through and make a fresh one
+      // rather than dropping the application on the floor.
+      Logger.log("Volunteer spreadsheet " + savedId + " unavailable: " + err.message);
+    }
+  }
+
+  const ss = SpreadsheetApp.create(VOLUNTEER_SHEET_NAME);
+  ss.getSheets()[0].setName("Volunteer Applications");
+  props.setProperty(VOLUNTEER_SHEET_PROP, ss.getId());
+  return ss;
+}
+
 function getSheetWithHeaders(ss, name, wantedHeaders) {
   let sheet = ss.getSheetByName(name);
   if (!sheet) {
@@ -509,12 +535,21 @@ function buildAdminHtml(data, students, studentListHtml, childWord, timestamp) {
 // The two lines below are the only wording you normally need to change --
 // they appear in the applicant's confirmation email.
 // ============================================================
+// The spreadsheet volunteer applications are written to. Leave VOLUNTEER_SHEET_ID
+// empty and the script makes the spreadsheet itself the first time someone
+// applies (or when you run createVolunteerSheetNow() from the editor), then
+// keeps using it. Paste a spreadsheet ID here only to point it somewhere else --
+// the ID is the long code in the sheet's web address, between /d/ and /edit.
+const VOLUNTEER_SHEET_ID = "";
+const VOLUNTEER_SHEET_NAME = "Almaden Voices Volunteer Applications";
+const VOLUNTEER_SHEET_PROP = "volunteerSheetId";
+
 const VOLUNTEER_DEADLINE_TEXT = "Applications close August 31 at 9 PM PT.";
 const VOLUNTEER_NEXT_STEP_TEXT =
   "We read every application ourselves. We'll be in touch the first week of September to schedule interviews.";
 
 function handleVolunteerApplication(data) {
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const ss = getVolunteerSpreadsheet();
   const sheet = getVolunteerSheet(ss);
 
   const timestamp = new Date();
@@ -573,6 +608,30 @@ function handleVolunteerApplication(data) {
   }
 
   return jsonOut({ success: true, confirmationNumber: confirmationNumber });
+}
+
+// Run this once from the Apps Script editor (pick it in the function dropdown
+// and click Run) to create the volunteer spreadsheet right away instead of
+// waiting for the first application. It emails the link to ADMIN_EMAIL, and is
+// safe to run more than once -- it reuses the spreadsheet if one already exists.
+function createVolunteerSheetNow() {
+  const ss = getVolunteerSpreadsheet();
+  getVolunteerSheet(ss);
+  const url = ss.getUrl();
+
+  Logger.log("Volunteer applications spreadsheet: " + url);
+  GmailApp.sendEmail(ADMIN_EMAIL,
+    "Your volunteer applications spreadsheet is ready",
+    "Volunteer applications will be added to this spreadsheet: " + url,
+    {
+      htmlBody: emailShell("Volunteer applications spreadsheet", VOLUNTEER_SHEET_NAME,
+        '<p style="margin:0 0 16px;">Every volunteer application from the website will be added to this spreadsheet, one row each:</p>' +
+        '<p style="margin:0 0 16px;"><a href="' + url + '" style="color:' + C_ACCENT + ';font-weight:700;text-decoration:none;">Open the volunteer applications spreadsheet</a></p>' +
+        '<p style="margin:0;">It lives in the almadenvoices@gmail.com Google Drive, separate from the registrations spreadsheet.</p>'),
+      name: ORG_NAME
+    }
+  );
+  return url;
 }
 
 // Applications are typed in by hand, so escape anything that lands in HTML.
