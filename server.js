@@ -489,7 +489,6 @@ app.post("/api/volunteer", async (req, res) => {
             .replace(/>/g, "&gt;")
             .replace(/"/g, "&quot;");
 
-        const confirmationNumber = generateConfirmationNumber();
         const appliedFor = applyingAs === "parent"
             ? "Parent/guardian applying on behalf of their child"
             : "Applying for themselves";
@@ -519,7 +518,6 @@ app.post("/api/volunteer", async (req, res) => {
                 ["Age / grade", esc(ageOrGrade)],
                 ["Parent/guardian", guardianLine],
                 ["Consent", consentLine],
-                ["Confirmation number", confirmationNumber],
                 ["Received", new Date().toLocaleString()],
             ]) +
             mailQuoteCard("Why this role, and what they&apos;d bring", escLines(why)) +
@@ -549,7 +547,6 @@ app.post("/api/volunteer", async (req, res) => {
                 ["Email", esc(email)],
                 ["Phone", esc(phone)],
                 ["Age / grade", esc(ageOrGrade)],
-                ["Confirmation number", confirmationNumber],
             ]) +
             `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:${MAIL_SOFT};border:1px solid ${MAIL_LINE};border-radius:12px;margin:0 0 24px;">
               <tr><td style="padding:20px 22px;">${mailSectionTitle("What happens next")}
@@ -573,14 +570,14 @@ app.post("/api/volunteer", async (req, res) => {
             await emailTransporter.sendMail({
                 from: `"Almaden Voices" <${EMAIL_USER}>`,
                 to: email,
-                subject: `We got your volunteer application — ${confirmationNumber}`,
+                subject: "We got your volunteer application",
                 html: applicantEmailHtml
             });
         } catch (receiptErr) {
             console.error("Volunteer receipt email failed:", receiptErr.message);
         }
 
-        res.json({ success: true, confirmationNumber });
+        res.json({ success: true });
 
     } catch (err) {
         console.error("Volunteer form error:", err);
