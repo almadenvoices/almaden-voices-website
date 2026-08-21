@@ -56,13 +56,16 @@ Follow these steps to deploy the Google Apps Script that receives registration f
 
 ## Step 5: Add the URL to Your Website
 
-1. Open the file: `client/src/Pages/Register/RegisterPage.js`
-2. Find this line near the top (around line 70):
+1. Open the file: `client/src/data/appsScript.js`
+2. Find this line:
    ```javascript
-   const APPS_SCRIPT_URL = "PASTE_YOUR_GOOGLE_APPS_SCRIPT_URL_HERE";
+   export const APPS_SCRIPT_URL = "https://script.google.com/macros/s/.../exec";
    ```
-3. Replace `PASTE_YOUR_GOOGLE_APPS_SCRIPT_URL_HERE` with the URL you copied
+3. Replace the URL with the one you copied
 4. Save the file
+
+Both the registration form and the volunteer application form read the URL from
+this one file, so this is the only place it needs changing.
 
 ---
 
@@ -92,6 +95,40 @@ gcloud run deploy almaden-voices \
   --project almaden-voices-486006 \
   --allow-unauthenticated \
   --set-env-vars="NODE_ENV=production,USE_GCP_SECRETS=true,GCP_PROJECT_ID=almaden-voices-486006"
+```
+
+---
+
+## Volunteer Applications
+
+The same script also handles the **Volunteer With Us** form
+(almadenvoices.org/volunteer). Nothing extra to set up — the first application
+creates a second tab in the same spreadsheet called **Volunteer Applications**,
+with one row per applicant:
+
+| Column | Description |
+|--------|-------------|
+| Timestamp | When the application came in |
+| Confirmation Number | Same number shown in the applicant's email |
+| Applicant Name / Email / Phone / Age / Grade | Who applied |
+| Positions Applied For | The role titles they checked |
+| Who Is Applying | Themselves, or a parent on behalf of their child |
+| Parent/Guardian Name, Email, Phone | Filled in for under-18 applicants |
+| Why This Role / Availability | Their written answers |
+| Photo/Video Consent, Parent/Guardian Aware | Yes/No |
+| Status, Notes | Empty columns for you to track interviews in |
+
+Two emails go out for every application: a branded confirmation to the
+applicant, and a notification to almadenvoices@gmail.com that you can reply to
+directly to reach them.
+
+To change the wording about deadlines and interviews, edit these two lines near
+the top of the "VOLUNTEER APPLICATIONS" section of `RegistrationScript.js`, then
+re-deploy the script (see below):
+
+```javascript
+const VOLUNTEER_DEADLINE_TEXT = "Applications close August 31 at 9 PM PT.";
+const VOLUNTEER_NEXT_STEP_TEXT = "We read every application ourselves. ...";
 ```
 
 ---

@@ -286,6 +286,77 @@ function generateConfirmationNumber() {
     return `AV-${timestamp}-${random}`;
 }
 
+// ---------------------------------------------------------------
+// Branded email shell — the same card layout the Apps Script uses for
+// registration confirmations (Playfair headings, DM Sans body, blue accent),
+// so every email from Almaden Voices looks like it came from the same place.
+// ---------------------------------------------------------------
+const MAIL_FONT_HEADING = "'Playfair Display', Georgia, 'Times New Roman', serif";
+const MAIL_FONT_BODY = "'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif";
+const MAIL_TEXT = "#111827";
+const MAIL_MUTED = "#6B7280";
+const MAIL_BODY = "#374151";
+const MAIL_ACCENT = "#2563EB";
+const MAIL_LINE = "#E5E7EB";
+const MAIL_SOFT = "#F9FAFB";
+const MAIL_ORG = "Almaden Voices";
+
+function brandedEmail(headline, subhead, innerHtml) {
+    return `
+<style>@import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Playfair+Display:wght@600;700&display=swap");</style>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:${MAIL_SOFT};margin:0;padding:24px 12px;font-family:${MAIL_FONT_BODY};">
+  <tr><td align="center">
+    <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;width:100%;background:#FFFFFF;border:1px solid ${MAIL_LINE};border-radius:16px;overflow:hidden;">
+      <tr><td style="background:${MAIL_ACCENT};padding:18px 28px 16px;">
+        <p style="margin:0 0 6px;font-size:11px;letter-spacing:1.4px;text-transform:uppercase;color:#BFDBFE;font-weight:700;">${MAIL_ORG}</p>
+        <h1 style="margin:0;font-family:${MAIL_FONT_HEADING};font-size:21px;line-height:1.3;color:#FFFFFF;font-weight:700;">${headline}</h1>
+        ${subhead ? `<p style="margin:5px 0 0;font-size:13px;line-height:1.45;color:#DBEAFE;">${subhead}</p>` : ""}
+      </td></tr>
+      <tr><td style="padding:32px;font-size:16px;line-height:1.65;color:${MAIL_BODY};">${innerHtml}</td></tr>
+      <tr><td align="center" style="background:${MAIL_SOFT};border-top:1px solid ${MAIL_LINE};padding:24px 32px;font-size:13px;line-height:1.6;color:${MAIL_MUTED};text-align:center;">
+        <p style="margin:0 0 4px;color:${MAIL_TEXT};font-weight:700;">${MAIL_ORG}</p>
+        <p style="margin:0;">
+          <a href="https://almadenvoices.org" style="color:${MAIL_ACCENT};text-decoration:none;">almadenvoices.org</a>
+          &nbsp;&middot;&nbsp;
+          <a href="mailto:almadenvoices@gmail.com" style="color:${MAIL_ACCENT};text-decoration:none;">almadenvoices@gmail.com</a>
+        </p>
+      </td></tr>
+    </table>
+  </td></tr>
+</table>`;
+}
+
+// Small uppercase heading used inside an email card.
+function mailSectionTitle(text) {
+    return `<p style="margin:0 0 12px;font-size:12px;letter-spacing:1.2px;text-transform:uppercase;color:${MAIL_MUTED};font-weight:700;">${text}</p>`;
+}
+
+// A label / value list rendered as a bordered card.
+function mailDetailCard(title, rows) {
+    const body = rows.filter(r => r && r[1]).map(([label, value], i) => `
+      <tr><td style="padding:14px 0;${i ? `border-top:1px solid ${MAIL_LINE};` : ""}">
+        <p style="margin:0 0 4px;font-size:13px;font-weight:700;color:${MAIL_TEXT};">${label}</p>
+        <p style="margin:0;font-size:15px;line-height:1.6;color:${MAIL_BODY};">${value}</p>
+      </td></tr>`).join("");
+
+    return `
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#FFFFFF;border:1px solid ${MAIL_LINE};border-radius:12px;margin:0 0 24px;">
+  <tr><td style="padding:18px 22px;">${mailSectionTitle(title)}
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">${body}</table>
+  </td></tr>
+</table>`;
+}
+
+// Soft card for a longer free-text answer.
+function mailQuoteCard(title, htmlText) {
+    return `
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:${MAIL_SOFT};border:1px solid ${MAIL_LINE};border-radius:12px;margin:0 0 16px;">
+  <tr><td style="padding:18px 20px;">${mailSectionTitle(title)}
+    <p style="margin:0;font-size:15px;line-height:1.65;color:${MAIL_BODY};">${htmlText}</p>
+  </td></tr>
+</table>`;
+}
+
 // Generate unsubscribe token
 function generateUnsubscribeToken(email) {
     const secret = process.env.UNSUBSCRIBE_SECRET || 'almaden-voices-secret-key';
@@ -385,9 +456,11 @@ app.post("/api/contact", async (req, res) => {
     }
 });
 
-// Volunteer application endpoint — the "Volunteer With Us" page posts here.
-// Sends the application to EMAIL_TO and a receipt to the applicant, the same
-// way the contact form does.
+// Volunteer application endpoint — the FALLBACK path for the "Volunteer With
+// Us" page. Applications normally go to the Google Apps Script, which also
+// writes them to the volunteer spreadsheet; the page only posts here when
+// Google can't be reached, so the application still lands in the inbox.
+// Emails use the same branded layout as the Apps Script ones.
 app.post("/api/volunteer", async (req, res) => {
     try {
         const {
@@ -421,48 +494,71 @@ app.post("/api/volunteer", async (req, res) => {
             ? "Parent/guardian applying on behalf of their child"
             : "Applying for themselves";
 
-        const guardianRow = parentName || parentEmail || parentPhone
-            ? `<p><strong>Parent/guardian:</strong> ${esc(parentName)}${parentEmail ? ` &lt;${esc(parentEmail)}&gt;` : ""}${parentPhone ? ` — ${esc(parentPhone)}` : ""}</p>`
+        // Line breaks the applicant typed should survive into the email.
+        const escLines = (v) => esc(v).replace(/\r\n|\r|\n/g, "<br/>");
+
+        const guardianLine = parentName || parentEmail || parentPhone
+            ? esc(parentName) +
+              (parentEmail ? ` &middot; ${esc(parentEmail)}` : "") +
+              (parentPhone ? ` &middot; ${esc(parentPhone)}` : "")
             : "";
 
-        const adminEmailHtml = `
-            <div style="font-family: Arial, sans-serif; max-width: 640px; margin: 0 auto;">
-                <h2 style="color: #333;">New Volunteer Application</h2>
-                <p><strong>Confirmation Number:</strong> ${confirmationNumber}</p>
-                <hr style="border: 1px solid #eee;" />
-                <p><strong>Applying for:</strong> ${esc(positions)}</p>
-                <p><strong>Who is applying:</strong> ${appliedFor}</p>
-                <hr style="border: 1px solid #eee;" />
-                <p><strong>Volunteer:</strong> ${esc(fullName)}</p>
-                <p><strong>Email:</strong> ${esc(email)}</p>
-                <p><strong>Phone:</strong> ${esc(phone)}</p>
-                <p><strong>Age / grade:</strong> ${esc(ageOrGrade)}</p>
-                ${guardianRow}
-                <hr style="border: 1px solid #eee;" />
-                <p><strong>Why this role, and what they'd bring:</strong></p>
-                <p style="background: #f5f5f5; padding: 15px; border-radius: 5px; white-space: pre-wrap;">${esc(why)}</p>
-                <p><strong>Availability (2–3 hrs/week, 3-month minimum):</strong></p>
-                <p style="background: #f5f5f5; padding: 15px; border-radius: 5px; white-space: pre-wrap;">${esc(availability)}</p>
-                <hr style="border: 1px solid #eee;" />
-                <p><strong>Photo/video consent:</strong> ${mediaConsent ? "Yes" : "No"}</p>
-                ${guardianConsent === null || guardianConsent === undefined
-                    ? ""
-                    : `<p><strong>Parent/guardian aware (under 18):</strong> ${guardianConsent ? "Yes" : "No"}</p>`}
-                <p style="color: #666; font-size: 12px;">Received: ${new Date().toLocaleString()}</p>
-            </div>
-        `;
+        const consentLine = `Photo/video: ${mediaConsent ? "Yes" : "No"}` +
+            (guardianConsent === null || guardianConsent === undefined
+                ? ""
+                : ` &middot; Parent/guardian aware: ${guardianConsent ? "Yes" : "No"}`);
 
-        const applicantEmailHtml = `
-            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-                <h2 style="color: #333;">Thanks for applying to volunteer with Almaden Voices!</h2>
-                <p>Hi ${esc(fullName)},</p>
-                <p>We've received your application for: <strong>${esc(positions)}</strong>.</p>
-                <p>Applications close August 31 at 9 PM PT. We'll be in touch the first week of September to schedule interviews.</p>
-                <p><strong>Confirmation Number:</strong> <span style="background: #f0f0f0; padding: 5px 10px; border-radius: 3px; font-family: monospace;">${confirmationNumber}</span></p>
-                <hr style="border: 1px solid #eee;" />
-                <p style="color: #666;">Best regards,<br/>Almaden Voices Team</p>
-            </div>
-        `;
+        const adminEmailHtml = brandedEmail(
+            "New volunteer application",
+            `${esc(fullName)}${positions ? ` &mdash; ${esc(positions)}` : ""}`,
+            mailDetailCard("Applicant", [
+                ["Applying for", esc(positions)],
+                ["Who is applying", appliedFor],
+                ["Email", esc(email)],
+                ["Phone", esc(phone)],
+                ["Age / grade", esc(ageOrGrade)],
+                ["Parent/guardian", guardianLine],
+                ["Consent", consentLine],
+                ["Confirmation number", confirmationNumber],
+                ["Received", new Date().toLocaleString()],
+            ]) +
+            mailQuoteCard("Why this role, and what they&apos;d bring", escLines(why)) +
+            mailQuoteCard("Availability (2–3 hrs/week, 3-month minimum)", escLines(availability)) +
+            `<p style="margin:24px 0 0;font-size:14px;color:${MAIL_MUTED};">Reply to this email to answer ${esc(fullName)} directly.</p>`
+        );
+
+        const firstName = String(fullName).trim().split(/\s+/)[0] || "there";
+        const steps = [
+            ["1. We review your application", "Applications close August 31 at 9 PM PT."],
+            ["2. Interviews", "We read every application ourselves. We&apos;ll be in touch the first week of September to schedule interviews."],
+            ["3. Getting started", "If it&apos;s a fit, we&apos;ll walk you through onboarding and pair you with someone on the team."],
+        ].map(([title, body], i) => `
+              <tr><td style="padding:14px 0;${i ? `border-top:1px solid ${MAIL_LINE};` : ""}">
+                <p style="margin:0 0 4px;font-size:15px;font-weight:700;color:${MAIL_TEXT};">${title}</p>
+                <p style="margin:0;font-size:15px;line-height:1.6;color:${MAIL_BODY};">${body}</p>
+              </td></tr>`).join("");
+
+        const applicantEmailHtml = brandedEmail(
+            "Application received",
+            esc(positions),
+            `<p style="margin:0 0 16px;">Hi ${esc(firstName)},</p>` +
+            `<p style="margin:0 0 24px;">Thank you for applying to volunteer with Almaden Voices. Your application is in, and nothing more is needed from you right now.</p>` +
+            mailDetailCard("Your application", [
+                ["Applying for", esc(positions)],
+                ["Name", esc(fullName)],
+                ["Email", esc(email)],
+                ["Phone", esc(phone)],
+                ["Age / grade", esc(ageOrGrade)],
+                ["Confirmation number", confirmationNumber],
+            ]) +
+            `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:${MAIL_SOFT};border:1px solid ${MAIL_LINE};border-radius:12px;margin:0 0 24px;">
+              <tr><td style="padding:20px 22px;">${mailSectionTitle("What happens next")}
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">${steps}</table>
+              </td></tr>
+            </table>` +
+            `<p style="margin:0 0 16px;">Every one of our volunteers helps a kid stand up and speak with confidence. We&apos;re glad you want to be part of that.</p>` +
+            `<p style="margin:0;">Questions in the meantime? Just reply to this email.</p>`
+        );
 
         await emailTransporter.sendMail({
             from: `"Almaden Voices Volunteer Form" <${EMAIL_USER}>`,
