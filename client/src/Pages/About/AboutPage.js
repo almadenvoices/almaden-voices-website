@@ -34,8 +34,8 @@ const boardMembers = [
     {
         name: "Aditi Bansal",
         role: "Board Director",
-        intro: "Aditi Mittal is an expert Web Developer and Engineering Leader based in New York. With a B.Tech in IT and a Master's in Business Management, she blends technical expertise with strategic oversight to deliver scalable, user-centric applications. She also volunteers at her local fire station and is passionate about giving back — which brought her to Almaden Voices.",
-        photo: "/images/aditi-mittal.png",
+        intro: "Aditi Bansal is an expert Web Developer and Engineering Leader based in New York. With a B.Tech in IT and a Master's in Business Management, she blends technical expertise with strategic oversight to deliver scalable, user-centric applications. She also volunteers at her local fire station and is passionate about giving back — which brought her to Almaden Voices.",
+        photo: "/images/aditi-bansal.png",
     },
 ];
 
