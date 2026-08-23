@@ -47,23 +47,7 @@ const CoursesPage = () => {
     //     cover: "/images/your-image.jpg"
     // }
     // ============================================================
-    const upcomingSessions = [
-        {
-            id: "intro-workshop-aug-2026",
-            title: "Introductory Public Speaking Workshop",
-            date: "August 14, 2026",
-            time: "6–7 PM",
-            location: "To be announced",
-            ageGroup: "Ages 5–15",
-            // capacity: null means no limit — no seat count and it never shows as full.
-            capacity: null,
-            enrolled: 0,
-            description: "A free one-hour introduction to public speaking for kids: speaking clearly, standing with confidence, and settling the nerves that come with presenting to a group. No experience needed.",
-            status: "Open",
-            online: false,
-            cover: "/images/teaching-beginner.JPG",
-        },
-    ];
+    const upcomingSessions = [];
 
     const sessions = upcomingSessions.map(ses => ({
         ...ses,
@@ -252,7 +236,7 @@ const CoursesPage = () => {
                             Free Public Speaking Workshop
                         </h2>
                         <p style={{ textAlign: 'center', color: '#6B7280', fontSize: '1rem', marginBottom: '0' }}>
-                            A free one-hour introduction to public speaking for kids on Friday, August 14, 2026. Register below and we&apos;ll email you the location and all the details before the workshop.
+                            A free one-hour introduction to public speaking for kids. Register below and we&apos;ll email you the location and all the details before the workshop.
                         </p>
                     </div>
 
