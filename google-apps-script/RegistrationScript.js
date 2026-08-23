@@ -48,6 +48,8 @@ const REG_HEADERS = [
   "ZIP",
   "Additional Info",
   "Privacy Policy Agreed",
+  "Photo/Video Permission",
+  "Press/Media Permission",
   "Future Contact Opt-In"
 ];
 
@@ -154,6 +156,8 @@ function doPost(e) {
         "ZIP": data.zipCode || "",
         "Additional Info": data.additionalInfo || "",
         "Privacy Policy Agreed": data.privacyAgreed ? "Yes" : "No",
+        "Photo/Video Permission": data.photoConsent ? "Yes" : "No",
+        "Press/Media Permission": data.pressConsent ? "Yes" : "No",
         "Future Contact Opt-In": data.futureContact ? "Yes" : "No"
       });
     });
@@ -516,6 +520,8 @@ function buildAdminHtml(data, students, studentListHtml, childWord, timestamp) {
       '<h3 style="color: #333;">Preferences</h3>' +
       '<ul style="line-height: 1.8;">' +
         '<li>Privacy Policy Agreed: <strong>' + (data.privacyAgreed ? 'Yes' : 'No') + '</strong></li>' +
+        '<li>Photo/Video Permission: <strong>' + (data.photoConsent ? 'Yes' : 'No') + '</strong></li>' +
+        '<li>Press/Media Permission: <strong>' + (data.pressConsent ? 'Yes' : 'No') + '</strong></li>' +
         '<li>Future Contact Opt-In: <strong>' + (data.futureContact ? 'Yes' : 'No') + '</strong></li>' +
       '</ul>' +
       '<hr style="border: 1px solid #eee;" />' +

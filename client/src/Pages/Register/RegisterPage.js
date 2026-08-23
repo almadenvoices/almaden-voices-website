@@ -79,6 +79,10 @@ const emptyStudent = () => ({ firstName: "", lastName: "", age: "" });
 
 export default function RegisterPage() {
     const [agreed, setAgreed] = useState(false);
+    // Photo/video permission is opt-in and required: "" until the parent picks.
+    const [photoConsent, setPhotoConsent] = useState("");
+    // Press sharing is a separate, optional permission — never pre-checked.
+    const [pressConsent, setPressConsent] = useState(false);
     const [futureContact, setFutureContact] = useState(false);
     const [showToast, setShowToast] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -193,6 +197,11 @@ export default function RegisterPage() {
             return;
         }
 
+        if (!photoConsent) {
+            setError(t(T.errPhotoConsent, lang));
+            return;
+        }
+
         if (!agreed) {
             setError(t(T.errAgree, lang));
             return;
@@ -219,6 +228,8 @@ export default function RegisterPage() {
             zipCode: formData.get("zipCode"),
             additionalInfo: formData.get("additionalInfo"),
             privacyAgreed: agreed,
+            photoConsent: photoConsent === "yes",
+            pressConsent: pressConsent,
             futureContact: futureContact,
         };
 
@@ -240,6 +251,8 @@ export default function RegisterPage() {
                 const donateAmt = donationAmount;
                 e.target.reset();
                 setAgreed(false);
+                setPhotoConsent("");
+                setPressConsent(false);
                 setFutureContact(false);
                 setStudents([emptyStudent()]);
                 setDonationAmount(5);
@@ -769,6 +782,55 @@ export default function RegisterPage() {
                                 </div>
 
                                 <div className={s.actions}>
+                                    {/* Radios (required): photo/video permission, opt-in */}
+                                    <fieldset className={s.consentBlock}>
+                                        <legend className={s.consentTitle}>
+                                            <Bi entry={T.photoTitle} lang={lang} /> <span className={s.req}>*</span>
+                                        </legend>
+                                        <p className={s.consentIntro}>
+                                            <Bi entry={T.photoIntro} lang={lang} block />
+                                        </p>
+                                        <label className={s.check}>
+                                            <input
+                                                type="radio"
+                                                name="photoConsent"
+                                                value="yes"
+                                                checked={photoConsent === "yes"}
+                                                onChange={() => setPhotoConsent("yes")}
+                                                disabled={isSubmitting}
+                                            />
+                                            <span>
+                                                <Bi entry={T.photoYes} lang={lang} block />
+                                            </span>
+                                        </label>
+                                        <label className={s.check}>
+                                            <input
+                                                type="radio"
+                                                name="photoConsent"
+                                                value="no"
+                                                checked={photoConsent === "no"}
+                                                onChange={() => setPhotoConsent("no")}
+                                                disabled={isSubmitting}
+                                            />
+                                            <span>
+                                                <Bi entry={T.photoNo} lang={lang} block />
+                                            </span>
+                                        </label>
+
+                                        {/* Checkbox (optional): press sharing, answered independently */}
+                                        <label className={`${s.check} ${s.consentExtra}`}>
+                                            <input
+                                                type="checkbox"
+                                                checked={pressConsent}
+                                                onChange={(e) => setPressConsent(e.target.checked)}
+                                                disabled={isSubmitting}
+                                            />
+                                            <span>
+                                                <Bi entry={T.pressConsent} lang={lang} block />
+                                            </span>
+                                        </label>
+                                    </fieldset>
+
                                     {/* Checkbox (optional): Future contact opt-in */}
                                     <label className={s.check}>
                                         <input
@@ -795,7 +857,7 @@ export default function RegisterPage() {
                                         </span>
                                     </label>
 
-                                    <button className={s.btn} disabled={!agreed || isSubmitting || hasNameConflict}>
+                                    <button className={s.btn} disabled={!agreed || !photoConsent || isSubmitting || hasNameConflict}>
                                         <span>{isSubmitting
                                             ? t(T.submitting, lang)
                                             : students.length > 1

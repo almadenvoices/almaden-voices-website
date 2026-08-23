@@ -457,11 +457,44 @@
     cursor: pointer;
 }
 
-.check input[type="checkbox"] {
+.check input[type="checkbox"],
+.check input[type="radio"] {
     width: 18px;
     height: 18px;
     margin-top: 2px;
+    flex-shrink: 0;
     accent-color: #2563EB;
+}
+
+/* Photo/video permission: the required radio pair plus the optional press
+   checkbox, grouped so the two questions read as one block. */
+.consentBlock {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 20px;
+    border: 1px solid #E5E7EB;
+    border-radius: 12px;
+    background: #F9FAFB;
+}
+
+.consentTitle {
+    font-size: var(--r-font-sm);
+    font-weight: 700;
+    color: #111827;
+    padding: 0;
+}
+
+.consentIntro {
+    font-size: var(--r-font-sm);
+    color: #6B7280;
+    margin: 0;
+}
+
+.consentExtra {
+    margin-top: 4px;
+    padding-top: 12px;
+    border-top: 1px solid #E5E7EB;
 }
 
 .link {

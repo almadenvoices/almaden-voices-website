@@ -164,6 +164,23 @@ export const T = {
     },
 
     // ---- Consent + submit ----
+    photoTitle: { en: "Photo and video permission", es: "Permiso de fotos y video" },
+    photoIntro: {
+        en: "We sometimes photograph or record students during sessions and showcases. Please choose one:",
+        es: "A veces tomamos fotos o grabamos a los estudiantes durante las sesiones y presentaciones. Por favor elija una opción:",
+    },
+    photoYes: {
+        en: "Yes, I give permission for photos or video of my child to appear on the Almaden Voices website, program materials, and social media, identified by first name only.",
+        es: "Sí, doy permiso para que aparezcan fotos o videos de mi hijo/a en el sitio web, los materiales del programa y las redes sociales de Almaden Voices, identificado/a solo por su nombre de pila.",
+    },
+    photoNo: {
+        en: "No, please do not photograph or record my child.",
+        es: "No, por favor no fotografíen ni graben a mi hijo/a.",
+    },
+    pressConsent: {
+        en: "I also give permission for photos of my child to be shared with local news media in connection with coverage of Almaden Voices programs. (Optional — you can say yes to the above and no to this.)",
+        es: "También doy permiso para que se compartan fotos de mi hijo/a con medios de comunicación locales en relación con la cobertura de los programas de Almaden Voices. (Opcional — puede decir sí a lo anterior y no a esto.)",
+    },
     futureContact: {
         en: "I would like to be contacted about future Almaden Voices sessions and events.",
         es: "Deseo recibir información sobre futuras sesiones y eventos de Almaden Voices.",
@@ -178,6 +195,10 @@ export const T = {
     registerCount: { en: "Register {n} Children", es: "Inscribir a {n} niños" },
 
     // ---- Errors ----
+    errPhotoConsent: {
+        en: "Please choose a photo and video permission option to continue.",
+        es: "Por favor elija una opción de permiso de fotos y video para continuar.",
+    },
     errAgree: {
         en: "Please agree to the Privacy Policy to continue.",
         es: "Por favor acepte la Política de Privacidad para continuar.",
