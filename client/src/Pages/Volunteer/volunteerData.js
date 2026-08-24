@@ -42,14 +42,14 @@ export const POSITIONS = [
         doing: [
             "Research nonprofits, community centers, libraries, and youth organizations that could host a free workshop",
             "Reach out by email and phone to introduce Almaden Voices and propose a partnership",
-            "Follow up — most partnerships happen on the third email, not the first",
-            "Keep a shared tracker of who's been contacted, what they said, and what's next",
+            "Follow up and send emails. Most partnerships happen on the third email, not the first",
+            "Keep a shared spreadsheet of who's been contacted, what they said, and next steps",
         ],
         looking: [
             "Comfortable writing professional emails and speaking on the phone",
             "Persistent without being pushy",
             "Organized enough to remember who you contacted three weeks ago",
-            "Spanish is a real plus — several of the communities we serve are Spanish-speaking",
+            "Good-to-have: Spanish, since a lot of San José communities are Spanish-speaking",
         ],
     },
     {
@@ -127,6 +127,24 @@ export const POSITIONS = [
             "Must be able to get to session locations around San José",
         ],
         note: "Volunteers working directly with students may be asked to complete a background check depending on the site, and instructors are never alone one-on-one with a student.",
+    },
+    {
+        id: "newsletter",
+        title: "Newsletter Writer",
+        summary: "Families sign up to hear from us. This role is what actually lands in their inbox.",
+        intro: "Families, volunteers, and donors sign up to hear from us. This role is what actually lands in their inbox — the stories from our workshops, what's coming up, and where we need help.",
+        doing: [
+            "Write and send our newsletter to families, volunteers, and donors",
+            "Interview students, instructors, and parents for short pieces about what's happening in our workshops",
+            "Keep a simple calendar of what goes out and when, so the newsletter actually ships on schedule",
+            "Pull together photos and session details from the team into something people want to read",
+        ],
+        looking: [
+            "Clear, warm writer — this reads like a person, not a press release",
+            "Reliable about deadlines, since a newsletter nobody sends doesn't help anyone",
+            "Comfortable asking people for quotes and details",
+            "Good-to-have: any experience with a school paper, blog, or email tool like Mailchimp",
+        ],
     },
     {
         id: "bilingual",
