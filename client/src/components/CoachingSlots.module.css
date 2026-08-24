@@ -1,23 +1,412 @@
-/* Five coaching slots side by side, collapsing as the screen narrows. */
+/* Five numbered coaching slots side by side, collapsing as the screen narrows.
+   Most bookings come from a phone, so the single-column layout is the one that
+   has to feel right — the wider grids are the enhancement. */
 .wrap {
     max-width: 1120px;
     margin: 0 auto;
 }
 
-/* Intro copy stays narrow and centred even though the grid is wide. */
+/* ====== Intro copy ====== */
+/* Stays narrow and centred even though the grid is wide. */
 .intro {
     max-width: 620px;
     margin: 0 auto;
     text-align: center;
 }
 
+.introTitle {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #111827;
+    margin: 0 0 10px;
+}
+
+.introBody {
+    color: #6B7280;
+    font-size: 0.95rem;
+    line-height: 1.7;
+    margin: 0 0 12px;
+}
+
+.introNote {
+    color: #6B7280;
+    font-size: 0.88rem;
+    line-height: 1.7;
+    margin: 0;
+}
+
+.introNote strong {
+    color: #111827;
+}
+
+/* ====== Slot count + status lines ====== */
+.remaining {
+    text-align: center;
+    font-weight: 700;
+    color: #2563EB;
+    font-size: 0.95rem;
+    margin: 24px 0 12px;
+}
+
+.status {
+    text-align: center;
+    color: #6B7280;
+    font-size: 0.88rem;
+    margin: 0 0 12px;
+}
+
+.statusError {
+    text-align: center;
+    color: #DC2626;
+    font-size: 0.88rem;
+    margin: 0 0 12px;
+}
+
+/* ====== Waitlist notice, shown when every slot is taken ====== */
+.waitlist {
+    max-width: 620px;
+    margin: 24px auto 0;
+    background: #F9FAFB;
+    border: 1px solid #E5E7EB;
+    border-radius: 16px;
+    padding: 24px 22px;
+    text-align: center;
+    color: #374151;
+    font-size: 0.95rem;
+    line-height: 1.7;
+}
+
+.waitlistLink {
+    color: #2563EB;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.waitlistLink:hover {
+    text-decoration: underline;
+}
+
+/* ====== Slot cards ====== */
 .slotGrid {
     display: grid;
     gap: 12px;
     grid-template-columns: repeat(5, minmax(0, 1fr));
-    margin: 24px 0 28px;
+    margin: 0 0 28px;
 }
 
+.slot {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 16px 14px;
+    border-radius: 14px;
+    border: 2px solid #E5E7EB;
+    background: #FFFFFF;
+    transition: border-color 0.2s, background-color 0.2s;
+}
+
+.slotSelected {
+    border-color: #2563EB;
+    background: #F0F6FF;
+}
+
+.slotTaken {
+    background: #F9FAFB;
+    opacity: 0.6;
+}
+
+.slotLabel {
+    font-weight: 700;
+    color: #111827;
+    font-size: 0.95rem;
+}
+
+.slotMeta {
+    display: flex;
+    align-items: flex-start;
+    gap: 5px;
+    color: #374151;
+    font-size: 0.83rem;
+    line-height: 1.4;
+}
+
+.slotIcon {
+    font-size: 14px;
+    color: #2563EB;
+    flex: none;
+    margin-top: 2px;
+}
+
+.slotPrice {
+    font-weight: 700;
+    color: #2563EB;
+    font-size: 0.83rem;
+    line-height: 1.5;
+}
+
+/* Pushed to the bottom so buttons line up across cards of uneven height. */
+.claimBtn {
+    margin-top: auto;
+    width: 100%;
+    /* Comfortable tap target on a phone. */
+    min-height: 44px;
+    padding: 10px 12px;
+    border: 0;
+    border-radius: 10px;
+    background: #2563EB;
+    color: #FFFFFF;
+    font-family: inherit;
+    font-size: 0.85rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.claimBtn:hover {
+    background: #1D4ED8;
+}
+
+.slotBooked {
+    margin-top: auto;
+    width: 100%;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    background: #F3F4F6;
+    color: #6B7280;
+    font-size: 0.85rem;
+    font-weight: 700;
+}
+
+/* ====== Booking form ====== */
+/* Easier to read narrower than the slot row. */
+.bookingPanel {
+    max-width: 760px;
+    margin: 0 auto;
+    background: #FFFFFF;
+    border: 1px solid #E5E7EB;
+    border-radius: 16px;
+    padding: 26px 24px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+}
+
+.panelTitle {
+    margin: 0 0 18px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #111827;
+}
+
+.fieldLabel {
+    display: block;
+    margin-bottom: 6px;
+    padding: 0;
+    font-weight: 600;
+    color: #111827;
+    font-size: 0.9rem;
+}
+
+.input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 12px 14px;
+    border-radius: 8px;
+    border: 1px solid #D1D5DB;
+    /* 16px stops iOS Safari zooming in when a field is focused. */
+    font-size: 16px;
+    font-family: inherit;
+    background-color: #FFFFFF;
+    color: #111827;
+    outline: none;
+}
+
+.input:focus {
+    border-color: #2563EB;
+}
+
+.textarea {
+    resize: vertical;
+}
+
+.fieldGrid {
+    display: grid;
+    gap: 16px;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+}
+
+.notesField {
+    margin-top: 16px;
+}
+
+/* ====== Online vs in person ====== */
+.formatSet {
+    border: 0;
+    padding: 0;
+    margin: 0 0 20px;
+}
+
+.formatRow {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.formatOpt {
+    flex: 1 1 160px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 48px;
+    padding: 12px 16px;
+    border-radius: 12px;
+    border: 2px solid #E5E7EB;
+    background: #FFFFFF;
+    color: #374151;
+    font-weight: 700;
+    font-size: 0.95rem;
+    cursor: pointer;
+}
+
+.formatOptOn {
+    border-color: #2563EB;
+    background: #F0F6FF;
+    color: #1D4ED8;
+}
+
+.formatOpt input[type="radio"] {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+    accent-color: #2563EB;
+}
+
+/* ====== Photo/video permission ====== */
+/* Matches the block on the registration form. */
+.consentBlock {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 20px;
+    padding: 20px;
+    border: 1px solid #E5E7EB;
+    border-radius: 12px;
+    background: #F9FAFB;
+}
+
+.consentTitle {
+    padding: 0;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #111827;
+}
+
+.consentIntro {
+    font-size: 0.88rem;
+    color: #6B7280;
+    margin: 0;
+}
+
+.check {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 0.88rem;
+    line-height: 1.6;
+    color: #6B7280;
+    cursor: pointer;
+}
+
+.check input[type="checkbox"],
+.check input[type="radio"] {
+    width: 18px;
+    height: 18px;
+    margin-top: 2px;
+    flex-shrink: 0;
+    accent-color: #2563EB;
+}
+
+.consentExtra {
+    margin-top: 4px;
+    padding-top: 12px;
+    border-top: 1px solid #E5E7EB;
+}
+
+/* ====== Total + payment ====== */
+.payArea {
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px solid #E5E7EB;
+}
+
+.totalRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.totalLabel {
+    font-weight: 600;
+    color: #374151;
+}
+
+.totalAmount {
+    font-weight: 700;
+    font-size: 1.3rem;
+    color: #111827;
+}
+
+.payNote {
+    color: #9CA3AF;
+    font-size: 0.78rem;
+    margin: 14px 0 0;
+    text-align: center;
+    line-height: 1.6;
+}
+
+/* ====== Confirmation ====== */
+.confirm {
+    max-width: 620px;
+    margin: 0 auto;
+    background: #ECFDF5;
+    border: 1px solid #A7F3D0;
+    border-radius: 16px;
+    padding: 32px 28px;
+    text-align: center;
+}
+
+.confirmTitle {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #065F46;
+    margin: 12px 0 8px;
+}
+
+.confirmLead {
+    color: #047857;
+    font-weight: 600;
+    margin: 0 0 16px;
+}
+
+.confirmBody {
+    color: #065F46;
+    font-size: 0.9rem;
+    line-height: 1.7;
+    margin: 0;
+    text-align: left;
+}
+
+.confirmLink {
+    color: #047857;
+    font-weight: 600;
+    text-decoration: underline;
+}
+
+/* ====== Narrower screens ====== */
 @media (max-width: 1040px) {
     .slotGrid {
         grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -28,21 +417,36 @@
     .slotGrid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
-}
 
-@media (max-width: 430px) {
-    .slotGrid {
-        grid-template-columns: 1fr;
+    .bookingPanel {
+        padding: 22px 18px;
     }
 }
 
-/* The booking form is easier to read narrower than the slot row. */
-.bookingPanel {
-    max-width: 760px;
-    margin: 0 auto;
-    background: #FFFFFF;
-    border: 1px solid #E5E7EB;
-    border-radius: 16px;
-    padding: 26px 24px;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+@media (max-width: 520px) {
+    .slotGrid {
+        grid-template-columns: 1fr;
+    }
+
+    /* One per row on a phone: the label and price read better side by side
+       with the button underneath than as a tall stack. */
+    .slot {
+        padding: 16px;
+    }
+
+    .fieldGrid {
+        grid-template-columns: 1fr;
+    }
+
+    .formatOpt {
+        flex: 1 1 100%;
+    }
+
+    .consentBlock {
+        padding: 16px 14px;
+    }
+
+    .confirm {
+        padding: 26px 20px;
+    }
 }

@@ -33,7 +33,8 @@ const PANEL_IDS = {
 };
 
 // The 1-on-1 coaching slots take real payments, so the button stays hidden
-// until the five session dates in server.js are confirmed. Flip to true to
+// until you're ready to collect money. The slots are numbered rather than
+// dated now, so there are no dates left to confirm — flip this to true to
 // open bookings.
 const SHOW_COACHING = false;
 
