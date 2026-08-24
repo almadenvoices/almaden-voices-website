@@ -162,7 +162,7 @@ export default function CoachingSlots() {
             <div className={c.intro}>
                 <h3 className={c.introTitle}>One-on-one coaching</h3>
                 <p className={c.introBody}>
-                    An hour of focused, personal coaching for students ages 5 to 14. We work on
+                    An hour of focused, personal coaching for students ages 5 to 13. We work on
                     whatever your student needs most — a speech they&apos;re preparing, a class
                     presentation, stage nerves, or building confidence from scratch.
                 </p>
@@ -268,7 +268,7 @@ export default function CoachingSlots() {
                             <label className={c.fieldLabel} htmlFor="coach-age">Student&apos;s age</label>
                             <select id="coach-age" className={c.input} value={studentAge} onChange={e => setStudentAge(e.target.value)}>
                                 <option value="">Select age…</option>
-                                {[5, 6, 7, 8, 9, 10, 11, 12, 13, 14].map(age => (
+                                {[5, 6, 7, 8, 9, 10, 11, 12, 13].map(age => (
                                     <option key={age} value={String(age)}>{age} years old</option>
                                 ))}
                             </select>

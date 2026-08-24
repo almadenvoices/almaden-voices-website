@@ -41,8 +41,9 @@ const boardMembers = [
         name: "Deepti Agrawal",
         role: "Board Director",
         intro: "Deepti Agrawal is an entrepreneur, educator, and former corporate leader with more than 20 years of experience leading technology and business initiatives across the U.S., India, and Singapore. Her transition from a successful corporate career to a purpose-driven second chapter reflects her belief that leadership is ultimately about creating meaningful impact. Drawing on her own experience of reinvention, Deepti is passionate about helping young people build confidence, strengthen their communication skills, find their voice, and recognize their potential. This belief brought her to Almaden Voices.",
-        // No photo on file yet — the card falls back to initials until there is one.
-        photo: "",
+        // Drop the photo in at client/public/images/deepti-agrawal.png and it
+        // appears here. Until that file exists the card shows her initials.
+        photo: "/images/deepti-agrawal.png",
     },
 ];
 
@@ -51,6 +52,12 @@ const initialsOf = (name) =>
     name.split(" ").filter(Boolean).slice(0, 2).map(part => part[0]).join("").toUpperCase();
 
 function MeetTheTeam() {
+    // A director whose photo file isn't in place yet falls back to initials
+    // rather than showing a broken image.
+    const [missingPhotos, setMissingPhotos] = React.useState({});
+    const markPhotoMissing = (name) =>
+        setMissingPhotos((prev) => (prev[name] ? prev : { ...prev, [name]: true }));
+
     return (
         <Box
             id="team"
@@ -209,11 +216,12 @@ function MeetTheTeam() {
 
                                 {/* Image, or initials while we're waiting on a photo */}
                                 <Box sx={{ display: "flex", justifyContent: "center", mb: 2 }}>
-                                    {member.photo ? (
+                                    {member.photo && !missingPhotos[member.name] ? (
                                         <Box
                                             component="img"
                                             src={member.photo}
                                             alt={member.name}
+                                            onError={() => markPhotoMissing(member.name)}
                                             sx={{
                                                 width: 200,
                                                 height: 200,
