@@ -32,11 +32,9 @@ const PANEL_IDS = {
     coaching: "coaching-signup",
 };
 
-// The 1-on-1 coaching slots take real payments, so the button stays hidden
-// until you're ready to collect money. The slots are numbered rather than
-// dated now, so there are no dates left to confirm — flip this to true to
-// open bookings.
-const SHOW_COACHING = false;
+// The 1-on-1 coaching slots take real payments. Set this to false to pull the
+// booking option off the register page without touching anything else.
+const SHOW_COACHING = true;
 
 // ============================================================
 // UPCOMING SESSIONS — Add new sessions here!

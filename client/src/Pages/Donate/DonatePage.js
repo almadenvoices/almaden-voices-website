@@ -163,7 +163,7 @@ export default function DonatePage() {
         alert(
             `To donate by check:\n\n1. Make your check payable to: Almaden Voices\n2. Amount: $${displayAmount.toFixed(
                 2
-            )}\n3. Mail to:\nPO Box 1234\nSan Jose, CA 95120\n\nInclude your email if you'd like a digital receipt.\nThank you for your support!`
+            )}\n3. Email almadenvoices@gmail.com and we'll send you the mailing address.\n\nInclude your email if you'd like a digital receipt.\nThank you for your support!`
         );
     }
 
@@ -367,7 +367,7 @@ export default function DonatePage() {
                                     <ol style={{ margin: 0, paddingLeft: 20 }}>
                                         <li>Make your check payable to: <strong>Almaden Voices</strong></li>
                                         {displayAmount > 0 && <li>Amount: <strong>${displayAmount.toFixed(2)}</strong></li>}
-                                        <li>Mail to: <strong>PO Box 1234, San Jose, CA 95120</strong></li>
+                                        <li>Email <a href="mailto:almadenvoices@gmail.com" style={{ color: '#2563EB', fontWeight: 600 }}>almadenvoices@gmail.com</a> and we&apos;ll send you the mailing address</li>
                                     </ol>
                                     <p style={{ marginTop: 8, fontSize: 13, color: '#6B7280' }}>
                                         Include your email if you'd like a digital receipt. Thank you for your support!
