@@ -86,25 +86,40 @@ async function uploadCoachingToGCS() {
 }
 
 // ============================================================
-// 1-ON-1 COACHING SLOTS — edit this list to change what's offered.
-// Prices live here on the server so the amount charged can't be altered
-// by the browser. Each slot is a single one-hour session; the family
-// chooses online or in person when they book.
+// 1-ON-1 COACHING SLOTS
+//
+// TO CLOSE A SLOT BY HAND: change taken: false to taken: true below,
+// then redeploy. Nothing else needs editing.
+//
+// A slot also closes on its own as soon as someone pays for it, so this
+// flag is only for holding a slot back yourself.
+//
+// The slots are deliberately not tied to dates — they're numbered, and
+// scheduling happens by email after booking. Prices live here on the
+// server so the amount charged can't be altered by the browser.
 // ============================================================
 const COACHING_PRICES = { online: 20, inPerson: 30 };
 
 const COACHING_SLOTS = [
-    { id: "coach-1", label: "Session 1", date: "Monday, August 10, 2026", time: "6:30–7:30 PM PT" },
-    { id: "coach-2", label: "Session 2", date: "Tuesday, August 11, 2026", time: "6:30–7:30 PM PT" },
-    { id: "coach-3", label: "Session 3", date: "Wednesday, August 12, 2026", time: "6:30–7:30 PM PT" },
-    { id: "coach-4", label: "Session 4", date: "Thursday, August 13, 2026", time: "6:30–7:30 PM PT" },
-    { id: "coach-5", label: "Session 5", date: "Monday, August 17, 2026", time: "6:30–7:30 PM PT" },
+    { id: 1, taken: false },
+    { id: 2, taken: false },
+    { id: 3, taken: false },
+    { id: 4, taken: false },
+    { id: 5, taken: false },
 ];
 
+// What the card, the CSV, and the emails call a slot.
+const coachingSlotLabel = (id) => `Coaching Slot ${id}`;
+
+// The browser sends the id as JSON, so accept "3" as well as 3.
+const findCoachingSlot = (slotId) =>
+    COACHING_SLOTS.find(s => String(s.id) === String(slotId));
+
 const COACHING_HEADERS = [
-    "Timestamp", "Slot ID", "Slot Label", "Slot Date", "Slot Time", "Format",
+    "Timestamp", "Slot ID", "Slot Label", "Format",
     "Amount Paid", "PayPal Order ID", "Parent Name", "Email", "Phone",
-    "Student Name", "Student Age", "School Name", "Home ZIP", "Notes"
+    "Student Name", "Student Age", "School Name", "Home ZIP", "Notes",
+    "Photo/Video Permission", "Press/Media Permission"
 ];
 
 // Slot ids that already have a paid booking recorded.
@@ -1268,10 +1283,14 @@ app.get("/api/sessions/enrollment", (req, res) => {
 // The slot list plus which ones are already taken. Prices come from the server
 // so the browser can't change what gets charged.
 app.get("/api/coaching/slots", (req, res) => {
-    const booked = bookedCoachingSlotIds();
+    const paid = bookedCoachingSlotIds().map(String);
     res.json({
         prices: COACHING_PRICES,
-        slots: COACHING_SLOTS.map(slot => ({ ...slot, booked: booked.includes(slot.id) }))
+        slots: COACHING_SLOTS.map(slot => ({
+            id: slot.id,
+            label: coachingSlotLabel(slot.id),
+            booked: slot.taken || paid.includes(String(slot.id))
+        }))
     });
 });
 
@@ -1280,19 +1299,19 @@ app.post("/api/coaching/orders", async (req, res) => {
     try {
         const { slotId, format } = req.body;
 
-        const slot = COACHING_SLOTS.find(s => s.id === slotId);
-        if (!slot) return res.status(400).json({ error: "That session is no longer offered." });
+        const slot = findCoachingSlot(slotId);
+        if (!slot) return res.status(400).json({ error: "That slot is no longer offered." });
         if (format !== "online" && format !== "inPerson") {
             return res.status(400).json({ error: "Choose online or in person." });
         }
-        if (bookedCoachingSlotIds().includes(slotId)) {
-            return res.status(409).json({ error: "Sorry — that session was just booked by someone else." });
+        if (slot.taken || bookedCoachingSlotIds().map(String).includes(String(slotId))) {
+            return res.status(409).json({ error: "Sorry — that slot was just taken." });
         }
 
         const amount = COACHING_PRICES[format];
         const order = await createOrder({
             amount,
-            description: `1-on-1 coaching (${format === "inPerson" ? "in person" : "online"}) — ${slot.date}`
+            description: `1-on-1 coaching (${format === "inPerson" ? "in person" : "online"}) — ${coachingSlotLabel(slot.id)}`
         });
         res.json({ id: order.id });
     } catch (err) {
@@ -1306,10 +1325,11 @@ app.post("/api/coaching/orders", async (req, res) => {
 app.post("/api/coaching/orders/:orderID/capture", async (req, res) => {
     try {
         const { orderID } = req.params;
-        const { slotId, format, parentName, email, phone, studentName, studentAge, schoolName, zipCode, notes } = req.body;
+        const { slotId, format, parentName, email, phone, studentName, studentAge,
+                schoolName, zipCode, notes, photoConsent, pressConsent } = req.body;
 
-        const slot = COACHING_SLOTS.find(s => s.id === slotId);
-        if (!slot) return res.status(400).json({ error: "That session is no longer offered." });
+        const slot = findCoachingSlot(slotId);
+        if (!slot) return res.status(400).json({ error: "That slot is no longer offered." });
 
         const capture = await captureOrder(orderID);
         const amount = COACHING_PRICES[format] || 0;
@@ -1324,9 +1344,10 @@ app.post("/api/coaching/orders/:orderID/capture", async (req, res) => {
                 fs.writeFileSync(file, COACHING_HEADERS.map(csvCell).join(",") + "\n");
             }
             const row = [
-                new Date().toISOString(), slot.id, slot.label, slot.date, slot.time,
+                new Date().toISOString(), slot.id, coachingSlotLabel(slot.id),
                 formatLabel, amount, orderID, parentName, email, phone,
-                studentName, studentAge, schoolName, zipCode, notes
+                studentName, studentAge, schoolName, zipCode, notes,
+                photoConsent ? "Yes" : "No", pressConsent ? "Yes" : "No"
             ].map(csvCell).join(",") + "\n";
             fs.appendFileSync(file, row);
             uploadCoachingToGCS().catch(e => console.error("Coaching GCS upload failed:", e.message));
@@ -1337,26 +1358,25 @@ app.post("/api/coaching/orders/:orderID/capture", async (req, res) => {
         // Confirmation to the family + a copy to the admin.
         try {
             if (emailTransporter) {
-                const when = `${slot.date} · ${slot.time}`;
                 await emailTransporter.sendMail({
                     from: `"Almaden Voices" <${process.env.EMAIL_USER}>`,
                     to: email,
                     bcc: process.env.EMAIL_USER,
-                    subject: `Your 1-on-1 coaching session — ${slot.date}`,
+                    subject: `Your 1-on-1 coaching session — ${coachingSlotLabel(slot.id)}`,
                     html: `
                         <div style="font-family: 'DM Sans', Arial, sans-serif; max-width: 560px; margin: 0 auto; color: #111827; line-height: 1.6;">
-                            <h2 style="margin: 0 0 16px;">Your session is booked</h2>
-                            <p style="margin: 0 0 20px;">Hi ${parentName || "there"}, thanks for booking a 1-on-1 coaching session with Almaden Voices. Here are the details:</p>
+                            <h2 style="margin: 0 0 16px;">You&rsquo;re booked!</h2>
+                            <p style="margin: 0 0 20px;">Hi ${parentName || "there"}, thanks for booking a 1-on-1 coaching session with Almaden Voices. Here&rsquo;s what you paid for:</p>
                             <table style="width: 100%; border-collapse: collapse; background: #F9FAFB; border-radius: 12px;">
                                 <tr><td style="padding: 12px 16px; color: #6B7280;">Student</td><td style="padding: 12px 16px; font-weight: 600; text-align: right;">${studentName || ""}</td></tr>
-                                <tr><td style="padding: 12px 16px; color: #6B7280;">When</td><td style="padding: 12px 16px; font-weight: 600; text-align: right;">${when}</td></tr>
+                                <tr><td style="padding: 12px 16px; color: #6B7280;">Slot</td><td style="padding: 12px 16px; font-weight: 600; text-align: right;">${coachingSlotLabel(slot.id)}</td></tr>
                                 <tr><td style="padding: 12px 16px; color: #6B7280;">Format</td><td style="padding: 12px 16px; font-weight: 600; text-align: right;">${formatLabel}</td></tr>
                                 <tr><td style="padding: 12px 16px; color: #6B7280;">Paid</td><td style="padding: 12px 16px; font-weight: 600; text-align: right;">$${amount}.00 USD</td></tr>
                             </table>
-                            <p style="margin: 20px 0 0;">${format === "inPerson"
-                                ? "We'll email you the meeting location before your session."
-                                : "We'll email you the join link before your session."}</p>
-                            <p style="margin: 16px 0 0;">Need to reschedule? Just reply to this email.</p>
+                            <p style="margin: 20px 0 0;"><strong>Next step:</strong> I&rsquo;ll email you within two business days to schedule your session. Please reply to that email to confirm your time — your session isn&rsquo;t scheduled until you do.</p>
+                            <p style="margin: 16px 0 0;">${format === "inPerson"
+                                ? "We'll send the meeting location once we've agreed on a time."
+                                : "We'll send the join link once we've agreed on a time."}</p>
                             <p style="margin: 24px 0 0; font-size: 13px; color: #6B7280;">Every dollar goes straight back into running our free workshops. This is a payment for coaching, not a tax-deductible donation.</p>
                         </div>`
                 });

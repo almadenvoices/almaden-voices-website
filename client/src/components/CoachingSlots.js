@@ -1,18 +1,19 @@
 import React, { useEffect, useMemo, useState } from "react";
-import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
-import AccessTimeIcon from "@mui/icons-material/AccessTime";
-import VideocamIcon from "@mui/icons-material/Videocam";
-import PlaceIcon from "@mui/icons-material/Place";
+import ScheduleIcon from "@mui/icons-material/Schedule";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import usePayPalScript from "../hooks/usePayPalScript";
 import c from "./CoachingSlots.module.css";
 
 /**
- * Five one-hour 1-on-1 coaching slots. The slot list, their prices, and which
- * ones are already taken all come from /api/coaching/slots — the server is the
- * source of truth so the amount charged can't be changed from the browser.
+ * Five numbered one-hour 1-on-1 coaching slots. The slots aren't tied to dates
+ * — scheduling happens by email after booking.
  *
- * Flow: pick a slot -> pick online/in person -> fill in who it's for -> pay.
+ * The slot list, the prices, and which slots are closed all come from
+ * /api/coaching/slots. The server is the source of truth so the amount charged
+ * can't be changed from the browser. To close a slot by hand, flip its
+ * `taken` flag in COACHING_SLOTS at the top of server.js.
+ *
+ * Flow: claim a slot -> pick online/in person -> fill in who it's for -> pay.
  * The booking is only recorded once PayPal confirms the payment.
  */
 export default function CoachingSlots() {
@@ -31,6 +32,10 @@ export default function CoachingSlots() {
     const [schoolName, setSchoolName] = useState("");
     const [zipCode, setZipCode] = useState("");
     const [notes, setNotes] = useState("");
+    // Photo/video permission is opt-in and required: "" until the parent picks.
+    const [photoConsent, setPhotoConsent] = useState("");
+    // Press sharing is a separate, optional permission — never pre-checked.
+    const [pressConsent, setPressConsent] = useState(false);
 
     const [payError, setPayError] = useState("");
     const [booked, setBooked] = useState(null); // set once payment succeeds
@@ -46,7 +51,7 @@ export default function CoachingSlots() {
                 setLoading(false);
             })
             .catch(() => {
-                setLoadError("We couldn't load the available sessions. Please refresh and try again.");
+                setLoadError("We couldn't load the coaching slots. Please refresh and try again.");
                 setLoading(false);
             });
     };
@@ -55,18 +60,20 @@ export default function CoachingSlots() {
 
     const selectedSlot = slots.find(s => s.id === selectedId);
     const price = format === "inPerson" ? prices.inPerson : prices.online;
+    const openSlots = slots.filter(s => !s.booked).length;
+    const allTaken = slots.length > 0 && openSlots === 0;
 
     // Every field the confirmation email depends on must be filled in before we
     // let anyone reach the PayPal buttons.
-    const detailsComplete = useMemo(() => (
-        parentName.trim() && studentName.trim() && phone.trim() &&
-        schoolName.trim() && zipCode.trim() &&
+    const detailsComplete = useMemo(() => Boolean(
+        parentName.trim() && studentName.trim() && studentAge && phone.trim() &&
+        schoolName.trim() && zipCode.trim() && photoConsent &&
         /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
-    ), [parentName, studentName, phone, schoolName, zipCode, email]);
+    ), [parentName, studentName, studentAge, phone, schoolName, zipCode, photoConsent, email]);
 
     const readyToPay = Boolean(selectedSlot) && !selectedSlot?.booked && detailsComplete;
 
-    // Render the PayPal buttons once a slot is chosen and the details are in.
+    // Render the PayPal buttons once a slot is claimed and the details are in.
     useEffect(() => {
         if (!paypalLoaded || !readyToPay || booked) return;
         if (!window.paypal) return;
@@ -80,7 +87,11 @@ export default function CoachingSlots() {
         // the buttons were rendered.
         const slotId = selectedId;
         const chosenFormat = format;
-        const details = { parentName, email, phone, studentName, studentAge, schoolName, zipCode, notes };
+        const details = {
+            parentName, email, phone, studentName, studentAge, schoolName, zipCode, notes,
+            photoConsent: photoConsent === "yes",
+            pressConsent,
+        };
 
         window.paypal.Buttons({
             style: { layout: "vertical", shape: "rect", color: "gold", label: "pay" },
@@ -125,36 +136,22 @@ export default function CoachingSlots() {
 
             onCancel: () => setPayError("")
         }).render("#coaching-paypal-container");
-    }, [paypalLoaded, readyToPay, booked, selectedId, format, parentName, email, phone, studentName, studentAge, schoolName, zipCode, notes, price, selectedSlot]);
-
-    const inputStyle = {
-        width: "100%",
-        boxSizing: "border-box",
-        padding: "12px 14px",
-        borderRadius: "8px",
-        border: "1px solid #D1D5DB",
-        fontSize: "0.95rem",
-        fontFamily: "inherit",
-        outline: "none",
-    };
-
-    const labelStyle = { display: "block", marginBottom: "6px", fontWeight: 600, color: "#111827", fontSize: "0.9rem" };
+    }, [paypalLoaded, readyToPay, booked, selectedId, format, parentName, email, phone,
+        studentName, studentAge, schoolName, zipCode, notes, photoConsent, pressConsent,
+        price, selectedSlot]);
 
     if (booked) {
         return (
-            <div style={{ maxWidth: "620px", margin: "0 auto", background: "#ECFDF5", border: "1px solid #A7F3D0", borderRadius: "16px", padding: "32px 28px", textAlign: "center" }}>
+            <div className={c.confirm}>
                 <CheckCircleIcon style={{ fontSize: 52, color: "#059669" }} />
-                <h3 style={{ fontSize: "1.4rem", fontWeight: 700, color: "#065F46", margin: "12px 0 8px" }}>
-                    Your session is booked!
-                </h3>
-                <p style={{ color: "#047857", margin: "0 0 6px", fontWeight: 600 }}>
-                    {booked.slot.date} · {booked.slot.time}
-                </p>
-                <p style={{ color: "#047857", margin: 0 }}>
-                    {booked.format === "inPerson" ? "In person" : "Online"} · ${booked.price}.00 paid
-                </p>
-                <p style={{ color: "#065F46", fontSize: "0.9rem", margin: "16px 0 0", lineHeight: 1.6 }}>
-                    A confirmation email is on its way. We&apos;ll send the {booked.format === "inPerson" ? "location" : "join link"} before your session.
+                <h3 className={c.confirmTitle}>You&apos;re booked!</h3>
+                <p className={c.confirmLead}>Check your email for your payment receipt.</p>
+                <p className={c.confirmBody}>
+                    <strong>Next step:</strong> I&apos;ll email you within two business days to schedule
+                    your session. Please reply to that email to confirm your time — your session
+                    isn&apos;t scheduled until you do. If you don&apos;t hear from me within two business
+                    days, check your spam folder or email{" "}
+                    <a className={c.confirmLink} href="mailto:almadenvoices@gmail.com">almadenvoices@gmail.com</a>.
                 </p>
             </div>
         );
@@ -163,168 +160,206 @@ export default function CoachingSlots() {
     return (
         <div className={c.wrap}>
             <div className={c.intro}>
-                <h3 style={{ fontSize: "1.5rem", fontWeight: 700, color: "#111827", margin: "0 0 4px" }}>
-                    1-on-1 Coaching Sessions
-                </h3>
-                <p style={{ color: "#6B7280", fontSize: "0.95rem", lineHeight: 1.7, margin: "0 0 8px" }}>
-                    One hour of focused, personal coaching — we work on whatever your child needs most,
-                    whether that&apos;s a speech they&apos;re preparing, nerves, or building confidence from scratch.
+                <h3 className={c.introTitle}>One-on-one coaching</h3>
+                <p className={c.introBody}>
+                    An hour of focused, personal coaching for students ages 5 to 14. We work on
+                    whatever your student needs most — a speech they&apos;re preparing, a class
+                    presentation, stage nerves, or building confidence from scratch.
                 </p>
-                <p style={{ color: "#6B7280", fontSize: "0.88rem", lineHeight: 1.7, margin: 0 }}>
-                    <strong style={{ color: "#111827" }}>${prices.online} online · ${prices.inPerson} in person.</strong>{" "}
-                    Every dollar goes straight back into funding our free workshops.
+                <p className={c.introBody}>
+                    Five slots are available. After you book, we&apos;ll email you within two business
+                    days to find a time. Reply to that email to confirm your session — we can&apos;t
+                    hold a slot without a reply.
+                </p>
+                <p className={c.introNote}>
+                    <strong>${prices.online} online · ${prices.inPerson} in person.</strong>{" "}
+                    Every dollar goes back into funding our free workshops.
                 </p>
             </div>
 
-            {loading && <p style={{ textAlign: "center", color: "#6B7280" }}>Loading available sessions…</p>}
-            {loadError && (
-                <p style={{ textAlign: "center", color: "#DC2626", fontSize: "0.9rem" }}>{loadError}</p>
+            {loading && <p className={c.status}>Loading coaching slots…</p>}
+            {loadError && <p className={c.statusError}>{loadError}</p>}
+
+            {allTaken ? (
+                <div className={c.waitlist}>
+                    All coaching slots are currently filled. Email{" "}
+                    <a className={c.waitlistLink} href="mailto:almadenvoices@gmail.com">almadenvoices@gmail.com</a>{" "}
+                    to join the waitlist for the next round.
+                </div>
+            ) : slots.length > 0 && (
+                <>
+                    <p className={c.remaining}>
+                        {openSlots} of {slots.length} slots remaining
+                    </p>
+
+                    <div className={c.slotGrid}>
+                        {slots.map(slot => {
+                            const isSelected = slot.id === selectedId;
+                            return (
+                                <div
+                                    key={slot.id}
+                                    className={`${c.slot} ${slot.booked ? c.slotTaken : ""} ${isSelected ? c.slotSelected : ""}`}
+                                >
+                                    <span className={c.slotLabel}>{slot.label}</span>
+                                    <span className={c.slotMeta}>
+                                        <ScheduleIcon className={c.slotIcon} />
+                                        1 hour · scheduled with you after booking
+                                    </span>
+                                    <span className={c.slotPrice}>
+                                        ${prices.online} online · ${prices.inPerson} in person
+                                    </span>
+                                    {slot.booked ? (
+                                        <span className={c.slotBooked}>Booked</span>
+                                    ) : (
+                                        <button
+                                            type="button"
+                                            className={c.claimBtn}
+                                            onClick={() => setSelectedId(isSelected ? "" : slot.id)}
+                                        >
+                                            {isSelected ? "Selected" : "Claim this slot"}
+                                        </button>
+                                    )}
+                                </div>
+                            );
+                        })}
+                    </div>
+                </>
             )}
-
-            {/* Slot boxes — five across, collapsing on narrower screens */}
-            <div className={c.slotGrid}>
-                {slots.map(slot => {
-                    const isSelected = slot.id === selectedId;
-                    return (
-                        <button
-                            key={slot.id}
-                            type="button"
-                            disabled={slot.booked}
-                            onClick={() => setSelectedId(isSelected ? "" : slot.id)}
-                            style={{
-                                textAlign: "left",
-                                padding: "16px 14px",
-                                borderRadius: "14px",
-                                border: isSelected ? "2px solid #2563EB" : "2px solid #E5E7EB",
-                                background: slot.booked ? "#F9FAFB" : isSelected ? "#F0F6FF" : "#FFFFFF",
-                                cursor: slot.booked ? "not-allowed" : "pointer",
-                                opacity: slot.booked ? 0.6 : 1,
-                                fontFamily: "inherit",
-                                transition: "border-color 0.2s, background-color 0.2s",
-                            }}
-                        >
-                            <span style={{ display: "block", fontWeight: 700, color: "#111827", marginBottom: "8px", fontSize: "0.95rem" }}>
-                                {slot.label}
-                                {slot.booked && <span style={{ display: "block", color: "#DC2626", fontWeight: 600, fontSize: "0.8rem" }}>Booked</span>}
-                            </span>
-                            <span style={{ display: "flex", alignItems: "flex-start", gap: "5px", color: "#374151", fontSize: "0.83rem", lineHeight: 1.4 }}>
-                                <CalendarMonthIcon style={{ fontSize: 14, color: "#2563EB", flex: "none", marginTop: "2px" }} /> {slot.date}
-                            </span>
-                            <span style={{ display: "flex", alignItems: "flex-start", gap: "5px", color: "#374151", fontSize: "0.83rem", marginTop: "3px", lineHeight: 1.4 }}>
-                                <AccessTimeIcon style={{ fontSize: 14, color: "#2563EB", flex: "none", marginTop: "2px" }} /> {slot.time}
-                            </span>
-                            <span style={{ display: "block", marginTop: "10px", fontWeight: 700, color: "#2563EB", fontSize: "0.83rem", lineHeight: 1.5 }}>
-                                ${prices.online} online
-                                <br />
-                                ${prices.inPerson} in person
-                            </span>
-                        </button>
-                    );
-                })}
-            </div>
 
             {selectedSlot && (
                 <div className={c.bookingPanel}>
-                    <h4 style={{ margin: "0 0 18px", fontSize: "1.1rem", fontWeight: 700, color: "#111827" }}>
-                        Book {selectedSlot.label} — {selectedSlot.date}
-                    </h4>
+                    <h4 className={c.panelTitle}>Book {selectedSlot.label}</h4>
 
-                    {/* Online vs in person */}
-                    <div style={{ marginBottom: "20px" }}>
-                        <span style={labelStyle}>How would you like to meet?</span>
-                        <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
+                    {/* Online vs in person — the total below follows this. */}
+                    <fieldset className={c.formatSet}>
+                        <legend className={c.fieldLabel}>How would you like to meet?</legend>
+                        <div className={c.formatRow}>
                             {[
-                                { key: "online", icon: <VideocamIcon style={{ fontSize: 18 }} />, title: "Online", cost: prices.online },
-                                { key: "inPerson", icon: <PlaceIcon style={{ fontSize: 18 }} />, title: "In person", cost: prices.inPerson },
+                                { key: "online", title: "Online", cost: prices.online },
+                                { key: "inPerson", title: "In person", cost: prices.inPerson },
                             ].map(opt => (
-                                <button
+                                <label
                                     key={opt.key}
-                                    type="button"
-                                    onClick={() => setFormat(opt.key)}
-                                    style={{
-                                        flex: "1 1 140px",
-                                        display: "flex",
-                                        alignItems: "center",
-                                        justifyContent: "center",
-                                        gap: "8px",
-                                        padding: "12px 16px",
-                                        borderRadius: "12px",
-                                        border: format === opt.key ? "2px solid #2563EB" : "2px solid #E5E7EB",
-                                        background: format === opt.key ? "#F0F6FF" : "#FFFFFF",
-                                        color: format === opt.key ? "#1D4ED8" : "#374151",
-                                        fontWeight: 700,
-                                        fontFamily: "inherit",
-                                        cursor: "pointer",
-                                    }}
+                                    className={`${c.formatOpt} ${format === opt.key ? c.formatOptOn : ""}`}
                                 >
-                                    {opt.icon} {opt.title} · ${opt.cost}
-                                </button>
+                                    <input
+                                        type="radio"
+                                        name="coachFormat"
+                                        value={opt.key}
+                                        checked={format === opt.key}
+                                        onChange={() => setFormat(opt.key)}
+                                    />
+                                    <span>{opt.title} — ${opt.cost}</span>
+                                </label>
                             ))}
                         </div>
-                    </div>
+                    </fieldset>
 
-                    <div style={{ display: "grid", gap: "16px", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))" }}>
+                    <div className={c.fieldGrid}>
                         <div>
-                            <label style={labelStyle} htmlFor="coach-parent">Parent/guardian name</label>
-                            <input id="coach-parent" style={inputStyle} value={parentName} onChange={e => setParentName(e.target.value)} placeholder="Your name" />
+                            <label className={c.fieldLabel} htmlFor="coach-parent">Parent/guardian name</label>
+                            <input id="coach-parent" className={c.input} value={parentName} onChange={e => setParentName(e.target.value)} placeholder="Your name" />
                         </div>
                         <div>
-                            <label style={labelStyle} htmlFor="coach-student">Student&apos;s name</label>
-                            <input id="coach-student" style={inputStyle} value={studentName} onChange={e => setStudentName(e.target.value)} placeholder="Child's name" />
+                            <label className={c.fieldLabel} htmlFor="coach-student">Student&apos;s name</label>
+                            <input id="coach-student" className={c.input} value={studentName} onChange={e => setStudentName(e.target.value)} placeholder="Child's name" />
                         </div>
                         <div>
-                            <label style={labelStyle} htmlFor="coach-email">Email</label>
-                            <input id="coach-email" type="email" style={inputStyle} value={email} onChange={e => setEmail(e.target.value)} placeholder="you@email.com" />
-                        </div>
-                        <div>
-                            <label style={labelStyle} htmlFor="coach-phone">Phone number</label>
-                            <input id="coach-phone" type="tel" style={inputStyle} value={phone} onChange={e => setPhone(e.target.value)} placeholder="+1 (000) 000-0000" />
-                        </div>
-                        <div>
-                            <label style={labelStyle} htmlFor="coach-school">School name</label>
-                            <input id="coach-school" style={inputStyle} value={schoolName} onChange={e => setSchoolName(e.target.value)} placeholder="e.g. Graystone Elementary" />
-                        </div>
-                        <div>
-                            <label style={labelStyle} htmlFor="coach-zip">Home ZIP code</label>
-                            <input id="coach-zip" style={inputStyle} value={zipCode} onChange={e => setZipCode(e.target.value)} placeholder="e.g. 95120" />
-                        </div>
-                        <div>
-                            <label style={labelStyle} htmlFor="coach-age">Student&apos;s age</label>
-                            <select id="coach-age" style={{ ...inputStyle, backgroundColor: "#FFFFFF" }} value={studentAge} onChange={e => setStudentAge(e.target.value)}>
+                            <label className={c.fieldLabel} htmlFor="coach-age">Student&apos;s age</label>
+                            <select id="coach-age" className={c.input} value={studentAge} onChange={e => setStudentAge(e.target.value)}>
                                 <option value="">Select age…</option>
-                                {[5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15].map(age => (
+                                {[5, 6, 7, 8, 9, 10, 11, 12, 13, 14].map(age => (
                                     <option key={age} value={String(age)}>{age} years old</option>
                                 ))}
                             </select>
                         </div>
+                        <div>
+                            <label className={c.fieldLabel} htmlFor="coach-email">Email</label>
+                            <input id="coach-email" type="email" className={c.input} value={email} onChange={e => setEmail(e.target.value)} placeholder="you@email.com" />
+                        </div>
+                        <div>
+                            <label className={c.fieldLabel} htmlFor="coach-phone">Phone number</label>
+                            <input id="coach-phone" type="tel" className={c.input} value={phone} onChange={e => setPhone(e.target.value)} placeholder="+1 (000) 000-0000" />
+                        </div>
+                        <div>
+                            <label className={c.fieldLabel} htmlFor="coach-school">School name</label>
+                            <input id="coach-school" className={c.input} value={schoolName} onChange={e => setSchoolName(e.target.value)} placeholder="e.g. Graystone Elementary" />
+                        </div>
+                        <div>
+                            <label className={c.fieldLabel} htmlFor="coach-zip">Home ZIP code</label>
+                            <input id="coach-zip" className={c.input} value={zipCode} onChange={e => setZipCode(e.target.value)} placeholder="e.g. 95120" />
+                        </div>
                     </div>
 
-                    <div style={{ marginTop: "16px" }}>
-                        <label style={labelStyle} htmlFor="coach-notes">What would you like to work on? (optional)</label>
-                        <textarea id="coach-notes" rows="3" style={{ ...inputStyle, resize: "vertical" }} value={notes} onChange={e => setNotes(e.target.value)} placeholder="A speech they're preparing, stage nerves, anything else we should know…" />
+                    <div className={c.notesField}>
+                        <label className={c.fieldLabel} htmlFor="coach-notes">What would you like to work on? (optional)</label>
+                        <textarea id="coach-notes" rows="3" className={`${c.input} ${c.textarea}`} value={notes} onChange={e => setNotes(e.target.value)} placeholder="A speech they're preparing, stage nerves, a class presentation, anything else…" />
                     </div>
 
-                    <div style={{ marginTop: "24px", paddingTop: "20px", borderTop: "1px solid #E5E7EB" }}>
-                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
-                            <span style={{ fontWeight: 600, color: "#374151" }}>Total</span>
-                            <span style={{ fontWeight: 700, fontSize: "1.3rem", color: "#111827" }}>${price}.00</span>
+                    {/* Same opt-in photo permission as the registration form. */}
+                    <fieldset className={c.consentBlock}>
+                        <legend className={c.consentTitle}>Photo and video permission</legend>
+                        <p className={c.consentIntro}>
+                            We sometimes photograph or record students during sessions and showcases.
+                            Please choose one:
+                        </p>
+                        <label className={c.check}>
+                            <input
+                                type="radio"
+                                name="coachPhotoConsent"
+                                value="yes"
+                                checked={photoConsent === "yes"}
+                                onChange={() => setPhotoConsent("yes")}
+                            />
+                            <span>
+                                Yes, I give permission for photos or video of my child to appear on the
+                                Almaden Voices website, program materials, and social media, identified
+                                by first name only.
+                            </span>
+                        </label>
+                        <label className={c.check}>
+                            <input
+                                type="radio"
+                                name="coachPhotoConsent"
+                                value="no"
+                                checked={photoConsent === "no"}
+                                onChange={() => setPhotoConsent("no")}
+                            />
+                            <span>No, please do not photograph or record my child.</span>
+                        </label>
+
+                        <label className={`${c.check} ${c.consentExtra}`}>
+                            <input
+                                type="checkbox"
+                                checked={pressConsent}
+                                onChange={e => setPressConsent(e.target.checked)}
+                            />
+                            <span>
+                                I also give permission for photos of my child to be shared with local
+                                news media in connection with coverage of Almaden Voices programs.
+                                (Optional — you can say yes to the above and no to this.)
+                            </span>
+                        </label>
+                    </fieldset>
+
+                    <div className={c.payArea}>
+                        <div className={c.totalRow}>
+                            <span className={c.totalLabel}>Total</span>
+                            <span className={c.totalAmount}>${price}.00</span>
                         </div>
 
                         {!detailsComplete && (
-                            <p style={{ color: "#6B7280", fontSize: "0.88rem", margin: "0 0 12px", textAlign: "center" }}>
-                                Fill in your name, your child&apos;s name, email, phone, school and ZIP to continue to payment.
+                            <p className={c.status}>
+                                Fill in your name, your child&apos;s name and age, email, phone, school
+                                and ZIP, and answer the photo question to continue to payment.
                             </p>
                         )}
-                        {payError && (
-                            <p style={{ color: "#DC2626", fontSize: "0.88rem", margin: "0 0 12px", textAlign: "center" }}>{payError}</p>
-                        )}
-                        {paypalError && (
-                            <p style={{ color: "#DC2626", fontSize: "0.88rem", margin: "0 0 12px", textAlign: "center" }}>{paypalError}</p>
-                        )}
+                        {payError && <p className={c.statusError}>{payError}</p>}
+                        {paypalError && <p className={c.statusError}>{paypalError}</p>}
 
                         <div id="coaching-paypal-container" />
 
-                        <p style={{ color: "#9CA3AF", fontSize: "0.78rem", margin: "14px 0 0", textAlign: "center", lineHeight: 1.6 }}>
+                        <p className={c.payNote}>
                             Payment is handled by PayPal — you can pay with a card without a PayPal account.
                             <br />
                             This is a payment for coaching, not a tax-deductible donation.
