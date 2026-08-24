@@ -62,6 +62,8 @@ const VOL_HEADERS = [
   "Email",
   "Phone",
   "Age / Grade",
+  "Location",
+  "Resume",
   "Positions Applied For",
   "Who Is Applying",
   "Parent/Guardian Name",
@@ -549,15 +551,52 @@ const VOLUNTEER_SHEET_ID = "";
 const VOLUNTEER_SHEET_NAME = "Almaden Voices Volunteer Applications";
 const VOLUNTEER_SHEET_PROP = "volunteerSheetId";
 
+// Uploaded resumes land in this Drive folder. It's created the first time
+// someone attaches one, and lives in the almadenvoices@gmail.com Drive.
+const VOLUNTEER_RESUME_FOLDER = "Almaden Voices Volunteer Resumes";
+
 const VOLUNTEER_DEADLINE_TEXT = "Applications close August 31 at 9 PM PT.";
 const VOLUNTEER_NEXT_STEP_TEXT =
   "We read every application ourselves. We'll be in touch the first week of September to schedule interviews.";
+
+// Resumes arrive base64-encoded in the JSON payload. Each one is saved into a
+// "Volunteer Resumes" folder in the same Drive as the spreadsheet, and the
+// sheet gets a link rather than the file itself. Returns "" when there's no
+// resume, and never throws — a bad upload must not lose the application.
+function saveVolunteerResume(data) {
+  if (!data.resumeData) return "";
+  try {
+    const folders = DriveApp.getFoldersByName(VOLUNTEER_RESUME_FOLDER);
+    const folder = folders.hasNext()
+      ? folders.next()
+      : DriveApp.createFolder(VOLUNTEER_RESUME_FOLDER);
+
+    // Name the file after the applicant so the folder stays browsable.
+    const safeName = String(data.fullName || "applicant").replace(/[^\w .-]/g, "_");
+    const original = String(data.resumeName || "resume");
+    const dotAt = original.lastIndexOf(".");
+    const ext = dotAt > -1 ? original.slice(dotAt) : "";
+    const stamp = Utilities.formatDate(new Date(), "America/Los_Angeles", "yyyy-MM-dd");
+
+    const blob = Utilities.newBlob(
+      Utilities.base64Decode(data.resumeData),
+      data.resumeType || "application/octet-stream",
+      safeName + " - " + stamp + ext
+    );
+    const file = folder.createFile(blob);
+    return file.getUrl();
+  } catch (err) {
+    Logger.log("Resume upload failed: " + err.message);
+    return "Upload failed - ask the applicant to email it";
+  }
+}
 
 function handleVolunteerApplication(data) {
   const ss = getVolunteerSpreadsheet();
   const sheet = getVolunteerSheet(ss);
 
   const timestamp = new Date();
+  const resumeUrl = saveVolunteerResume(data);
   const whoIsApplying = data.applyingAs === "parent"
     ? "Parent/guardian, on behalf of their child"
     : "Applying for themselves";
@@ -568,6 +607,8 @@ function handleVolunteerApplication(data) {
     "Email": data.email || "",
     "Phone": data.phone || "",
     "Age / Grade": data.ageOrGrade || "",
+    "Location": data.location || "",
+    "Resume": resumeUrl,
     "Positions Applied For": data.positions || "",
     "Who Is Applying": whoIsApplying,
     "Parent/Guardian Name": data.parentName || "",
@@ -588,7 +629,7 @@ function handleVolunteerApplication(data) {
     "Volunteer application: " + (data.fullName || "") + " - " + (data.positions || ""),
     "New volunteer application received. See the HTML version for details.",
     {
-      htmlBody: buildVolunteerAdminHtml(data, whoIsApplying, timestamp, ss.getUrl()),
+      htmlBody: buildVolunteerAdminHtml(data, whoIsApplying, timestamp, ss.getUrl(), resumeUrl),
       name: ORG_NAME + " Volunteer Form",
       replyTo: data.email || ADMIN_EMAIL
     }
@@ -723,7 +764,7 @@ function buildVolunteerApplicantHtml(data) {
   return emailShell("Application received", data.positions ? esc(data.positions) : "", inner);
 }
 
-function buildVolunteerAdminHtml(data, whoIsApplying, timestamp, sheetUrl) {
+function buildVolunteerAdminHtml(data, whoIsApplying, timestamp, sheetUrl, resumeUrl) {
   const guardian = (data.parentName || data.parentEmail || data.parentPhone)
     ? esc(data.parentName) +
       (data.parentEmail ? ' &middot; ' + esc(data.parentEmail) : '') +
@@ -742,6 +783,10 @@ function buildVolunteerAdminHtml(data, whoIsApplying, timestamp, sheetUrl) {
     ["Email", data.email],
     ["Phone", data.phone],
     ["Age / grade", data.ageOrGrade],
+    ["Location", data.location],
+    ["Resume", resumeUrl && resumeUrl.indexOf('http') === 0
+      ? '<a href="' + esc(resumeUrl) + '" style="color:' + C_ACCENT + ';font-weight:700;">Open resume</a>'
+      : esc(resumeUrl || ''), true],
     ["Parent/guardian", guardian, true],
     ["Consent", consent, true],
     ["Received", timestamp.toLocaleString()]

@@ -161,7 +161,10 @@ const BASE_URL = process.env.BASE_URL || (process.env.NODE_ENV === 'production' 
 // ---------- middleware ----------
 
 app.use(cors());
-app.use(express.json());
+// Volunteer resumes arrive base64-encoded in the JSON body, so the default
+// 100kb cap would reject them. The form itself stops anything over 4MB;
+// base64 inflates that by about a third, and 8mb leaves room around it.
+app.use(express.json({ limit: "8mb" }));
 
 // ---------- PayPal helpers ----------
 
@@ -480,7 +483,8 @@ app.post("/api/volunteer", async (req, res) => {
     try {
         const {
             applyingAs, parentName, parentEmail, parentPhone,
-            fullName, email, phone, ageOrGrade,
+            fullName, email, phone, ageOrGrade, location,
+            resumeName, resumeType, resumeData,
             positions, why, availability,
             mediaConsent, guardianConsent,
         } = req.body;
@@ -531,6 +535,8 @@ app.post("/api/volunteer", async (req, res) => {
                 ["Email", esc(email)],
                 ["Phone", esc(phone)],
                 ["Age / grade", esc(ageOrGrade)],
+                ["Location", esc(location)],
+                ["Resume", resumeData ? esc(resumeName || "attached") + " (attached)" : "None"],
                 ["Parent/guardian", guardianLine],
                 ["Consent", consentLine],
                 ["Received", new Date().toLocaleString()],
@@ -577,7 +583,14 @@ app.post("/api/volunteer", async (req, res) => {
             replyTo: `"${fullName}" <${email}>`,
             to: EMAIL_TO,
             subject: `Volunteer Application: ${fullName} — ${positions}`,
-            html: adminEmailHtml
+            html: adminEmailHtml,
+            ...(resumeData ? {
+                attachments: [{
+                    filename: resumeName || "resume",
+                    content: Buffer.from(resumeData, "base64"),
+                    contentType: resumeType || "application/octet-stream",
+                }]
+            } : {})
         });
 
         // A bad applicant address shouldn't lose us the application itself.

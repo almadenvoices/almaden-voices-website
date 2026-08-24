@@ -37,7 +37,18 @@ const boardMembers = [
         intro: "Aditi Bansal is an expert Web Developer and Engineering Leader based in New York. With a B.Tech in IT and a Master's in Business Management, she blends technical expertise with strategic oversight to deliver scalable, user-centric applications. She also volunteers at her local fire station and is passionate about giving back — which brought her to Almaden Voices.",
         photo: "/images/aditi-bansal.png",
     },
+    {
+        name: "Deepti Agrawal",
+        role: "Board Director",
+        intro: "Deepti Agrawal is an entrepreneur, educator, and former corporate leader with more than 20 years of experience leading technology and business initiatives across the U.S., India, and Singapore. Her transition from a successful corporate career to a purpose-driven second chapter reflects her belief that leadership is ultimately about creating meaningful impact. Drawing on her own experience of reinvention, Deepti is passionate about helping young people build confidence, strengthen their communication skills, find their voice, and recognize their potential. This belief brought her to Almaden Voices.",
+        // No photo on file yet — the card falls back to initials until there is one.
+        photo: "",
+    },
 ];
+
+// "Deepti Agrawal" -> "DA". Used when a director has no photo yet.
+const initialsOf = (name) =>
+    name.split(" ").filter(Boolean).slice(0, 2).map(part => part[0]).join("").toUpperCase();
 
 function MeetTheTeam() {
     return (
@@ -196,21 +207,44 @@ function MeetTheTeam() {
                                     {member.role}
                                 </Typography>
 
-                                {/* Image */}
+                                {/* Image, or initials while we're waiting on a photo */}
                                 <Box sx={{ display: "flex", justifyContent: "center", mb: 2 }}>
-                                    <Box
-                                        component="img"
-                                        src={member.photo}
-                                        alt={member.name}
-                                        sx={{
-                                            width: 200,
-                                            height: 200,
-                                            objectFit: "cover",
-                                            borderRadius: "50%",
-                                            border: "3px solid #111827",
-                                            boxShadow: "0 4px 16px rgba(0,0,0,0.1)",
-                                        }}
-                                    />
+                                    {member.photo ? (
+                                        <Box
+                                            component="img"
+                                            src={member.photo}
+                                            alt={member.name}
+                                            sx={{
+                                                width: 200,
+                                                height: 200,
+                                                objectFit: "cover",
+                                                borderRadius: "50%",
+                                                border: "3px solid #111827",
+                                                boxShadow: "0 4px 16px rgba(0,0,0,0.1)",
+                                            }}
+                                        />
+                                    ) : (
+                                        <Box
+                                            aria-label={member.name}
+                                            sx={{
+                                                width: 200,
+                                                height: 200,
+                                                display: "flex",
+                                                alignItems: "center",
+                                                justifyContent: "center",
+                                                borderRadius: "50%",
+                                                border: "3px solid #111827",
+                                                boxShadow: "0 4px 16px rgba(0,0,0,0.1)",
+                                                bgcolor: "#E8EEFB",
+                                                color: "#2563EB",
+                                                fontSize: "3.4rem",
+                                                fontWeight: 700,
+                                                letterSpacing: "0.02em",
+                                            }}
+                                        >
+                                            {initialsOf(member.name)}
+                                        </Box>
+                                    )}
                                 </Box>
 
                                 {/* Description */}

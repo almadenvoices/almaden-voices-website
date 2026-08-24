@@ -62,6 +62,25 @@ function checkGradeFloor(text) {
 
 const emailLooksValid = (value) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(value || "").trim());
 
+// Resumes travel to the Apps Script as base64 inside the JSON payload, so the
+// file has to stay small enough for that request to succeed.
+const RESUME_MAX_BYTES = 4 * 1024 * 1024;
+const RESUME_TYPES = [".pdf", ".doc", ".docx", ".rtf", ".txt"];
+
+function readFileAsBase64(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+            // Drop the "data:<type>;base64," prefix — the script wants the body.
+            const result = String(reader.result || "");
+            const comma = result.indexOf(",");
+            resolve(comma >= 0 ? result.slice(comma + 1) : "");
+        };
+        reader.onerror = () => reject(new Error("read failed"));
+        reader.readAsDataURL(file);
+    });
+}
+
 export default function VolunteerPage() {
     const [openRole, setOpenRole] = useState("");
 
@@ -73,6 +92,9 @@ export default function VolunteerPage() {
     const [email, setEmail] = useState("");
     const [phone, setPhone] = useState("");
     const [ageOrGrade, setAgeOrGrade] = useState("");
+    const [location, setLocation] = useState("");
+    // The picked resume file, plus its base64 body once we've read it.
+    const [resume, setResume] = useState(null);
     const [roles, setRoles] = useState([]);
     const [why, setWhy] = useState("");
     const [availability, setAvailability] = useState("");
@@ -95,6 +117,29 @@ export default function VolunteerPage() {
 
     function toggleRole(id) {
         setRoles((prev) => (prev.includes(id) ? prev.filter((r) => r !== id) : [...prev, id]));
+    }
+
+    async function pickResume(file) {
+        if (!file) {
+            setResume(null);
+            return;
+        }
+        const name = file.name || "resume";
+        const extOk = RESUME_TYPES.some(ext => name.toLowerCase().endsWith(ext));
+        if (!extOk) {
+            setResume({ name, error: "Please upload a PDF, Word, RTF, or text file." });
+            return;
+        }
+        if (file.size > RESUME_MAX_BYTES) {
+            setResume({ name, error: "That file is larger than 4 MB. Please upload a smaller one." });
+            return;
+        }
+        try {
+            const data = await readFileAsBase64(file);
+            setResume({ name, type: file.type || "application/octet-stream", size: file.size, data });
+        } catch {
+            setResume({ name, error: "We couldn't read that file. Please try another one." });
+        }
     }
 
     function openApplication(roleId) {
@@ -120,6 +165,8 @@ export default function VolunteerPage() {
         if (!email.trim()) next.email = "Required.";
         else if (!emailLooksValid(email)) next.email = "Please enter a valid email address.";
         if (!phone.trim()) next.phone = "Required.";
+        if (!location.trim()) next.location = "Required.";
+        if (resume && resume.error) next.resume = resume.error;
         if (!ageOrGrade.trim()) next.ageOrGrade = "Required.";
         else if (checkGradeFloor(ageOrGrade) === "too-young") {
             // A bare "8" reads as age 8 and gets caught here, so the message
@@ -171,6 +218,10 @@ export default function VolunteerPage() {
             email,
             phone,
             ageOrGrade,
+            location,
+            resumeName: resume?.name || "",
+            resumeType: resume?.type || "",
+            resumeData: resume?.data || "",
             positions: roleTitles,
             why,
             availability,
@@ -544,6 +595,44 @@ export default function VolunteerPage() {
                                     />
                                     {errors.ageOrGrade && <p className={s.fieldErrorText}>{errors.ageOrGrade}</p>}
                                 </div>
+
+                                <div className={`${s.field} ${errors.location ? s.fieldError : ""}`}>
+                                    <label htmlFor="location">
+                                        Location <span className={s.req}>*</span>
+                                    </label>
+                                    <p className={s.hint}>
+                                        Where you&apos;re based. Most roles are remote, but in-person
+                                        ones need you near San Jos&eacute;.
+                                    </p>
+                                    <input
+                                        id="location"
+                                        type="text"
+                                        placeholder="e.g. San José, CA"
+                                        value={location}
+                                        onChange={(e) => setLocation(e.target.value)}
+                                        disabled={isSubmitting}
+                                    />
+                                    {errors.location && <p className={s.fieldErrorText}>{errors.location}</p>}
+                                </div>
+                            </div>
+
+                            <div className={`${s.field} ${errors.resume ? s.fieldError : ""}`}>
+                                <label htmlFor="resume">Resume (optional)</label>
+                                <p className={s.hint}>
+                                    PDF, Word, RTF, or text, up to 4&nbsp;MB. No resume is completely
+                                    fine — plenty of our volunteers are students and don&apos;t have one.
+                                </p>
+                                <input
+                                    id="resume"
+                                    type="file"
+                                    accept=".pdf,.doc,.docx,.rtf,.txt"
+                                    onChange={(e) => pickResume(e.target.files?.[0] || null)}
+                                    disabled={isSubmitting}
+                                />
+                                {resume && !resume.error && (
+                                    <p className={s.hint}>Attached: {resume.name}</p>
+                                )}
+                                {errors.resume && <p className={s.fieldErrorText}>{errors.resume}</p>}
                             </div>
 
                             {/* Under-18 guardian details when applying for yourself */}

@@ -182,21 +182,24 @@ export default function DonatePage() {
                                 clearly, and build lifelong confidence through our four-week
                                 public speaking program in Almaden Valley.
                             </p>
+                            <div className={s.taxBanner}>
+                                <VerifiedIcon className={s.taxBannerIcon} />
+                                <div>
+                                    <p className={s.taxBannerTitle}>Your donation is tax-deductible</p>
+                                    <p className={s.taxBannerBody}>
+                                        Almaden Voices is a registered 501(c)(3) nonprofit
+                                        (EIN: 39-4978818). Every donation is tax-deductible to the
+                                        fullest extent allowed by law, and you&apos;ll get a receipt
+                                        for your records as soon as you give.
+                                    </p>
+                                </div>
+                            </div>
                             <ul className={s.bullets}>
-                                <li>
-                                    <VerifiedIcon /> Registered 501(c)(3) nonprofit (EIN: 39-4978818) — donations are tax-deductible
-                                </li>
                                 <li>
                                     <ShieldIcon /> All online payments are processed securely by
                                     PayPal.
                                 </li>
                             </ul>
-                            <p className={s.legal} style={{ color: 'rgba(255,255,255,0.7)', textAlign: 'left' }}>
-                                Almaden Voices is a registered 501(c)(3) nonprofit organization
-                                (EIN: 39-4978818). Your donation is tax-deductible to the fullest
-                                extent allowed by law. You'll receive a confirmation receipt via
-                                PayPal when you pay online.
-                            </p>
                         </div>
 
                         {/* DONATE CARD */}
@@ -205,6 +208,13 @@ export default function DonatePage() {
                                 <VolunteerActivismIcon />
                                 <span>Make a Donation</span>
                             </header>
+
+                            <p className={s.taxChip}>
+                                <VerifiedIcon className={s.taxChipIcon} />
+                                <span>
+                                    <strong>Tax-deductible.</strong> 501(c)(3) EIN 39-4978818 — receipt included.
+                                </span>
+                            </p>
 
                             {/* frequency */}
                             <div className={s.freq}>
