@@ -835,7 +835,8 @@ app.post("/api/register", async (req, res) => {
             'storytelling': 'Storytelling',
             'communication': 'Communication Skills',
             'av-workshop-march24-2026': 'Free Public Speaking Workshop (March 24 & 25, 2026)',
-            'av-workshop-april8-2026': 'Free Public Speaking Workshop (April 8 & 9, 2026)'
+            'av-workshop-april8-2026': 'Free Public Speaking Workshop (April 8 & 9, 2026)',
+            'nj-workshop-aug-2026': 'New Jersey Public Speaking Workshop (August 29 & 30, 2026)'
         };
 
         const sessionLabel = sessionLabels[sessionType] || sessionType;
