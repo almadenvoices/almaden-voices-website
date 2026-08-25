@@ -34,8 +34,6 @@ export default function CoachingSlots() {
     const [notes, setNotes] = useState("");
     // Photo/video permission is opt-in and required: "" until the parent picks.
     const [photoConsent, setPhotoConsent] = useState("");
-    // Press sharing is a separate, optional permission — never pre-checked.
-    const [pressConsent, setPressConsent] = useState(false);
 
     const [payError, setPayError] = useState("");
     const [booked, setBooked] = useState(null); // set once payment succeeds
@@ -90,7 +88,7 @@ export default function CoachingSlots() {
         const details = {
             parentName, email, phone, studentName, studentAge, schoolName, zipCode, notes,
             photoConsent: photoConsent === "yes",
-            pressConsent,
+            pressConsent: false,
         };
 
         window.paypal.Buttons({
@@ -137,7 +135,7 @@ export default function CoachingSlots() {
             onCancel: () => setPayError("")
         }).render("#coaching-paypal-container");
     }, [paypalLoaded, readyToPay, booked, selectedId, format, parentName, email, phone,
-        studentName, studentAge, schoolName, zipCode, notes, photoConsent, pressConsent,
+        studentName, studentAge, schoolName, zipCode, notes, photoConsent,
         price, selectedSlot]);
 
     if (booked) {
@@ -326,19 +324,6 @@ export default function CoachingSlots() {
                                 onChange={() => setPhotoConsent("no")}
                             />
                             <span>No, please do not photograph or record my child.</span>
-                        </label>
-
-                        <label className={`${c.check} ${c.consentExtra}`}>
-                            <input
-                                type="checkbox"
-                                checked={pressConsent}
-                                onChange={e => setPressConsent(e.target.checked)}
-                            />
-                            <span>
-                                I also give permission for photos of my child to be shared with local
-                                news media in connection with coverage of Almaden Voices programs.
-                                (Optional — you can say yes to the above and no to this.)
-                            </span>
                         </label>
                     </fieldset>
 
