@@ -14,13 +14,11 @@ const founder = {
     intro:
         "Hi! I'm Anjika Bansal — Founder of Almaden Voices, with a passion for helping students grow into confident speakers.\n" +
         "\n" +
-        "I've dedicated over 1,500 hours to public speaking through Leland Speech and Debate, ranked #1 in California and #5 in the nation. I've competed at 32 tournaments, traveled to Arizona and Berkeley representing Leland, and qualified to elimination rounds at four nationally competitive tournaments, including Stanford, where I earned a bid to the Tournament of Champions. Along the way, I've trained at elite programs like UCLA, GSA, and others, and I'm proud to have been recognized with NSDA's Special Distinction Award and ranked #1 among Leland's sophomore speakers.\n" +
+        "I've spent over 1,500 hours in public speaking through Leland Speech and Debate, ranked #1 in California and #5 in the nation. Across 32 tournaments I've reached elimination rounds at four nationally competitive ones, including Stanford, where I earned a bid to the Tournament of Champions, and I've been recognized with NSDA's Special Distinction Award.\n" +
         "\n" +
         "But none of that matters as much as the smile on a student's face when they give their very first speech.\n" +
         "\n" +
-        "Growing up, I was lucky to feel confident speaking in front of others — and I know that's not always the case for everyone. I started Almaden Voices to create a space where every student could build that same confidence, discover their voice, and feel proud to use it.\n" +
-        "\n" +
-        "My goal is simple: to help students become powerful communicators by building skills that go beyond the stage — skills they can use to step into the world with courage.",
+        "Growing up, I was lucky to feel confident speaking in front of others. I started Almaden Voices so every student could build that same confidence, discover their voice, and feel proud to use it.",
     photo: "/images/anjika-bansal.png",
 };
 
@@ -40,7 +38,7 @@ const boardMembers = [
     {
         name: "Deepti Agrawal",
         role: "Board Director",
-        intro: "Deepti Agrawal is an entrepreneur, educator, and former corporate leader with more than 20 years of experience leading technology and business initiatives across the U.S., India, and Singapore. Her transition from a successful corporate career to a purpose-driven second chapter reflects her belief that leadership is ultimately about creating meaningful impact. Drawing on her own experience of reinvention, Deepti is passionate about helping young people build confidence, strengthen their communication skills, find their voice, and recognize their potential. This belief brought her to Almaden Voices.",
+        intro: "Deepti Agrawal is an entrepreneur and educator with more than 20 years leading technology and business initiatives across the U.S., India, and Singapore. Her move from a corporate career to a purpose-driven second chapter reflects her belief that leadership is about creating meaningful impact. Helping young people build confidence and recognize their potential is what brought her to Almaden Voices.",
         photo: "/images/deepti-agrawal.jpeg",
     },
 ];
