@@ -41,9 +41,7 @@ const boardMembers = [
         name: "Deepti Agrawal",
         role: "Board Director",
         intro: "Deepti Agrawal is an entrepreneur, educator, and former corporate leader with more than 20 years of experience leading technology and business initiatives across the U.S., India, and Singapore. Her transition from a successful corporate career to a purpose-driven second chapter reflects her belief that leadership is ultimately about creating meaningful impact. Drawing on her own experience of reinvention, Deepti is passionate about helping young people build confidence, strengthen their communication skills, find their voice, and recognize their potential. This belief brought her to Almaden Voices.",
-        // Drop the photo in at client/public/images/deepti-agrawal.png and it
-        // appears here. Until that file exists the card shows her initials.
-        photo: "/images/deepti-agrawal.png",
+        photo: "/images/deepti-agrawal.jpeg",
     },
 ];
 
