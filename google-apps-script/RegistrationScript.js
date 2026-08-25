@@ -28,6 +28,11 @@ const TEST_EMAIL = ADMIN_EMAIL;
 // BCC'd on every join-link email in the blast, so there's a copy of each send.
 const BCC_EMAIL = ADMIN_EMAIL;
 
+// Bump this whenever this file changes, then check it shows up at the web app
+// URL after redeploying. If the URL still reports the old version, the new
+// code is pasted but not deployed.
+const SCRIPT_VERSION = "2026-08-25";
+
 // Desired column order for the Registrations sheet. New columns are appended
 // automatically to existing sheets, so this is safe to extend over time.
 const REG_HEADERS = [
@@ -104,6 +109,34 @@ const WORKSHOPS = {
     ],
     // Webex Personal Room — no meeting password required.
     // The same room hosts both days.
+    webex: {
+      link: "https://anjikabansal-405.my.webex.com/meet/almadenvoices",
+      meetingNumber: "2554 439 4487",
+      phone: "+1-650-479-3208",
+      phoneTapToJoin: "+1-650-479-3208,,25544394487##",
+      videoDial: "almadenvoices.anjikabansal-405.my@webex.com",
+      videoIp: "173.243.2.68"
+    }
+  },
+  "nj-workshop-aug-2026": {
+    name: "Free New Jersey Public Speaking Workshop for Kids",
+    datesText: "Saturday, August 29 &amp; Sunday, August 30, 2026",
+    timesText: "2:00–3:00 PM ET (New Jersey) &middot; 11:00 AM–12:00 PM PT",
+    // Start times in UTC. Late August is EDT (UTC-4), so 2:00 PM ET = 18:00 UTC.
+    sessions: [
+      {
+        label: "Day 1: Saturday, August 29, 2026",
+        time: "2:00–3:00 PM ET (New Jersey) &middot; 11:00 AM–12:00 PM PT",
+        startUtc: "2026-08-29T18:00:00Z"
+      },
+      {
+        label: "Day 2: Sunday, August 30, 2026",
+        time: "2:00–3:00 PM ET (New Jersey) &middot; 11:00 AM–12:00 PM PT",
+        startUtc: "2026-08-30T18:00:00Z"
+      }
+    ],
+    // Same Webex Personal Room as the other online workshops — no password,
+    // and it hosts both days.
     webex: {
       link: "https://anjikabansal-405.my.webex.com/meet/almadenvoices",
       meetingNumber: "2554 439 4487",
@@ -1679,5 +1712,9 @@ function jsonOut(obj) {
 
 // GET handler — for testing that the script is deployed
 function doGet() {
-  return jsonOut({ status: "ok", message: "Almaden Voices Registration Script is running." });
+  return jsonOut({
+    status: "ok",
+    version: SCRIPT_VERSION,
+    message: "Almaden Voices Registration Script is running."
+  });
 }

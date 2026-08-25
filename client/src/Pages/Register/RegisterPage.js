@@ -53,7 +53,22 @@ const SHOW_COACHING = true;
 //     status: "Open",  // "Open" or "Full"
 // }
 // ============================================================
-const upcomingSessions = [];
+const upcomingSessions = [
+    {
+        id: "nj-workshop-aug-2026",
+        title: "New Jersey Public Speaking Workshop",
+        date: "August 29 & 30, 2026",
+        time: "2–3 PM ET",
+        location: "Online",
+        grades: "Ages 5–15",
+        // capacity: null means no limit — no seat count and it never shows as full.
+        capacity: null,
+        enrolled: 0,
+        description: "A free two-day online workshop for kids in New Jersey. We cover the fundamentals — speaking clearly, standing with confidence, and settling the nerves that come with presenting to a group. No experience needed. Runs Saturday, August 29 and Sunday, August 30, 2–3 PM ET; we'll email you the join link before day one.",
+        status: "Open",
+        online: true,
+    },
+];
 
 // A session with no capacity set takes unlimited registrations.
 const hasSeatLimit = (ses) => ses && ses.capacity != null;
