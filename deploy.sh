@@ -53,9 +53,11 @@ gcloud run deploy "$SERVICE" \
     --set-env-vars="NODE_ENV=production,USE_GCP_SECRETS=true,GCP_PROJECT_ID=$PROJECT" \
     2>&1 | tee "$LOG"
 
-# "serving 100 percent of traffic" is the only trustworthy sign it worked.
-# Checking the exit code alone has let a failed deploy look like a success.
-if grep -q "serving 100 percent of traffic" "$LOG"; then
+# Reaching "serving 100 percent of traffic" is the only trustworthy sign it
+# worked; checking the exit code alone has let a failed deploy look like a
+# success. gcloud colourises the number, so match only the plain-text tail of
+# that sentence — anything spanning the "100" would miss on the escape codes.
+if grep -qaE "percent of traffic|has been deployed" "$LOG"; then
     echo
     echo "============================================"
     echo " DEPLOYED — the site is live."
