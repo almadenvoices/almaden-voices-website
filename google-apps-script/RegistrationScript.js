@@ -555,9 +555,9 @@ const VOLUNTEER_SHEET_PROP = "volunteerSheetId";
 // someone attaches one, and lives in the almadenvoices@gmail.com Drive.
 const VOLUNTEER_RESUME_FOLDER = "Almaden Voices Volunteer Resumes";
 
-const VOLUNTEER_DEADLINE_TEXT = "Applications close August 31 at 9 PM PT.";
+const VOLUNTEER_DEADLINE_TEXT = "Applications close September 4 at 9 PM PT.";
 const VOLUNTEER_NEXT_STEP_TEXT =
-  "We read every application ourselves. We'll be in touch the first week of September to schedule interviews.";
+  "We read every application ourselves. We'll be in touch the second week of September to schedule interviews.";
 
 // Resumes arrive base64-encoded in the JSON payload. Each one is saved into a
 // "Volunteer Resumes" folder in the same Drive as the spreadsheet, and the
