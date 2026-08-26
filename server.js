@@ -119,7 +119,7 @@ const COACHING_HEADERS = [
     "Timestamp", "Slot ID", "Slot Label", "Format",
     "Amount Paid", "PayPal Order ID", "Parent Name", "Email", "Phone",
     "Student Name", "Student Age", "School Name", "Home ZIP", "Notes",
-    "Photo/Video Permission", "Press/Media Permission"
+    "Questions/Comments", "Photo/Video Permission", "Press/Media Permission"
 ];
 
 // Slot ids that already have a paid booking recorded.
@@ -1340,7 +1340,7 @@ app.post("/api/coaching/orders/:orderID/capture", async (req, res) => {
     try {
         const { orderID } = req.params;
         const { slotId, format, parentName, email, phone, studentName, studentAge,
-                schoolName, zipCode, notes, photoConsent, pressConsent } = req.body;
+                schoolName, zipCode, notes, comments, photoConsent, pressConsent } = req.body;
 
         const slot = findCoachingSlot(slotId);
         if (!slot) return res.status(400).json({ error: "That slot is no longer offered." });
@@ -1360,7 +1360,7 @@ app.post("/api/coaching/orders/:orderID/capture", async (req, res) => {
             const row = [
                 new Date().toISOString(), slot.id, coachingSlotLabel(slot.id),
                 formatLabel, amount, orderID, parentName, email, phone,
-                studentName, studentAge, schoolName, zipCode, notes,
+                studentName, studentAge, schoolName, zipCode, notes, comments,
                 photoConsent ? "Yes" : "No", pressConsent ? "Yes" : "No"
             ].map(csvCell).join(",") + "\n";
             fs.appendFileSync(file, row);
