@@ -1,0 +1,43 @@
+# What NOT to upload when deploying to Cloud Run.
+#
+# Without this file gcloud falls back to .gitignore and uploads everything else
+# — including the 300MB+ .git folder — which made the source upload time out
+# and fail the deploy.
+#
+# The container only needs client/, server.js, config.js and the package files.
+# See the Dockerfile: nothing else is ever COPYed in.
+
+# The repository history. Big, and the container has no use for it.
+.git/
+.gitattributes
+
+# Reinstalled inside the image by `npm ci`.
+node_modules/
+client/node_modules/
+
+# Rebuilt inside the image by `npm run build`.
+/build
+/client/build
+
+# Full-size camera originals; the web-sized copies in client/public are used.
+/media-originals
+
+# Secrets. Production reads these from GCP Secret Manager, never from a file.
+.env
+.env.*
+
+# Runtime data mirrored to GCS — the server downloads these at boot.
+subscribers.csv
+registrations.csv
+coaching-bookings.csv
+
+# Editor and OS clutter
+.idea/
+.vscode/
+.DS_Store
+*.swp
+*.swo
+*~
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
