@@ -54,7 +54,7 @@ const CoursesPage = () => {
             date: "August 29 & 30, 2026",
             time: "2–3 PM ET",
             location: "Online",
-            ageGroup: "Ages 5–15",
+            ageGroup: "Ages 5–14",
             // capacity: null means no limit — no seat count and it never shows as full.
             capacity: null,
             enrolled: 0,
