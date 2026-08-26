@@ -31,7 +31,7 @@ const BCC_EMAIL = ADMIN_EMAIL;
 // Bump this whenever this file changes, then check it shows up at the web app
 // URL after redeploying. If the URL still reports the old version, the new
 // code is pasted but not deployed.
-const SCRIPT_VERSION = "2026-08-25";
+const SCRIPT_VERSION = "2026-08-26";
 
 // Desired column order for the Registrations sheet. New columns are appended
 // automatically to existing sheets, so this is safe to extend over time.
@@ -80,6 +80,34 @@ const VOL_HEADERS = [
   "Parent/Guardian Aware",
   "Status",
   "Notes"
+];
+
+// Desired column order for the "Coaching Sessions" tab — paid 1-on-1 coaching
+// bookings. Same rules as the two above: columns are matched by name, and any
+// new ones are appended to an existing sheet rather than shifting what is
+// already there.
+//
+// These rows are posted by the website's own server (server.js) after PayPal
+// confirms the payment, not by the browser, so a row here always means money
+// actually changed hands. "Scheduled?" is left blank on purpose — it is for
+// you to fill in once you have agreed a time with the family.
+const COACH_HEADERS = [
+  "Timestamp",
+  "Slot",
+  "Format",
+  "Amount Paid",
+  "Parent Name",
+  "Email",
+  "Phone",
+  "Student Name",
+  "Student Age",
+  "School Name",
+  "Home ZIP",
+  "What They Want To Work On",
+  "Questions/Comments",
+  "Photo/Video Permission",
+  "PayPal Order ID",
+  "Scheduled?"
 ];
 
 // ============================================================
@@ -164,6 +192,12 @@ function doPost(e) {
       return handleVolunteerApplication(data);
     }
 
+    // Paid 1-on-1 coaching bookings, posted by the website's server once
+    // PayPal has confirmed the payment.
+    if (data.formType === "coaching") {
+      return handleCoachingBooking(data);
+    }
+
     const ss = SpreadsheetApp.getActiveSpreadsheet();
     const sheet = getRegistrationsSheet(ss);
 
@@ -237,6 +271,14 @@ function doPost(e) {
 // ============================================================
 function getRegistrationsSheet(ss) {
   return getSheetWithHeaders(ss, "Registrations", REG_HEADERS);
+}
+
+// Paid coaching bookings land on their own tab in the registration
+// spreadsheet, beside the workshop registrations.
+function getCoachingSheet(ss) {
+  const sheet = getSheetWithHeaders(ss, "Coaching Sessions", COACH_HEADERS);
+  sheet.setFrozenRows(1);
+  return sheet;
 }
 
 // The volunteer applications land on their own tab in the same spreadsheet.
@@ -621,6 +663,53 @@ function saveVolunteerResume(data) {
   } catch (err) {
     Logger.log("Resume upload failed: " + err.message);
     return "Upload failed - ask the applicant to email it";
+  }
+}
+
+// ============================================================
+// 1-ON-1 COACHING BOOKINGS
+//
+// Posted by the website's server (server.js) after PayPal confirms payment,
+// so a row on this tab always means the family has actually paid.
+//
+// This writes the row and nothing else — the server already sends both the
+// parent's confirmation and the admin notification, and sending them from
+// here too would just duplicate every email.
+// ============================================================
+function handleCoachingBooking(data) {
+  try {
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    const sheet = getCoachingSheet(ss);
+
+    // The server sends an ISO timestamp; turn it back into a real date so the
+    // column sorts and formats like the Timestamp column on the other tabs.
+    const stamp = data.timestamp ? new Date(data.timestamp) : new Date();
+
+    appendMappedRow(sheet, {
+      "Timestamp": stamp,
+      "Slot": data.slotLabel || ("Coaching Slot " + (data.slotId || "")),
+      "Format": data.format || "",
+      "Amount Paid": data.amountPaid === undefined || data.amountPaid === null
+        ? "" : Number(data.amountPaid),
+      "Parent Name": data.parentName || "",
+      "Email": data.parentEmail || "",
+      "Phone": data.phone || "",
+      "Student Name": data.studentName || "",
+      "Student Age": data.studentAge || "",
+      "School Name": data.schoolName || "",
+      "Home ZIP": data.zipCode || "",
+      "What They Want To Work On": data.notes || "",
+      "Questions/Comments": data.comments || "",
+      "Photo/Video Permission": data.photoConsent ? "Yes" : "No",
+      "PayPal Order ID": data.orderId || "",
+      "Scheduled?": ""
+    });
+
+    return jsonOut({ success: true });
+  } catch (err) {
+    // The server logs this against the PayPal order id so a booking that never
+    // reached the sheet can be found and added by hand.
+    return jsonOut({ success: false, error: err.message });
   }
 }
 
