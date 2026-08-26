@@ -80,8 +80,6 @@ export default function RegisterPage() {
     const [agreed, setAgreed] = useState(false);
     // Photo/video permission is opt-in and required: "" until the parent picks.
     const [photoConsent, setPhotoConsent] = useState("");
-    // Press sharing is a separate, optional permission — never pre-checked.
-    const [pressConsent, setPressConsent] = useState(false);
     const [futureContact, setFutureContact] = useState(false);
     const [showToast, setShowToast] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -228,7 +226,6 @@ export default function RegisterPage() {
             additionalInfo: formData.get("additionalInfo"),
             privacyAgreed: agreed,
             photoConsent: photoConsent === "yes",
-            pressConsent: pressConsent,
             futureContact: futureContact,
         };
 
@@ -251,7 +248,6 @@ export default function RegisterPage() {
                 e.target.reset();
                 setAgreed(false);
                 setPhotoConsent("");
-                setPressConsent(false);
                 setFutureContact(false);
                 setStudents([emptyStudent()]);
                 setDonationAmount(5);
@@ -813,19 +809,6 @@ export default function RegisterPage() {
                                             />
                                             <span>
                                                 <Bi entry={T.photoNo} lang={lang} block />
-                                            </span>
-                                        </label>
-
-                                        {/* Checkbox (optional): press sharing, answered independently */}
-                                        <label className={`${s.check} ${s.consentExtra}`}>
-                                            <input
-                                                type="checkbox"
-                                                checked={pressConsent}
-                                                onChange={(e) => setPressConsent(e.target.checked)}
-                                                disabled={isSubmitting}
-                                            />
-                                            <span>
-                                                <Bi entry={T.pressConsent} lang={lang} block />
                                             </span>
                                         </label>
                                     </fieldset>

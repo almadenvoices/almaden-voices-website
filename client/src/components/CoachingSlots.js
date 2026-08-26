@@ -32,6 +32,11 @@ export default function CoachingSlots() {
     const [schoolName, setSchoolName] = useState("");
     const [zipCode, setZipCode] = useState("");
     const [notes, setNotes] = useState("");
+    const [comments, setComments] = useState("");
+    // Which required fields the parent has been told about, and whether the
+    // PayPal buttons have been unlocked yet.
+    const [errors, setErrors] = useState({});
+    const [showPayment, setShowPayment] = useState(false);
     // Photo/video permission is opt-in and required: "" until the parent picks.
     const [photoConsent, setPhotoConsent] = useState("");
 
@@ -61,15 +66,55 @@ export default function CoachingSlots() {
     const openSlots = slots.filter(s => !s.booked).length;
     const allTaken = slots.length > 0 && openSlots === 0;
 
-    // Every field the confirmation email depends on must be filled in before we
-    // let anyone reach the PayPal buttons.
-    const detailsComplete = useMemo(() => Boolean(
-        parentName.trim() && studentName.trim() && studentAge && phone.trim() &&
-        schoolName.trim() && zipCode.trim() && photoConsent &&
-        /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
-    ), [parentName, studentName, studentAge, phone, schoolName, zipCode, photoConsent, email]);
+    // Every required field, checked in one place so the submit button and the
+    // red marks can never disagree about what's missing.
+    const missingFields = useMemo(() => {
+        const missing = {};
+        if (!parentName.trim()) missing.parentName = "Required.";
+        if (!studentName.trim()) missing.studentName = "Required.";
+        if (!studentAge) missing.studentAge = "Required.";
+        if (!email.trim()) missing.email = "Required.";
+        else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) missing.email = "Please enter a valid email address.";
+        if (!phone.trim()) missing.phone = "Required.";
+        if (!schoolName.trim()) missing.schoolName = "Required.";
+        if (!zipCode.trim()) missing.zipCode = "Required.";
+        if (!notes.trim()) missing.notes = "Required.";
+        if (!photoConsent) missing.photoConsent = "Please choose one.";
+        return missing;
+    }, [parentName, studentName, studentAge, email, phone, schoolName, zipCode, notes, photoConsent]);
 
-    const readyToPay = Boolean(selectedSlot) && !selectedSlot?.booked && detailsComplete;
+    const detailsComplete = Object.keys(missingFields).length === 0;
+    const readyToPay = Boolean(selectedSlot) && !selectedSlot?.booked && detailsComplete && showPayment;
+
+    // Fixing a field clears its mark straight away rather than making the
+    // parent press the button again to find out.
+    useEffect(() => {
+        setErrors(prev => {
+            if (Object.keys(prev).length === 0) return prev;
+            const next = {};
+            Object.keys(prev).forEach(key => {
+                if (missingFields[key]) next[key] = missingFields[key];
+            });
+            return Object.keys(next).length === Object.keys(prev).length ? prev : next;
+        });
+    }, [missingFields]);
+
+    // Changing slot or format sends them back through the check.
+    useEffect(() => { setShowPayment(false); }, [selectedId, format]);
+
+    function onContinueToPayment() {
+        if (!detailsComplete) {
+            setErrors(missingFields);
+            setShowPayment(false);
+            // Bring the first problem into view.
+            const firstBad = document.querySelector(`.${c.fieldErrorText}`);
+            (firstBad || document.getElementById("coaching-pay-area"))
+                ?.scrollIntoView({ behavior: "smooth", block: "center" });
+            return;
+        }
+        setErrors({});
+        setShowPayment(true);
+    }
 
     // Render the PayPal buttons once a slot is claimed and the details are in.
     useEffect(() => {
@@ -86,7 +131,7 @@ export default function CoachingSlots() {
         const slotId = selectedId;
         const chosenFormat = format;
         const details = {
-            parentName, email, phone, studentName, studentAge, schoolName, zipCode, notes,
+            parentName, email, phone, studentName, studentAge, schoolName, zipCode, notes, comments,
             photoConsent: photoConsent === "yes",
             pressConsent: false,
         };
@@ -135,7 +180,7 @@ export default function CoachingSlots() {
             onCancel: () => setPayError("")
         }).render("#coaching-paypal-container");
     }, [paypalLoaded, readyToPay, booked, selectedId, format, parentName, email, phone,
-        studentName, studentAge, schoolName, zipCode, notes, photoConsent,
+        studentName, studentAge, schoolName, zipCode, notes, comments, photoConsent,
         price, selectedSlot]);
 
     if (booked) {
@@ -255,48 +300,67 @@ export default function CoachingSlots() {
 
                     <div className={c.fieldGrid}>
                         <div>
-                            <label className={c.fieldLabel} htmlFor="coach-parent">Parent/guardian name</label>
-                            <input id="coach-parent" className={c.input} value={parentName} onChange={e => setParentName(e.target.value)} placeholder="Your name" />
+                            <label className={c.fieldLabel} htmlFor="coach-parent">Parent/guardian name <span className={c.req}>*</span></label>
+                            <input id="coach-parent" className={`${c.input} ${errors.parentName ? c.inputError : ""}`} value={parentName} onChange={e => setParentName(e.target.value)} placeholder="Your name" />
+                            {errors.parentName && <p className={c.fieldErrorText}>{errors.parentName}</p>}
                         </div>
                         <div>
-                            <label className={c.fieldLabel} htmlFor="coach-student">Student&apos;s name</label>
-                            <input id="coach-student" className={c.input} value={studentName} onChange={e => setStudentName(e.target.value)} placeholder="Child's name" />
+                            <label className={c.fieldLabel} htmlFor="coach-student">Student&apos;s name <span className={c.req}>*</span></label>
+                            <input id="coach-student" className={`${c.input} ${errors.studentName ? c.inputError : ""}`} value={studentName} onChange={e => setStudentName(e.target.value)} placeholder="Child's name" />
+                            {errors.studentName && <p className={c.fieldErrorText}>{errors.studentName}</p>}
                         </div>
                         <div>
-                            <label className={c.fieldLabel} htmlFor="coach-age">Student&apos;s age</label>
-                            <select id="coach-age" className={c.input} value={studentAge} onChange={e => setStudentAge(e.target.value)}>
+                            <label className={c.fieldLabel} htmlFor="coach-age">Student&apos;s age <span className={c.req}>*</span></label>
+                            <select id="coach-age" className={`${c.input} ${errors.studentAge ? c.inputError : ""}`} value={studentAge} onChange={e => setStudentAge(e.target.value)}>
                                 <option value="">Select age…</option>
                                 {[5, 6, 7, 8, 9, 10, 11, 12, 13].map(age => (
                                     <option key={age} value={String(age)}>{age} years old</option>
                                 ))}
                             </select>
+                            {errors.studentAge && <p className={c.fieldErrorText}>{errors.studentAge}</p>}
                         </div>
                         <div>
-                            <label className={c.fieldLabel} htmlFor="coach-email">Email</label>
-                            <input id="coach-email" type="email" className={c.input} value={email} onChange={e => setEmail(e.target.value)} placeholder="you@email.com" />
+                            <label className={c.fieldLabel} htmlFor="coach-email">Email <span className={c.req}>*</span></label>
+                            <input id="coach-email" type="email" className={`${c.input} ${errors.email ? c.inputError : ""}`} value={email} onChange={e => setEmail(e.target.value)} placeholder="you@email.com" />
+                            {errors.email && <p className={c.fieldErrorText}>{errors.email}</p>}
                         </div>
                         <div>
-                            <label className={c.fieldLabel} htmlFor="coach-phone">Phone number</label>
-                            <input id="coach-phone" type="tel" className={c.input} value={phone} onChange={e => setPhone(e.target.value)} placeholder="+1 (000) 000-0000" />
+                            <label className={c.fieldLabel} htmlFor="coach-phone">Phone number <span className={c.req}>*</span></label>
+                            <input id="coach-phone" type="tel" className={`${c.input} ${errors.phone ? c.inputError : ""}`} value={phone} onChange={e => setPhone(e.target.value)} placeholder="+1 (000) 000-0000" />
+                            {errors.phone && <p className={c.fieldErrorText}>{errors.phone}</p>}
                         </div>
                         <div>
-                            <label className={c.fieldLabel} htmlFor="coach-school">School name</label>
-                            <input id="coach-school" className={c.input} value={schoolName} onChange={e => setSchoolName(e.target.value)} placeholder="e.g. Graystone Elementary" />
+                            <label className={c.fieldLabel} htmlFor="coach-school">School name <span className={c.req}>*</span></label>
+                            <input id="coach-school" className={`${c.input} ${errors.schoolName ? c.inputError : ""}`} value={schoolName} onChange={e => setSchoolName(e.target.value)} placeholder="e.g. Graystone Elementary" />
+                            {errors.schoolName && <p className={c.fieldErrorText}>{errors.schoolName}</p>}
                         </div>
                         <div>
-                            <label className={c.fieldLabel} htmlFor="coach-zip">Home ZIP code</label>
-                            <input id="coach-zip" className={c.input} value={zipCode} onChange={e => setZipCode(e.target.value)} placeholder="e.g. 95120" />
+                            <label className={c.fieldLabel} htmlFor="coach-zip">Home ZIP code <span className={c.req}>*</span></label>
+                            <input id="coach-zip" className={`${c.input} ${errors.zipCode ? c.inputError : ""}`} value={zipCode} onChange={e => setZipCode(e.target.value)} placeholder="e.g. 95120" />
+                            {errors.zipCode && <p className={c.fieldErrorText}>{errors.zipCode}</p>}
                         </div>
                     </div>
 
                     <div className={c.notesField}>
-                        <label className={c.fieldLabel} htmlFor="coach-notes">What would you like to work on? (optional)</label>
-                        <textarea id="coach-notes" rows="3" className={`${c.input} ${c.textarea}`} value={notes} onChange={e => setNotes(e.target.value)} placeholder="A speech they're preparing, stage nerves, a class presentation, anything else…" />
+                        <label className={c.fieldLabel} htmlFor="coach-notes">
+                            What would you like to work on? <span className={c.req}>*</span>
+                        </label>
+                        <textarea id="coach-notes" rows="3" className={`${c.input} ${c.textarea} ${errors.notes ? c.inputError : ""}`} value={notes} onChange={e => setNotes(e.target.value)} placeholder="A speech they're preparing, stage nerves, a class presentation, anything else…" />
+                        {errors.notes && <p className={c.fieldErrorText}>{errors.notes}</p>}
+                    </div>
+
+                    <div className={c.notesField}>
+                        <label className={c.fieldLabel} htmlFor="coach-comments">
+                            Any questions, concerns, or comments? (optional)
+                        </label>
+                        <textarea id="coach-comments" rows="3" className={`${c.input} ${c.textarea}`} value={comments} onChange={e => setComments(e.target.value)} placeholder="Anything else you'd like us to know…" />
                     </div>
 
                     {/* Same opt-in photo permission as the registration form. */}
                     <fieldset className={c.consentBlock}>
-                        <legend className={c.consentTitle}>Photo and video permission</legend>
+                        <legend className={c.consentTitle}>
+                            Photo and video permission <span className={c.req}>*</span>
+                        </legend>
                         <p className={c.consentIntro}>
                             We sometimes photograph or record students during sessions and showcases.
                             Please choose one:
@@ -325,24 +389,49 @@ export default function CoachingSlots() {
                             />
                             <span>No, please do not photograph or record my child.</span>
                         </label>
+                        {errors.photoConsent && <p className={c.fieldErrorText}>{errors.photoConsent}</p>}
                     </fieldset>
 
-                    <div className={c.payArea}>
+                    <div className={c.payArea} id="coaching-pay-area">
                         <div className={c.totalRow}>
                             <span className={c.totalLabel}>Total</span>
                             <span className={c.totalAmount}>${price}.00</span>
                         </div>
 
-                        {!detailsComplete && (
-                            <p className={c.status}>
-                                Fill in your name, your child&apos;s name and age, email, phone, school
-                                and ZIP, and answer the photo question to continue to payment.
-                            </p>
+                        <p className={c.reqNote}>
+                            <span className={c.req}>*</span> Required
+                        </p>
+
+                        {/* Payment stays out of reach until every required field is
+                            filled in, so nobody pays before we have what we need. */}
+                        {!showPayment && (
+                            <>
+                                <button
+                                    type="button"
+                                    className={c.submitBtn}
+                                    onClick={onContinueToPayment}
+                                >
+                                    Continue to payment
+                                </button>
+                                {Object.keys(errors).length > 0 && (
+                                    <p className={c.statusError}>
+                                        Please fill in the fields marked in red above, then try again.
+                                    </p>
+                                )}
+                            </>
                         )}
+
                         {payError && <p className={c.statusError}>{payError}</p>}
                         {paypalError && <p className={c.statusError}>{paypalError}</p>}
 
-                        <div id="coaching-paypal-container" />
+                        {showPayment && (
+                            <>
+                                {!paypalLoaded && !paypalError && (
+                                    <p className={c.status}>Loading secure payment…</p>
+                                )}
+                                <div id="coaching-paypal-container" />
+                            </>
+                        )}
 
                         <p className={c.payNote}>
                             Payment is handled by PayPal — you can pay with a card without a PayPal account.

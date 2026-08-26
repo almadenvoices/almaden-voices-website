@@ -177,13 +177,9 @@ export const T = {
         en: "No, please do not photograph or record my child.",
         es: "No, por favor no fotografíen ni graben a mi hijo/a.",
     },
-    pressConsent: {
-        en: "I also give permission for photos of my child to be shared with local news media in connection with coverage of Almaden Voices programs. (Optional — you can say yes to the above and no to this.)",
-        es: "También doy permiso para que se compartan fotos de mi hijo/a con medios de comunicación locales en relación con la cobertura de los programas de Almaden Voices. (Opcional — puede decir sí a lo anterior y no a esto.)",
-    },
     futureContact: {
-        en: "I would like to be contacted about future Almaden Voices sessions and events.",
-        es: "Deseo recibir información sobre futuras sesiones y eventos de Almaden Voices.",
+        en: "I would like to be contacted about future Almaden Voices sessions and events, and to receive the Almaden Voices newsletter.",
+        es: "Deseo recibir información sobre futuras sesiones y eventos de Almaden Voices, y suscribirme al boletín de Almaden Voices.",
     },
     agreePrefix: { en: "I have read and agree to the Almaden Voices", es: "He leído y acepto la" },
     privacyPolicy: { en: "Privacy Policy", es: "Política de Privacidad" },
