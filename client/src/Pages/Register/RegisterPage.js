@@ -60,7 +60,7 @@ const upcomingSessions = [
         date: "August 29 & 30, 2026",
         time: "2–3 PM ET",
         location: "Online",
-        grades: "Ages 5–15",
+        grades: "Ages 5–14",
         // capacity: null means no limit — no seat count and it never shows as full.
         capacity: null,
         enrolled: 0,
@@ -587,7 +587,7 @@ export default function RegisterPage() {
                                                 onChange={(e) => updateStudent(index, "age", e.target.value)}
                                             >
                                                 <option value="">{t(T.selectAge, lang)}</option>
-                                                {[5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15].map(age => (
+                                                {[5, 6, 7, 8, 9, 10, 11, 12, 13, 14].map(age => (
                                                     <option key={age} value={String(age)}>{t(T.yearsOld, lang, { n: age })}</option>
                                                 ))}
                                             </select>

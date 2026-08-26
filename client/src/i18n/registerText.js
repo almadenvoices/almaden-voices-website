@@ -47,8 +47,8 @@ export const T = {
     // ---- Left rail ----
     whoTitle: { en: "Who Can Join?", es: "¿Quién puede participar?" },
     whoBody: {
-        en: "This free workshop is open to kids ages 5 to 15. No experience needed — all levels welcome!",
-        es: "Este taller gratuito está abierto a niños de 5 a 15 años. No se necesita experiencia: ¡todos los niveles son bienvenidos!",
+        en: "This free workshop is open to kids ages 5 to 14. No experience needed — all levels welcome!",
+        es: "Este taller gratuito está abierto a niños de 5 a 14 años. No se necesita experiencia: ¡todos los niveles son bienvenidos!",
     },
     learnTitle: { en: "What You'll Learn", es: "Qué aprenderá" },
     learnBody: {
