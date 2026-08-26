@@ -152,6 +152,47 @@ const VOLUNTEER_NEXT_STEP_TEXT = "We read every application ourselves. ...";
 
 ---
 
+## 1-on-1 Coaching Sessions
+
+Paid coaching bookings land on their own tab, **Coaching Sessions**, in the same
+registrations spreadsheet. The tab and its headers are created automatically the
+first time someone books — you don't have to make it yourself.
+
+Coaching is different from the other two forms in one important way: the row is
+posted by the **website's own server**, not the browser, and only after PayPal
+has confirmed the payment. So a row on this tab always means the family has
+actually paid. (The server keeps its own copy in `coaching-bookings.csv` in
+Cloud Storage as well, so the sheet is a convenience, never the only record.)
+
+The server also sends both coaching emails — the family's confirmation and your
+notification — so the script only writes the row. That's on purpose: sending
+them from here too would send every family two of everything.
+
+| Column | Description |
+|--------|-------------|
+| Timestamp | When the booking was paid for |
+| Slot | Which of the five slots (e.g. Coaching Slot 3) |
+| Format | Online or In person |
+| Amount Paid | 20 for online, 30 for in person |
+| Parent Name / Email / Phone | Who booked |
+| Student Name / Student Age | Who the session is for |
+| School Name / Home ZIP | As given on the form |
+| What They Want To Work On | The required "what do you want help with" answer |
+| Questions/Comments | Anything else they told us |
+| Photo/Video Permission | Yes/No |
+| PayPal Order ID | For matching against PayPal if you ever need to |
+| Scheduled? | Left blank for you — fill it in once a time is agreed |
+
+**Important:** update this script *before* (or at the same time as) deploying a
+version of the website that sends coaching bookings. If the website is newer
+than the script, the script won't recognise a coaching booking and the row won't
+be written — the family is still charged correctly, still gets their
+confirmation, and the booking is still saved to Cloud Storage, but you'll have
+to add the row by hand. Cloud Run's logs record any booking that failed to reach
+the sheet, tagged with its PayPal order id.
+
+---
+
 ## Updating the Script Later
 
 If you need to update the script after deployment:
