@@ -18,7 +18,9 @@ import c from "./CoachingSlots.module.css";
  */
 export default function CoachingSlots() {
     const [slots, setSlots] = useState([]);
-    const [prices, setPrices] = useState({ online: 20, inPerson: 30 });
+    // Only a placeholder for the moment before /api/coaching/slots answers —
+    // the server is the authority on what anyone is actually charged.
+    const [prices, setPrices] = useState({ online: 25, inPerson: 30 });
     const [loading, setLoading] = useState(true);
     const [loadError, setLoadError] = useState("");
 
@@ -303,7 +305,12 @@ export default function CoachingSlots() {
                     presentation, stage nerves, or building confidence from scratch.
                 </p>
                 <p className={c.introBody}>
-                    Five slots are available. After you book, we&apos;ll email you within two business
+                    {/* Counted rather than written out, so opening another round of
+                        slots never leaves the wrong number sitting here. */}
+                    {openSlots > 0 && (
+                        <>{openSlots === 1 ? "One slot is" : `${openSlots} slots are`} currently available. </>
+                    )}
+                    After you book, we&apos;ll email you within two business
                     days to find a time. Reply to that email to confirm your session — we can&apos;t
                     hold a slot without a reply.
                 </p>

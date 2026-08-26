@@ -127,7 +127,7 @@ const refreshCoachingFromGCS = () =>
 // scheduling happens by email after booking. Prices live here on the
 // server so the amount charged can't be altered by the browser.
 // ============================================================
-const COACHING_PRICES = { online: 20, inPerson: 30 };
+const COACHING_PRICES = { online: 25, inPerson: 30 };
 
 const COACHING_SLOTS = [
     { id: 1, taken: false },
@@ -135,6 +135,13 @@ const COACHING_SLOTS = [
     { id: 3, taken: false },
     { id: 4, taken: false },
     { id: 5, taken: false },
+    // Second round, opened 26 August 2026 once the first five sold out. Slots
+    // 1-5 stay listed and show as "Booked" — their families keep those numbers.
+    { id: 6, taken: false },
+    { id: 7, taken: false },
+    { id: 8, taken: false },
+    { id: 9, taken: false },
+    { id: 10, taken: false },
 ];
 
 // What the card, the CSV, and the emails call a slot.
