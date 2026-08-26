@@ -123,8 +123,14 @@ export default function CoachingSlots() {
         });
     }, [missingFields]);
 
-    // Changing slot or format sends them back through the check.
-    useEffect(() => { setShowPayment(false); }, [selectedId, format]);
+    // Changing slot or format sends them back through the check. The payment
+    // error goes too — PayPal reports a cancelled order as an error after we
+    // have already sent the parent back to the grid, and that message would
+    // otherwise still be sitting there when they open the next slot.
+    useEffect(() => {
+        setShowPayment(false);
+        setPayError("");
+    }, [selectedId, format]);
 
     async function onContinueToPayment() {
         if (!detailsComplete) {
