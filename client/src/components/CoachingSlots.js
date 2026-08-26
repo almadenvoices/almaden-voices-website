@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import ScheduleIcon from "@mui/icons-material/Schedule";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import usePayPalScript from "../hooks/usePayPalScript";
@@ -41,25 +41,51 @@ export default function CoachingSlots() {
     const [photoConsent, setPhotoConsent] = useState("");
 
     const [payError, setPayError] = useState("");
+    // Shown above the slot grid when a slot is taken out from under someone.
+    const [slotNotice, setSlotNotice] = useState("");
+    const [checkingSlot, setCheckingSlot] = useState(false);
     const [booked, setBooked] = useState(null); // set once payment succeeds
 
     const { loaded: paypalLoaded, error: paypalError } = usePayPalScript();
 
-    const loadSlots = () => {
-        fetch("/api/coaching/slots")
+    // Returns the fresh list as well as storing it, so a caller can check
+    // whether a particular slot is still free before sending anyone to PayPal.
+    const loadSlots = useCallback(() => {
+        return fetch("/api/coaching/slots")
             .then(res => res.json())
             .then(data => {
-                setSlots(data.slots || []);
+                const fresh = data.slots || [];
+                setSlots(fresh);
                 if (data.prices) setPrices(data.prices);
                 setLoading(false);
+                return fresh;
             })
             .catch(() => {
                 setLoadError("We couldn't load the coaching slots. Please refresh and try again.");
                 setLoading(false);
+                return null;
             });
-    };
+    }, []);
 
-    useEffect(loadSlots, []);
+    useEffect(() => { loadSlots(); }, [loadSlots]);
+
+    // Someone else paid for the slot this parent was filling in the form for.
+    // Send them back to the grid with a plain explanation instead of leaving a
+    // dead PayPal button on screen — this is the single most common reason a
+    // coaching payment fails.
+    const handleSlotTaken = useCallback((message) => {
+        setSlotNotice(message
+            ? `${message} Please pick another slot below — you have not been charged.`
+            : "That slot was just booked by someone else. Please pick another slot below — you have not been charged.");
+        setSelectedId("");
+        setShowPayment(false);
+        setPayError("");
+        loadSlots();
+        setTimeout(() => {
+            document.getElementById("coaching-slot-grid")
+                ?.scrollIntoView({ behavior: "smooth", block: "center" });
+        }, 60);
+    }, [loadSlots]);
 
     const selectedSlot = slots.find(s => s.id === selectedId);
     const price = format === "inPerson" ? prices.inPerson : prices.online;
@@ -100,7 +126,7 @@ export default function CoachingSlots() {
     // Changing slot or format sends them back through the check.
     useEffect(() => { setShowPayment(false); }, [selectedId, format]);
 
-    function onContinueToPayment() {
+    async function onContinueToPayment() {
         if (!detailsComplete) {
             setErrors(missingFields);
             setShowPayment(false);
@@ -111,10 +137,47 @@ export default function CoachingSlots() {
             return;
         }
         setErrors({});
+
+        // Filling in the form takes a few minutes, and the slot list on screen
+        // was loaded before any of it. Re-check now rather than finding out at
+        // the moment of payment that the slot has gone.
+        setCheckingSlot(true);
+        const fresh = await loadSlots();
+        setCheckingSlot(false);
+        if (fresh && !fresh.some(slot => slot.id === selectedId && !slot.booked)) {
+            handleSlotTaken();
+            return;
+        }
+
+        setSlotNotice("");
         setShowPayment(true);
     }
 
+    // The PayPal button below is built once and then left alone, so it can't
+    // read state directly — anything it needs at click time is kept here and
+    // refreshed after every render.
+    const latest = useRef({});
+    useEffect(() => {
+        latest.current = {
+            selectedSlot,
+            price,
+            details: {
+                parentName, email, phone, studentName, studentAge, schoolName, zipCode,
+                notes, comments,
+                photoConsent: photoConsent === "yes",
+                pressConsent: false,
+            },
+        };
+    });
+
     // Render the PayPal buttons once a slot is claimed and the details are in.
+    //
+    // The dependencies here are deliberately all primitives. They used to
+    // include the selected slot object and every form field, and because the
+    // slot object is rebuilt on each render this effect re-ran constantly —
+    // tearing the live PayPal button out of the page mid-click and leaving the
+    // parent with a payment that only worked on the second try. Anything that
+    // changes as the parent types is read from `latest` at click time instead.
     useEffect(() => {
         if (!paypalLoaded || !readyToPay || booked) return;
         if (!window.paypal) return;
@@ -124,46 +187,54 @@ export default function CoachingSlots() {
         container.innerHTML = "";
         setPayError("");
 
-        // Captured here so the handlers below use the values as they were when
-        // the buttons were rendered.
+        // Captured here so the handlers below use the slot and format as they
+        // were when the buttons were rendered. Changing either re-runs the
+        // effect, which builds a fresh button for the new choice.
         const slotId = selectedId;
         const chosenFormat = format;
-        const details = {
-            parentName, email, phone, studentName, studentAge, schoolName, zipCode, notes, comments,
-            photoConsent: photoConsent === "yes",
-            pressConsent: false,
-        };
 
-        window.paypal.Buttons({
+        let cancelled = false;
+
+        const buttons = window.paypal.Buttons({
             style: { layout: "vertical", shape: "rect", color: "gold", label: "pay" },
 
-            createOrder: () => fetch("/api/coaching/orders", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ slotId, format: chosenFormat })
-            })
-                .then(async res => {
-                    const data = await res.json().catch(() => ({}));
-                    if (!res.ok) throw new Error(data.error || `Server ${res.status}`);
-                    if (!data.id) throw new Error("Missing order id");
-                    return data.id;
-                })
-                .catch(err => {
-                    setPayError(err.message);
-                    // A 409 means someone else took the slot while this form was open.
-                    loadSlots();
-                    throw err;
-                }),
+            createOrder: async () => {
+                const res = await fetch("/api/coaching/orders", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ slotId, format: chosenFormat })
+                });
+                const data = await res.json().catch(() => ({}));
+
+                // Someone else got there first while this form was open.
+                if (res.status === 409 || data.code === "SLOT_TAKEN") {
+                    handleSlotTaken(data.error);
+                    throw new Error(data.error || "That slot was just taken.");
+                }
+                if (!res.ok || !data.id) {
+                    setPayError(data.error || "We couldn't start the payment. Please try again.");
+                    throw new Error(data.error || `Server ${res.status}`);
+                }
+                return data.id;
+            },
 
             onApprove: (data) => fetch(`/api/coaching/orders/${data.orderID}/capture`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ slotId, format: chosenFormat, ...details })
+                body: JSON.stringify({
+                    slotId,
+                    format: chosenFormat,
+                    ...latest.current.details
+                })
             })
                 .then(async res => {
                     if (!res.ok) throw new Error("Failed to capture payment");
                     await res.json();
-                    setBooked({ slot: selectedSlot, format: chosenFormat, price });
+                    setBooked({
+                        slot: latest.current.selectedSlot,
+                        format: chosenFormat,
+                        price: latest.current.price
+                    });
                     loadSlots();
                 })
                 .catch(() => {
@@ -176,10 +247,28 @@ export default function CoachingSlots() {
             },
 
             onCancel: () => setPayError("")
-        }).render("#coaching-paypal-container");
-    }, [paypalLoaded, readyToPay, booked, selectedId, format, parentName, email, phone,
-        studentName, studentAge, schoolName, zipCode, notes, comments, photoConsent,
-        price, selectedSlot]);
+        });
+
+        buttons.render("#coaching-paypal-container").catch(err => {
+            // A button torn down before it finished mounting is expected —
+            // only a genuine failure should reach the parent.
+            if (cancelled) return;
+            console.error("PayPal render error:", err);
+            setPayError("We couldn't load the payment button. Please refresh and try again.");
+        });
+
+        // Close the button properly instead of wiping the container out from
+        // under it, which is what used to break the first payment attempt.
+        return () => {
+            cancelled = true;
+            try {
+                const closing = buttons.close();
+                if (closing && typeof closing.catch === "function") closing.catch(() => {});
+            } catch (err) {
+                /* already gone */
+            }
+        };
+    }, [paypalLoaded, readyToPay, booked, selectedId, format, handleSlotTaken, loadSlots]);
 
     if (booked) {
         return (
@@ -233,7 +322,9 @@ export default function CoachingSlots() {
                         {openSlots} of {slots.length} slots remaining
                     </p>
 
-                    <div className={c.slotGrid}>
+                    {slotNotice && <p className={c.statusError}>{slotNotice}</p>}
+
+                    <div className={c.slotGrid} id="coaching-slot-grid">
                         {slots.map(slot => {
                             const isSelected = slot.id === selectedId;
                             return (
@@ -408,8 +499,9 @@ export default function CoachingSlots() {
                                     type="button"
                                     className={c.submitBtn}
                                     onClick={onContinueToPayment}
+                                    disabled={checkingSlot}
                                 >
-                                    Continue to payment
+                                    {checkingSlot ? "Checking availability…" : "Continue to payment"}
                                 </button>
                                 {Object.keys(errors).length > 0 && (
                                     <p className={c.statusError}>

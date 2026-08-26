@@ -85,6 +85,35 @@ async function uploadCoachingToGCS() {
     await uploadToGCS(coachingPath(), COACHING_GCS_FILE, "coaching bookings");
 }
 
+// Pull the newest copy from GCS right before we append to it.
+//
+// Cloud Run runs several instances side by side, and each one keeps its own
+// copy of these files on its own disk, then re-uploads the WHOLE file after a
+// write. So an instance that booted before someone else's booking still holds
+// the old file, and its next upload would wipe that booking out. Re-reading
+// first narrows the danger window to the append itself instead of leaving it
+// open for the whole life of the instance.
+//
+// Deliberately quiet: this runs on every write, and the success line from
+// downloadFromGCS would bury the entries that actually matter in the log.
+async function refreshFromGCS(gcsFile, destination, label) {
+    try {
+        await storage.bucket(GCS_BUCKET).file(gcsFile).download({ destination });
+    } catch (err) {
+        // 404 just means nothing has been written yet — the local file (or the
+        // header we are about to write) is already correct.
+        if (err.code !== 404) {
+            console.error(`Error refreshing ${label} from GCS before write:`, err.message);
+        }
+    }
+}
+
+const refreshRegistrationsFromGCS = () =>
+    refreshFromGCS(GCS_FILE, registrationsPath(), "registrations");
+
+const refreshCoachingFromGCS = () =>
+    refreshFromGCS(COACHING_GCS_FILE, coachingPath(), "coaching bookings");
+
 // ============================================================
 // 1-ON-1 COACHING SLOTS
 //
@@ -121,6 +150,63 @@ const COACHING_HEADERS = [
     "Student Name", "Student Age", "School Name", "Home ZIP", "Notes",
     "Questions/Comments", "Photo/Video Permission", "Press/Media Permission"
 ];
+
+// The deployed Google Apps Script web app — the same one the registration and
+// volunteer forms post to. It owns the Almaden Voices registration spreadsheet,
+// so coaching bookings are sent here to land on their own tab beside the
+// workshop registrations.
+//
+// Unlike those two forms, this POST is sent by the server rather than the
+// browser: a coaching row should only ever exist for a payment PayPal has
+// actually confirmed, and only the server knows that.
+//
+// If the script is ever redeployed and Google issues a new /exec URL, update it
+// here and in client/src/data/appsScript.js.
+const APPS_SCRIPT_URL = process.env.APPS_SCRIPT_URL ||
+    "https://script.google.com/macros/s/AKfycbxrbVWSjMpAB4Ru1mm_DSywPdfFS3KfMMA07Ie_e1VbXGeW_ILtNQ-vE8rQrIYubjFI/exec";
+
+// Add a booking to the Coaching Sessions tab. The payment is already captured
+// and written to the CSV by the time this runs, so every failure path here is
+// logged and swallowed — a spreadsheet problem must never surface to a parent
+// who has just paid, and must never fail the request.
+async function sendCoachingToSpreadsheet(booking) {
+    try {
+        const response = await fetch(APPS_SCRIPT_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ formType: "coaching", ...booking }),
+            // The Apps Script is not on the critical path — don't let a slow or
+            // hanging response hold up the parent's confirmation screen.
+            signal: AbortSignal.timeout(15000)
+        });
+        const text = await response.text();
+        if (!response.ok) {
+            console.error("⚠️ Coaching booking not added to spreadsheet — order",
+                booking.orderId, `HTTP ${response.status}`, text.slice(0, 300));
+            return;
+        }
+        // The script answers with JSON, but an error inside Google (an expired
+        // deployment, a permissions prompt) comes back as an HTML page with a
+        // 200 — so a parse failure is itself the signal that something is off.
+        let result;
+        try {
+            result = JSON.parse(text);
+        } catch (parseErr) {
+            console.error("⚠️ Coaching booking not added to spreadsheet — order",
+                booking.orderId, "unexpected response:", text.slice(0, 300));
+            return;
+        }
+        if (result.success) {
+            console.log("Added coaching booking to spreadsheet —", booking.slotLabel);
+        } else {
+            console.error("⚠️ Coaching booking not added to spreadsheet — order",
+                booking.orderId, result.error);
+        }
+    } catch (err) {
+        console.error("⚠️ Coaching booking not added to spreadsheet — order",
+            booking.orderId, err.message);
+    }
+}
 
 // Slot ids that already have a paid booking recorded.
 function bookedCoachingSlotIds() {
@@ -786,6 +872,11 @@ app.post("/api/register", async (req, res) => {
             return res.status(400).json({ error: "Parent/guardian name cannot be the same as the child's name. Please enter the parent's actual name." });
         }
 
+        // Pick up any rows another instance wrote since we booted, so both the
+        // duplicate check below and the append further down work off the
+        // current file rather than a stale copy.
+        await refreshRegistrationsFromGCS();
+
         // Duplicate prevention: reject if this email already registered
         // the same student(s) for the same session
         const existingFile = path.join(__dirname, 'registrations.csv');
@@ -1296,7 +1387,11 @@ app.get("/api/sessions/enrollment", (req, res) => {
 
 // The slot list plus which ones are already taken. Prices come from the server
 // so the browser can't change what gets charged.
-app.get("/api/coaching/slots", (req, res) => {
+app.get("/api/coaching/slots", async (req, res) => {
+    // Availability has to be right across every running instance, otherwise a
+    // parent is shown a free slot that someone else already paid for and their
+    // payment is rejected at the last moment.
+    await refreshCoachingFromGCS();
     const paid = bookedCoachingSlotIds().map(String);
     res.json({
         prices: COACHING_PRICES,
@@ -1318,8 +1413,15 @@ app.post("/api/coaching/orders", async (req, res) => {
         if (format !== "online" && format !== "inPerson") {
             return res.status(400).json({ error: "Choose online or in person." });
         }
+        // Check against the newest booking list, not this instance's copy.
+        await refreshCoachingFromGCS();
         if (slot.taken || bookedCoachingSlotIds().map(String).includes(String(slotId))) {
-            return res.status(409).json({ error: "Sorry — that slot was just taken." });
+            // The code lets the browser tell this apart from a genuine failure
+            // and send the parent to a different slot instead of just retrying.
+            return res.status(409).json({
+                code: "SLOT_TAKEN",
+                error: `${coachingSlotLabel(slot.id)} was just booked by someone else.`
+            });
         }
 
         const amount = COACHING_PRICES[format];
@@ -1352,22 +1454,51 @@ app.post("/api/coaching/orders/:orderID/capture", async (req, res) => {
         // Record the booking. This happens after a successful capture, so a
         // failure here must not lose the payment — log loudly and still return
         // success to the browser.
+        const bookedAt = new Date();
         try {
+            // Another instance may have taken a booking since we booted, and our
+            // upload replaces the whole file — so start from the newest copy.
+            await refreshCoachingFromGCS();
+
             const file = coachingPath();
             if (!fs.existsSync(file)) {
                 fs.writeFileSync(file, COACHING_HEADERS.map(csvCell).join(",") + "\n");
             }
             const row = [
-                new Date().toISOString(), slot.id, coachingSlotLabel(slot.id),
+                bookedAt.toISOString(), slot.id, coachingSlotLabel(slot.id),
                 formatLabel, amount, orderID, parentName, email, phone,
                 studentName, studentAge, schoolName, zipCode, notes, comments,
                 photoConsent ? "Yes" : "No", pressConsent ? "Yes" : "No"
             ].map(csvCell).join(",") + "\n";
             fs.appendFileSync(file, row);
-            uploadCoachingToGCS().catch(e => console.error("Coaching GCS upload failed:", e.message));
+            // Awaited, not fire-and-forget: the very next parent's availability
+            // check reads this file back out of GCS.
+            await uploadCoachingToGCS();
         } catch (writeErr) {
             console.error("⚠️ PAID BUT NOT RECORDED — order", orderID, writeErr.message);
         }
+
+        // Mirror the booking onto the Coaching Sessions tab of the registration
+        // spreadsheet, so coaching sits alongside the workshops. Never let a
+        // problem here fail the request — the payment has already gone through
+        // and the CSV above is the record that matters.
+        await sendCoachingToSpreadsheet({
+            timestamp: bookedAt.toISOString(),
+            slotId: slot.id,
+            slotLabel: coachingSlotLabel(slot.id),
+            format: formatLabel,
+            amountPaid: amount,
+            orderId: orderID,
+            parentName,
+            // Deliberately NOT called "email". If the site is ever deployed
+            // before the Apps Script is updated, the old script falls through
+            // to its registration path — and with no top-level "email" it
+            // throws before it can send a bogus confirmation to the family.
+            parentEmail: email,
+            phone, studentName, studentAge,
+            schoolName, zipCode, notes, comments,
+            photoConsent: Boolean(photoConsent)
+        });
 
         // Confirmation to the family + a copy to the admin.
         try {
@@ -1375,7 +1506,6 @@ app.post("/api/coaching/orders/:orderID/capture", async (req, res) => {
                 await emailTransporter.sendMail({
                     from: `"Almaden Voices" <${process.env.EMAIL_USER}>`,
                     to: email,
-                    bcc: process.env.EMAIL_USER,
                     subject: `Your 1-on-1 coaching session — ${coachingSlotLabel(slot.id)}`,
                     html: `
                         <div style="font-family: 'DM Sans', Arial, sans-serif; max-width: 560px; margin: 0 auto; color: #111827; line-height: 1.6;">
@@ -1392,6 +1522,38 @@ app.post("/api/coaching/orders/:orderID/capture", async (req, res) => {
                                 ? "We'll send the meeting location once we've agreed on a time."
                                 : "We'll send the join link once we've agreed on a time."}</p>
                             <p style="margin: 24px 0 0; font-size: 13px; color: #6B7280;">Every dollar goes straight back into running our free workshops. This is a payment for coaching, not a tax-deductible donation.</p>
+                        </div>`
+                });
+                // A separate email to the admin, exactly like every other form
+                // on the site. This used to be a BCC on the message above, but
+                // Gmail drops a BCC addressed to the account that sent it — the
+                // copy only ever reached the Sent folder, never the inbox.
+                await emailTransporter.sendMail({
+                    from: `"Almaden Voices Coaching" <${EMAIL_USER}>`,
+                    replyTo: `"${parentName || "Parent"}" <${email}>`,
+                    to: EMAIL_TO,
+                    subject: `New coaching booking: ${studentName || "student"} — ${coachingSlotLabel(slot.id)} (${formatLabel})`,
+                    html: `
+                        <div style="font-family: 'DM Sans', Arial, sans-serif; max-width: 560px; margin: 0 auto; color: #111827; line-height: 1.6;">
+                            <h2 style="margin: 0 0 16px;">New 1-on-1 coaching booking</h2>
+                            <table style="width: 100%; border-collapse: collapse; background: #F9FAFB; border-radius: 12px;">
+                                <tr><td style="padding: 10px 16px; color: #6B7280;">Slot</td><td style="padding: 10px 16px; font-weight: 600; text-align: right;">${coachingSlotLabel(slot.id)}</td></tr>
+                                <tr><td style="padding: 10px 16px; color: #6B7280;">Format</td><td style="padding: 10px 16px; font-weight: 600; text-align: right;">${formatLabel}</td></tr>
+                                <tr><td style="padding: 10px 16px; color: #6B7280;">Paid</td><td style="padding: 10px 16px; font-weight: 600; text-align: right;">$${amount}.00 USD</td></tr>
+                                <tr><td style="padding: 10px 16px; color: #6B7280;">Student</td><td style="padding: 10px 16px; font-weight: 600; text-align: right;">${studentName || ""}${studentAge ? `, age ${studentAge}` : ""}</td></tr>
+                                <tr><td style="padding: 10px 16px; color: #6B7280;">Parent</td><td style="padding: 10px 16px; font-weight: 600; text-align: right;">${parentName || ""}</td></tr>
+                                <tr><td style="padding: 10px 16px; color: #6B7280;">Email</td><td style="padding: 10px 16px; font-weight: 600; text-align: right;">${email || ""}</td></tr>
+                                <tr><td style="padding: 10px 16px; color: #6B7280;">Phone</td><td style="padding: 10px 16px; font-weight: 600; text-align: right;">${phone || ""}</td></tr>
+                                <tr><td style="padding: 10px 16px; color: #6B7280;">School</td><td style="padding: 10px 16px; font-weight: 600; text-align: right;">${schoolName || "—"}</td></tr>
+                                <tr><td style="padding: 10px 16px; color: #6B7280;">Home ZIP</td><td style="padding: 10px 16px; font-weight: 600; text-align: right;">${zipCode || "—"}</td></tr>
+                                <tr><td style="padding: 10px 16px; color: #6B7280;">Photo/video permission</td><td style="padding: 10px 16px; font-weight: 600; text-align: right;">${photoConsent ? "Yes" : "No"}</td></tr>
+                                <tr><td style="padding: 10px 16px; color: #6B7280;">PayPal order</td><td style="padding: 10px 16px; font-weight: 600; text-align: right;">${orderID}</td></tr>
+                            </table>
+                            <p style="margin: 20px 0 4px; font-weight: 600;">What they want to work on</p>
+                            <p style="margin: 0; white-space: pre-wrap;">${notes || "—"}</p>
+                            <p style="margin: 20px 0 4px; font-weight: 600;">Anything else they told us</p>
+                            <p style="margin: 0; white-space: pre-wrap;">${comments || "—"}</p>
+                            <p style="margin: 24px 0 0; font-size: 13px; color: #6B7280;">Reply to this email to reach the parent directly. Remember to email them within two business days to schedule.</p>
                         </div>`
                 });
             } else {
