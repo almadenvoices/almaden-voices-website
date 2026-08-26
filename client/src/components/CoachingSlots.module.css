@@ -346,6 +346,14 @@
     border-color: #DC2626;
 }
 
+/* Why an optional field is worth filling in anyway. */
+.fieldHint {
+    margin: 6px 0 0;
+    font-size: 0.78rem;
+    line-height: 1.5;
+    color: #6B7280;
+}
+
 .fieldErrorText {
     margin: 6px 0 0;
     font-size: 0.8rem;

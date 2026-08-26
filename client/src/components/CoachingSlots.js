@@ -76,12 +76,10 @@ export default function CoachingSlots() {
         if (!email.trim()) missing.email = "Required.";
         else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) missing.email = "Please enter a valid email address.";
         if (!phone.trim()) missing.phone = "Required.";
-        if (!schoolName.trim()) missing.schoolName = "Required.";
-        if (!zipCode.trim()) missing.zipCode = "Required.";
         if (!notes.trim()) missing.notes = "Required.";
         if (!photoConsent) missing.photoConsent = "Please choose one.";
         return missing;
-    }, [parentName, studentName, studentAge, email, phone, schoolName, zipCode, notes, photoConsent]);
+    }, [parentName, studentName, studentAge, email, phone, notes, photoConsent]);
 
     const detailsComplete = Object.keys(missingFields).length === 0;
     const readyToPay = Boolean(selectedSlot) && !selectedSlot?.booked && detailsComplete && showPayment;
@@ -205,7 +203,7 @@ export default function CoachingSlots() {
             <div className={c.intro}>
                 <h3 className={c.introTitle}>One-on-one coaching</h3>
                 <p className={c.introBody}>
-                    An hour of focused, personal coaching for students ages 5 to 13. We work on
+                    An hour of focused, personal coaching for students ages 5 to 14. We work on
                     whatever your student needs most — a speech they&apos;re preparing, a class
                     presentation, stage nerves, or building confidence from scratch.
                 </p>
@@ -313,7 +311,7 @@ export default function CoachingSlots() {
                             <label className={c.fieldLabel} htmlFor="coach-age">Student&apos;s age <span className={c.req}>*</span></label>
                             <select id="coach-age" className={`${c.input} ${errors.studentAge ? c.inputError : ""}`} value={studentAge} onChange={e => setStudentAge(e.target.value)}>
                                 <option value="">Select age…</option>
-                                {[5, 6, 7, 8, 9, 10, 11, 12, 13].map(age => (
+                                {[5, 6, 7, 8, 9, 10, 11, 12, 13, 14].map(age => (
                                     <option key={age} value={String(age)}>{age} years old</option>
                                 ))}
                             </select>
@@ -330,14 +328,14 @@ export default function CoachingSlots() {
                             {errors.phone && <p className={c.fieldErrorText}>{errors.phone}</p>}
                         </div>
                         <div>
-                            <label className={c.fieldLabel} htmlFor="coach-school">School name <span className={c.req}>*</span></label>
-                            <input id="coach-school" className={`${c.input} ${errors.schoolName ? c.inputError : ""}`} value={schoolName} onChange={e => setSchoolName(e.target.value)} placeholder="e.g. Graystone Elementary" />
-                            {errors.schoolName && <p className={c.fieldErrorText}>{errors.schoolName}</p>}
+                            <label className={c.fieldLabel} htmlFor="coach-school">School name</label>
+                            <input id="coach-school" className={c.input} value={schoolName} onChange={e => setSchoolName(e.target.value)} placeholder="e.g. Graystone Elementary" />
+                            <p className={c.fieldHint}>Optional — this helps us understand which communities we&apos;re reaching and apply for grants.</p>
                         </div>
                         <div>
-                            <label className={c.fieldLabel} htmlFor="coach-zip">Home ZIP code <span className={c.req}>*</span></label>
-                            <input id="coach-zip" className={`${c.input} ${errors.zipCode ? c.inputError : ""}`} value={zipCode} onChange={e => setZipCode(e.target.value)} placeholder="e.g. 95120" />
-                            {errors.zipCode && <p className={c.fieldErrorText}>{errors.zipCode}</p>}
+                            <label className={c.fieldLabel} htmlFor="coach-zip">Home ZIP code</label>
+                            <input id="coach-zip" className={c.input} value={zipCode} onChange={e => setZipCode(e.target.value)} placeholder="e.g. 95120" />
+                            <p className={c.fieldHint}>Optional — this helps us understand which communities we&apos;re reaching and apply for grants.</p>
                         </div>
                     </div>
 
