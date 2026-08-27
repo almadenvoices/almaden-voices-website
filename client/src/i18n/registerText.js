@@ -40,8 +40,8 @@ export const T = {
         es: "Haga clic aquí para reservar una sesión de asesoría individual",
     },
     chooseCoachingSub: {
-        en: "One hour of personal coaching · $20 online or $30 in person · Funds our free workshops",
-        es: "Una hora de asesoría personal · $20 en línea o $30 en persona · Financia nuestros talleres gratuitos",
+        en: "One hour of personal coaching · $25 online or $30 in person · Funds our free workshops",
+        es: "Una hora de asesoría personal · $25 en línea o $30 en persona · Financia nuestros talleres gratuitos",
     },
 
     // ---- Left rail ----

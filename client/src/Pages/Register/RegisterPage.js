@@ -68,7 +68,33 @@ const upcomingSessions = [
         status: "Open",
         online: true,
     },
+    {
+        id: "intro-workshop-sep-2026",
+        title: "Introductory Public Speaking Workshop",
+        titleEs: "Taller introductorio de oratoria",
+        date: "September 4, 2026",
+        dateEs: "4 de septiembre de 2026",
+        time: "6–7 PM",
+        timeEs: "6–7 PM",
+        location: "To be announced",
+        locationEs: "Por confirmar",
+        grades: "Ages 5–14",
+        gradesEs: "Edades 5 a 14",
+        // capacity: null means no limit — no seat count and it never shows as full.
+        capacity: null,
+        enrolled: 0,
+        description: "A free one-hour introduction to public speaking for kids. We cover the fundamentals — speaking clearly, standing with confidence, and settling the nerves that come with presenting to a group. No experience needed. Runs Friday, September 4 from 6–7 PM; we'll email you the location as soon as it's confirmed.",
+        descriptionEs: "Una introducción gratuita de una hora a la oratoria para niños. Cubrimos los fundamentos: hablar con claridad, mantener una postura segura y calmar los nervios de presentar ante un grupo. No se necesita experiencia. Se realiza el viernes 4 de septiembre de 6 a 7 PM; le enviaremos la ubicación por correo en cuanto esté confirmada.",
+        status: "Open",
+        online: false,
+    },
 ];
+
+// Wraps a session field and its Spanish twin into the {en, es} shape <Bi> wants.
+// Sessions keep plain English fields as well, because those are what get written
+// to the spreadsheet and the confirmation emails; the Spanish is display only.
+// A session with no Spanish for a field simply shows the English in both modes.
+const bi = (en, es) => ({ en, es: es || en });
 
 // A session with no capacity set takes unlimited registrations.
 const hasSeatLimit = (ses) => ses && ses.capacity != null;
@@ -328,9 +354,12 @@ export default function RegisterPage() {
                         <span className={s.chooseIcon}><HowToRegIcon /></span>
                         <span className={s.chooseText}>
                             <span className={s.chooseTitle}>
-                                <Bi entry={T.chooseWorkshopPrefix} lang={lang} block /> {sessions[0].title.replace(/^Free\s+/i, "")}
+                                <Bi entry={T.chooseWorkshopPrefix} lang={lang} block />{" "}
+                                <Bi entry={bi(sessions[0].title.replace(/^Free\s+/i, ""), sessions[0].titleEs)} lang={lang} />
                             </span>
-                            <span className={s.chooseSub}>{sessions[0].date} · {sessions[0].time}</span>
+                            <span className={s.chooseSub}>
+                                <Bi entry={bi(sessions[0].date, sessions[0].dateEs)} lang={lang} /> · <Bi entry={bi(sessions[0].time, sessions[0].timeEs)} lang={lang} />
+                            </span>
                         </span>
                         <ChevronRightIcon className={s.chooseArrow} />
                     </button>}
@@ -447,7 +476,7 @@ export default function RegisterPage() {
                                     <option value="">{t(T.selectSession, lang)}</option>
                                     {sessions.map(ses => (
                                         <option key={ses.id} value={ses.id} disabled={isSessionFull(ses)}>
-                                            {ses.title} — {ses.date}{isSessionFull(ses) ? " " + t(T.fullTag, lang) : ""}
+                                            {t(bi(ses.title, ses.titleEs), lang)} — {t(bi(ses.date, ses.dateEs), lang)}{isSessionFull(ses) ? " " + t(T.fullTag, lang) : ""}
                                         </option>
                                     ))}
                                 </select>
@@ -478,23 +507,23 @@ export default function RegisterPage() {
                                 marginBottom: "8px",
                             }}>
                                 <h4 style={{ margin: "0 0 12px", color: "#111827", fontSize: "1rem", fontWeight: 700 }}>
-                                    {selectedSession.title}
+                                    <Bi entry={bi(selectedSession.title, selectedSession.titleEs)} lang={lang} block />
                                 </h4>
                                 <p style={{ margin: "0 0 12px", color: "#6B7280", fontSize: "0.9rem", lineHeight: 1.6 }}>
-                                    {selectedSession.description}
+                                    <Bi entry={bi(selectedSession.description, selectedSession.descriptionEs)} lang={lang} block />
                                 </p>
                                 <div style={{ display: "flex", flexWrap: "wrap", gap: "12px 24px", fontSize: "0.85rem", color: "#374151" }}>
                                     <span style={{ display: "flex", alignItems: "center", gap: "4px" }}>
-                                        <CalendarMonthIcon style={{ fontSize: 16, color: "#2563EB" }} /> {selectedSession.date}
+                                        <CalendarMonthIcon style={{ fontSize: 16, color: "#2563EB" }} /> <Bi entry={bi(selectedSession.date, selectedSession.dateEs)} lang={lang} />
                                     </span>
                                     <span style={{ display: "flex", alignItems: "center", gap: "4px" }}>
-                                        <AccessTimeIcon style={{ fontSize: 16, color: "#2563EB" }} /> {selectedSession.time}
+                                        <AccessTimeIcon style={{ fontSize: 16, color: "#2563EB" }} /> <Bi entry={bi(selectedSession.time, selectedSession.timeEs)} lang={lang} />
                                     </span>
                                     <span style={{ display: "flex", alignItems: "center", gap: "4px" }}>
-                                        <PlaceIcon style={{ fontSize: 16, color: "#2563EB" }} /> {selectedSession.location}
+                                        <PlaceIcon style={{ fontSize: 16, color: "#2563EB" }} /> <Bi entry={bi(selectedSession.location, selectedSession.locationEs)} lang={lang} />
                                     </span>
                                     <span style={{ display: "flex", alignItems: "center", gap: "4px" }}>
-                                        <GroupsIcon style={{ fontSize: 16, color: "#2563EB" }} /> {selectedSession.grades}
+                                        <GroupsIcon style={{ fontSize: 16, color: "#2563EB" }} /> <Bi entry={bi(selectedSession.grades, selectedSession.gradesEs)} lang={lang} />
                                     </span>
                                 </div>
                                 {selectedSession.status !== "Open" && (
