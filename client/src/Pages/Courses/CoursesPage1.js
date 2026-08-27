@@ -65,7 +65,7 @@ const CoursesPage = () => {
         },
         {
             id: "intro-workshop-sep-2026",
-            title: "Introductory Public Speaking Workshop",
+            title: "Free Public Speaking Workshop",
             date: "September 4, 2026",
             time: "6–7 PM",
             location: "To be announced",
