@@ -9,7 +9,6 @@ import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import PlaceIcon from "@mui/icons-material/Place";
 import GroupsIcon from "@mui/icons-material/Groups";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
-import HomeIcon from "@mui/icons-material/Home";
 import VolunteerActivismIcon from "@mui/icons-material/VolunteerActivism";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
@@ -70,8 +69,8 @@ const upcomingSessions = [
     },
     {
         id: "intro-workshop-sep-2026",
-        title: "Introductory Public Speaking Workshop",
-        titleEs: "Taller introductorio de oratoria",
+        title: "Free Public Speaking Workshop",
+        titleEs: "Taller gratuito de oratoria",
         date: "September 4, 2026",
         dateEs: "4 de septiembre de 2026",
         time: "6–7 PM",
@@ -87,6 +86,10 @@ const upcomingSessions = [
         descriptionEs: "Una introducción gratuita de una hora a la oratoria para niños. Cubrimos los fundamentos: hablar con claridad, mantener una postura segura y calmar los nervios de presentar ante un grupo. No se necesita experiencia. Se realiza el viernes 4 de septiembre de 6 a 7 PM; le enviaremos la ubicación por correo en cuanto esté confirmada.",
         status: "Open",
         online: false,
+        // No donation ask on this one — the form goes straight from the
+        // details to the consent boxes. Leave the flag off (or set it true)
+        // on a session that should still show it.
+        askDonation: false,
     },
 ];
 
@@ -184,6 +187,8 @@ export default function RegisterPage() {
         enrolled: ses.enrolled + (enrollmentCounts[ses.id] || 0),
     }));
     const selectedSession = sessions.find(ses => ses.id === selectedSessionId);
+    // Sessions opt out of the donation ask with askDonation: false.
+    const askDonation = !selectedSession || selectedSession.askDonation !== false;
     const spotsRemaining = !selectedSession
         ? 0
         : hasSeatLimit(selectedSession)
@@ -269,7 +274,7 @@ export default function RegisterPage() {
             if (result && result.success) {
                 setSubmitted(true);
                 setShowToast(true);
-                const shouldDonate = donationAmount > 0;
+                const shouldDonate = askDonation && donationAmount > 0;
                 const donateAmt = donationAmount;
                 e.target.reset();
                 setAgreed(false);
@@ -716,38 +721,15 @@ export default function RegisterPage() {
                                         </div>
                                     </div>
                                 ) : (
-                                    <>
-                                        <h2 className={s.formTitle}>
-                                            <HomeIcon /> <Bi entry={T.mailingAddress} lang={lang} />
-                                        </h2>
-                                        <p style={{ fontSize: "0.85rem", color: "#6B7280", margin: "-4px 0 16px", lineHeight: 1.5 }}>
-                                            <InfoOutlinedIcon style={{ fontSize: 14, color: "#9CA3AF", verticalAlign: "middle", marginRight: "4px" }} />
-                                            <Bi entry={T.mailingNote} lang={lang} block />
-                                        </p>
-
+                                    // In-person sessions ask for the home ZIP and nothing
+                                    // more. There is no mailing — the venue goes out by
+                                    // email — so a street address was more than we need.
+                                    <div className={s.grid}>
                                         <div className={s.field}>
-                                            <label><Bi entry={T.streetAddress} lang={lang} block /> <span className={s.req}>*</span></label>
-                                            <input name="streetAddress" placeholder="123 Main St" required disabled={isSubmitting} />
+                                            <label><Bi entry={T.homeZip} lang={lang} block /> <span className={s.req}>*</span></label>
+                                            <input name="zipCode" placeholder={t(T.phHomeZip, lang)} required disabled={isSubmitting} />
                                         </div>
-
-                                        <div className={s.grid}>
-                                            <div className={s.field}>
-                                                <label><Bi entry={T.city} lang={lang} block /> <span className={s.req}>*</span></label>
-                                                <input name="city" placeholder="San Jose" required disabled={isSubmitting} />
-                                            </div>
-                                            <div className={s.field}>
-                                                <label><Bi entry={T.state} lang={lang} block /> <span className={s.req}>*</span></label>
-                                                <input name="state" placeholder="CA" required disabled={isSubmitting} />
-                                            </div>
-                                        </div>
-
-                                        <div className={s.grid}>
-                                            <div className={s.field}>
-                                                <label><Bi entry={T.zipCode} lang={lang} block /> <span className={s.req}>*</span></label>
-                                                <input name="zipCode" placeholder="95120" required disabled={isSubmitting} />
-                                            </div>
-                                        </div>
-                                    </>
+                                    </div>
                                 )}
 
                                 <div className={s.field}>
@@ -760,8 +742,9 @@ export default function RegisterPage() {
                                     />
                                 </div>
 
-                                {/* Optional Donation */}
-                                <div style={{
+                                {/* Optional Donation — skipped entirely by sessions
+                                    that set askDonation: false. */}
+                                {askDonation && <div style={{
                                     background: "linear-gradient(135deg, #FFF7ED 0%, #FFFBEB 100%)",
                                     border: "1px solid #FDE68A",
                                     borderRadius: "16px",
@@ -803,7 +786,7 @@ export default function RegisterPage() {
                                     <p style={{ fontSize: "0.8rem", color: "#9CA3AF", margin: 0, textAlign: "center" }}>
                                         <Bi entry={donationAmount > 0 ? T.donateThanks : T.donateSkip} lang={lang} block />
                                     </p>
-                                </div>
+                                </div>}
 
                                 <div className={s.actions}>
                                     {/* Radios (required): photo/video permission, opt-in */}
