@@ -63,6 +63,21 @@ const CoursesPage = () => {
             online: true,
             cover: "/images/teaching-beginner.JPG",
         },
+        {
+            id: "intro-workshop-sep-2026",
+            title: "Introductory Public Speaking Workshop",
+            date: "September 4, 2026",
+            time: "6–7 PM",
+            location: "To be announced",
+            ageGroup: "Ages 5–14",
+            // capacity: null means no limit — no seat count and it never shows as full.
+            capacity: null,
+            enrolled: 0,
+            description: "A free one-hour introduction to public speaking for kids: speaking clearly, standing with confidence, and settling the nerves that come with presenting to a group. No experience needed.",
+            status: "Open",
+            online: false,
+            cover: "/images/teaching-beginner.JPG",
+        },
     ];
 
     const sessions = upcomingSessions.map(ses => ({
