@@ -135,13 +135,13 @@ The spreadsheet has one row per applicant:
 | Parent/Guardian Name, Email, Phone | Filled in for under-18 applicants |
 | Why This Role / Availability | Their written answers |
 | Photo/Video Consent, Parent/Guardian Aware | Yes/No |
-| Status, Notes | Empty columns for you to track interviews in |
+| Status, Notes | Empty columns for you to track where each applicant got to |
 
 Two emails go out for every application: a branded confirmation to the
 applicant, and a notification to almadenvoices@gmail.com that you can reply to
 directly to reach them.
 
-To change the wording about deadlines and interviews, edit these two lines near
+To change the wording about deadlines and what happens next, edit these two lines near
 the top of the "VOLUNTEER APPLICATIONS" section of `RegistrationScript.js`, then
 re-deploy the script (see below):
 
