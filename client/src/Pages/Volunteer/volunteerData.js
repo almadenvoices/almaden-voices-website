@@ -155,7 +155,7 @@ export const POSITIONS = [
         intro: "Families, volunteers, and donors sign up to hear from us. This role is what actually lands in their inbox — the stories from our workshops, what's coming up, and where we need help.",
         doing: [
             "Write and send our newsletter to families, volunteers, and donors",
-            "Interview students, instructors, and parents for short pieces about what's happening in our workshops",
+            "Talk to students, instructors, and parents for short pieces about what's happening in our workshops",
             "Keep a simple calendar of what goes out and when, so the newsletter actually ships on schedule",
             "Pull together photos and session details from the team into something people want to read",
         ],
@@ -200,8 +200,8 @@ export const COMMITMENT_LINE = "About 2–3 hours a week, for at least 3 months"
 
 export const CLOSED_MESSAGE = {
     title: "Applications are closed",
-    body: "Thanks to everyone who applied. Applications for our fall volunteer roles closed on September 4. We're interviewing now and will be in touch with applicants directly. If you'd still like to help, email us at almadenvoices@gmail.com and we'll keep you in mind for the next round.",
+    body: "Thanks to everyone who applied. Applications for our fall volunteer roles closed on September 4. We're reading through them now and will be in touch with applicants directly. If you'd still like to help, email us at almadenvoices@gmail.com and we'll keep you in mind for the next round.",
 };
 
 export const CONFIRMATION_MESSAGE =
-    "Thanks for applying! Applications close September 4 at 9 PM PT. We'll be in touch the second week of September to schedule interviews.";
+    "Thanks for applying! Applications close September 4 at 9 PM PT. We'll be in touch the second week of September.";

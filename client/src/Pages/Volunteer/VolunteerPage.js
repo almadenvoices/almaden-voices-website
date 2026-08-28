@@ -56,7 +56,7 @@ function checkGradeFloor(text) {
 
     // A bare number is an age. 13 is the youngest an 8th grader normally is, so
     // that's the floor — better to let a 13-year-old 7th grader through and
-    // catch it at interview than to turn away an eligible 8th grader.
+    // sort it out when we reply than to turn away an eligible 8th grader.
     return value >= 13 ? "ok" : "too-young";
 }
 
@@ -288,8 +288,8 @@ export default function VolunteerPage() {
                         All roles are volunteer and unpaid. Most are remote and flexible. The Instructor role is
                         in person. We&apos;ll work around school and work schedules, and we ask that you plan to
                         stay with us for at least 3 months. Plenty of our volunteers stay far longer, and several
-                        of these roles are ones we&apos;d love someone to grow into. Interviews begin the first
-                        week of September. <strong>{GRADE_REQUIREMENT_LINE}</strong>
+                        of these roles are ones we&apos;d love someone to grow into.{" "}
+                        <strong>{GRADE_REQUIREMENT_LINE}</strong>
                     </p>
                 </div>
             </section>

@@ -632,7 +632,7 @@ const VOLUNTEER_RESUME_FOLDER = "Almaden Voices Volunteer Resumes";
 
 const VOLUNTEER_DEADLINE_TEXT = "Applications close September 4 at 9 PM PT.";
 const VOLUNTEER_NEXT_STEP_TEXT =
-  "We read every application ourselves. We'll be in touch the second week of September to schedule interviews.";
+  "We read every application ourselves. We'll be in touch the second week of September to let you know either way.";
 
 // Resumes arrive base64-encoded in the JSON payload. Each one is saved into a
 // "Volunteer Resumes" folder in the same Drive as the spreadsheet, and the
@@ -848,7 +848,7 @@ function buildVolunteerApplicantHtml(data) {
 
   const steps = [
     ["1. We review your application", VOLUNTEER_DEADLINE_TEXT],
-    ["2. Interviews", VOLUNTEER_NEXT_STEP_TEXT],
+    ["2. We get back to you", VOLUNTEER_NEXT_STEP_TEXT],
     ["3. Getting started", "If it's a fit, we'll walk you through onboarding and pair you with someone on the team."]
   ].map(function(step, i) {
     return '<tr><td style="padding:14px 0;' + (i ? 'border-top:1px solid ' + C_LINE + ';' : '') +
