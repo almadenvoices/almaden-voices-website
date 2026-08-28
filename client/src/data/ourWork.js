@@ -109,6 +109,12 @@ export const ourWork = [
         place: "Remote · Kenya",
         title: "One-on-One Interview Coaching",
         body: "One-on-one sessions with a college student preparing for job interviews — remote, free, and on their schedule.",
-        photos: [],
+        photos: [
+            {
+                src: "/images/dorcas-and-anjika.jpg",
+                alt: "Anjika Bansal and Dorcas side by side on a video call during a one-on-one coaching session",
+                caption: "A session with Dorcas, joining from Kenya",
+            },
+        ],
     },
 ];
