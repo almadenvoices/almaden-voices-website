@@ -31,7 +31,7 @@ const BCC_EMAIL = ADMIN_EMAIL;
 // Bump this whenever this file changes, then check it shows up at the web app
 // URL after redeploying. If the URL still reports the old version, the new
 // code is pasted but not deployed.
-const SCRIPT_VERSION = "2026-08-26";
+const SCRIPT_VERSION = "2026-08-27";
 
 // Desired column order for the Registrations sheet. New columns are appended
 // automatically to existing sheets, so this is safe to extend over time.
@@ -1790,6 +1790,270 @@ function getSentSet(logSheet) {
 
 function recordSent(logSheet, email, workshopId, reminderKey) {
   logSheet.appendRow([email, workshopId, reminderKey, new Date()]);
+}
+
+// ============================================================
+// NEWSLETTER
+//
+// A formal newsletter in the same centered card as every other email this
+// script sends: blue header band with the Almaden Voices name, your headline,
+// the body, then the footer with the website and contact address.
+//
+// ------------------------------------------------------------
+// HOW TO SEND ONE
+//
+//   1. Edit NEWSLETTER below — the subject, headline and paragraphs.
+//   2. Put the addresses in NEWSLETTER_TO, one per line.
+//   3. Change NEWSLETTER_ID to something new for this edition.
+//   4. Save (Cmd+S).
+//   5. Choose "sendTestNewsletter" from the function dropdown at the top of
+//      the editor and press Run. One copy arrives at almadenvoices@gmail.com.
+//      Open it on your phone as well as your laptop and read it properly.
+//   6. Happy with it? Choose "sendNewsletterToAll" and press Run.
+//
+// You do NOT need to Deploy for any of this. Deploy is only for the
+// registration form. Saving and running is enough.
+//
+// Nobody receives the same edition twice. Every send is written to the
+// ReminderLog tab, so if you add three more addresses tomorrow and run it
+// again, only those three get it.
+//
+// Gmail will not send more than 100 emails a day from a free account. The
+// send checks how many you have left and stops cleanly rather than failing
+// halfway, telling you exactly who still needs it.
+// ============================================================
+
+// Change this for every new newsletter. It is what separates one edition from
+// the next in the "already sent" log — reusing an old id means nobody who got
+// that edition receives this one.
+const NEWSLETTER_ID = "2026-09-edition-1";
+
+// Who it goes to. One address per line, each in quotes with a comma after.
+const NEWSLETTER_TO = [
+  // "parent@example.com",
+  // "someone.else@example.com",
+];
+
+// Set to true to also send to every family in the Registrations tab. Leave it
+// false to mail only the addresses listed above.
+const NEWSLETTER_INCLUDE_REGISTRANTS = false;
+
+// ---- The newsletter itself ----
+//
+// In the text you can use <strong>bold</strong>, <em>italics</em> and links
+// written as <a href="https://example.com">the words you want shown</a>.
+// Leave subhead, bullets or button as "" / null to leave that part out.
+const NEWSLETTER = {
+  subject: "What's coming up at Almaden Voices",
+
+  // The big line inside the blue header band.
+  headline: "What's coming up at Almaden Voices",
+
+  // Small supporting line under it. Use "" for none.
+  subhead: "Free workshops, 1-on-1 coaching, and how to join us",
+
+  greeting: "Hi there,",
+
+  // Each string becomes its own paragraph.
+  paragraphs: [
+    "Thank you for being part of Almaden Voices. Here is what we have coming up.",
+    "Our next free workshop is on <strong>Friday, September 4th, 6–7 PM</strong>. It is a one-hour introduction to public speaking for students ages 5 to 14 — speaking clearly, standing with confidence, and settling the nerves that come with presenting to a group. No experience needed, and there is no cost.",
+  ],
+
+  // An optional list. Set to null to leave it out entirely.
+  bullets: {
+    title: "What we cover",
+    items: [
+      "Speaking clearly and at the right pace",
+      "Standing and moving with confidence",
+      "Settling nerves before you begin",
+      "Answering questions on the spot",
+    ],
+  },
+
+  // An optional button. Set to null to leave it out.
+  button: {
+    label: "Register for the workshop",
+    url: "https://almadenvoices.org/register",
+  },
+
+  signoff: "Warmly,<br>Anjika Bansal<br>Almaden Voices",
+
+  // Adds a quiet line letting people ask to be taken off the list. Keep this
+  // true on anything that goes to more than a handful of people — it is what
+  // separates a newsletter from spam, both to a reader and to Gmail.
+  showUnsubscribe: true,
+};
+
+// Renders the newsletter into the standard card.
+function buildNewsletterHtml() {
+  const n = NEWSLETTER;
+  let body = "";
+
+  if (n.greeting) {
+    body += '<p style="margin:0 0 16px;">' + n.greeting + '</p>';
+  }
+
+  (n.paragraphs || []).forEach(function(text) {
+    body += '<p style="margin:0 0 16px;">' + text + '</p>';
+  });
+
+  if (n.bullets && n.bullets.items && n.bullets.items.length) {
+    body += '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" ' +
+      'style="margin:24px 0;background:' + C_SOFT + ';border:1px solid ' + C_LINE + ';border-radius:12px;">' +
+      '<tr><td style="padding:20px 24px;">';
+    if (n.bullets.title) body += sectionTitle(n.bullets.title);
+    body += '<ul style="margin:0;padding-left:20px;color:' + C_BODY + ';font-size:15px;line-height:1.8;">';
+    n.bullets.items.forEach(function(item) {
+      body += '<li style="margin:0 0 6px;">' + item + '</li>';
+    });
+    body += '</ul></td></tr></table>';
+  }
+
+  if (n.button && n.button.url) {
+    // Table-wrapped rather than a styled <a>, because Outlook ignores padding
+    // on a link and the button collapses to plain blue text.
+    body += '<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:8px 0 24px;">' +
+      '<tr><td align="center" style="border-radius:10px;background:' + C_ACCENT + ';">' +
+        '<a href="' + n.button.url + '" ' +
+          'style="display:inline-block;padding:13px 28px;font-family:' + FONT_BODY + ';font-size:15px;' +
+          'font-weight:700;color:#FFFFFF;text-decoration:none;border-radius:10px;">' +
+          n.button.label + '</a>' +
+      '</td></tr></table>';
+  }
+
+  if (n.signoff) {
+    body += '<p style="margin:24px 0 0;">' + n.signoff + '</p>';
+  }
+
+  if (n.showUnsubscribe) {
+    body += '<p style="margin:28px 0 0;padding-top:16px;border-top:1px solid ' + C_LINE + ';' +
+      'font-size:12px;line-height:1.6;color:' + C_MUTED + ';">' +
+      'You are receiving this because you registered for an Almaden Voices workshop or asked us to keep you posted. ' +
+      'To stop receiving these, just <a href="mailto:' + ADMIN_EMAIL + '?subject=Unsubscribe" ' +
+      'style="color:' + C_ACCENT + ';">reply and say so</a> and we will take you off the list.' +
+      '</p>';
+  }
+
+  return emailShell(n.headline, n.subhead, body);
+}
+
+// Every address this edition should go to, lowercased and de-duplicated so a
+// parent listed by hand who is also in Registrations only gets one copy.
+function newsletterRecipients() {
+  const seen = {};
+  const out = [];
+
+  const add = function(email) {
+    const clean = String(email || "").trim().toLowerCase();
+    // Good enough to catch typos and stray blanks; Gmail rejects the rest.
+    if (!clean || clean.indexOf("@") < 1 || seen[clean]) return;
+    seen[clean] = true;
+    out.push(clean);
+  };
+
+  NEWSLETTER_TO.forEach(add);
+
+  if (NEWSLETTER_INCLUDE_REGISTRANTS) {
+    const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Registrations");
+    if (sheet && sheet.getLastRow() > 1) {
+      const idx = headerIndexMap(sheet);
+      const emailCol = idx["Email"];
+      if (emailCol !== undefined) {
+        sheet.getRange(2, emailCol + 1, sheet.getLastRow() - 1, 1)
+          .getValues()
+          .forEach(function(row) { add(row[0]); });
+      }
+    }
+  }
+
+  return out;
+}
+
+// Sends one copy to yourself. Never touches the real list, and never writes to
+// the log — run it as many times as you like.
+function sendTestNewsletter() {
+  GmailApp.sendEmail(TEST_EMAIL,
+    "[TEST] " + NEWSLETTER.subject,
+    "See the HTML version of this email.",
+    { htmlBody: buildNewsletterHtml(), name: ORG_NAME });
+
+  const count = newsletterRecipients().length;
+  Logger.log("Test newsletter sent to " + TEST_EMAIL + ".");
+  Logger.log("The real send would go to " + count + " address(es) under id \"" + NEWSLETTER_ID + "\".");
+}
+
+// The real send — one email each, so every reader sees only their own address.
+function sendNewsletterToAll() {
+  const recipients = newsletterRecipients();
+  if (!recipients.length) {
+    Logger.log("No recipients. Add addresses to NEWSLETTER_TO (or set NEWSLETTER_INCLUDE_REGISTRANTS to true).");
+    return;
+  }
+
+  const logSheet = getReminderLogSheet(SpreadsheetApp.getActiveSpreadsheet());
+  const alreadySent = getSentSet(logSheet);
+  const html = buildNewsletterHtml();
+
+  let sent = 0, skipped = 0;
+  const notSent = [];
+
+  for (let i = 0; i < recipients.length; i++) {
+    const email = recipients[i];
+
+    if (alreadySent[sentKey(email, NEWSLETTER_ID, "newsletter")]) { skipped++; continue; }
+
+    // Stop before Gmail does. Hitting the quota mid-send throws, which would
+    // leave you unable to tell who had already received it.
+    if (MailApp.getRemainingDailyQuota() < 1) {
+      notSent.push(email);
+      continue;
+    }
+
+    GmailApp.sendEmail(email, NEWSLETTER.subject,
+      "See the HTML version of this email.",
+      { htmlBody: html, name: ORG_NAME });
+
+    recordSent(logSheet, email, NEWSLETTER_ID, "newsletter");
+    alreadySent[sentKey(email, NEWSLETTER_ID, "newsletter")] = true;
+    sent++;
+  }
+
+  Logger.log("Newsletter \"" + NEWSLETTER_ID + "\" sent to " + sent + " address(es).");
+  if (skipped) Logger.log("Skipped " + skipped + " who already had this edition.");
+  if (notSent.length) {
+    Logger.log("OUT OF GMAIL QUOTA — " + notSent.length + " still to go. Run this again tomorrow " +
+      "and only they will receive it. Waiting: " + notSent.join(", "));
+  }
+  Logger.log("Gmail sends left today: " + MailApp.getRemainingDailyQuota());
+}
+
+// Send it later instead of now. Set the time, run this once, then leave it —
+// it fires whether or not the editor is open.
+const NEWSLETTER_SEND_TIME_UTC = "2026-09-01T16:00:00Z";  // 9:00 AM PT
+
+function scheduleNewsletter() {
+  cancelScheduledNewsletter();
+
+  const when = new Date(NEWSLETTER_SEND_TIME_UTC);
+  if (when.getTime() <= Date.now()) {
+    Logger.log("NEWSLETTER_SEND_TIME_UTC is in the past — nothing scheduled. Update it and run again.");
+    return;
+  }
+
+  ScriptApp.newTrigger("sendNewsletterToAll").timeBased().at(when).create();
+  Logger.log("Newsletter scheduled for " + when + " — " + newsletterRecipients().length + " recipient(s).");
+}
+
+function cancelScheduledNewsletter() {
+  let removed = 0;
+  ScriptApp.getProjectTriggers().forEach(function(t) {
+    if (t.getHandlerFunction() === "sendNewsletterToAll") {
+      ScriptApp.deleteTrigger(t);
+      removed++;
+    }
+  });
+  Logger.log("Scheduled newsletters removed: " + removed);
 }
 
 // ============================================================
