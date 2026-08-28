@@ -7,7 +7,7 @@
 //  Edit what's inside the quotes, keep the quotes and the commas.
 //
 //  Where things are, top to bottom:
-//    POSITIONS ............ the six roles and their bullet lists
+//    POSITIONS ............ the roles and their bullet lists
 //    MIN_GRADE ............ the grade floor (currently 8th)
 //    APPLICATIONS_OPEN .... true = form showing, false = "closed" message
 //    The banner lines, closed message, and confirmation message
@@ -70,6 +70,26 @@ export const POSITIONS = [
             "Comfortable in Google Sheets",
             "Clear writer",
         ],
+    },
+    {
+        id: "donor-outreach",
+        title: "Donor Outreach & Thank-Yous",
+        summary: "The families we've already taught are the people most likely to give. This role is how we ask.",
+        intro: "Hundreds of families have been through a free Almaden Voices workshop, and most of them have never once been asked to help pay for the next one. This role writes to them and calls them — first to say thank you, then to ask.",
+        doing: [
+            "Write and send handwritten thank-you cards to past families, donors, and volunteers",
+            "Call families who've been through a workshop and ask whether they'd support the next one",
+            "Keep a shared record of who was contacted, what they said, and who asked not to be contacted again",
+            "Send the follow-up — a card after a call, a thank-you after a donation",
+            "Flag anyone worth asking again later, or who offered something other than money",
+        ],
+        looking: [
+            "Comfortable asking for money out loud — that's the whole role, and it's harder than it sounds",
+            "Warm on the phone, and able to hear a no without taking it personally",
+            "Handwriting neat enough that a card reads as a thank-you rather than a chore",
+            "Organized — nobody should get the same call twice, and nobody should get one after asking us to stop",
+        ],
+        note: "You'll always contact a parent or guardian, never a student directly. Anyone who asks not to be contacted goes on a do-not-contact list and stays there.",
     },
     {
         id: "events",

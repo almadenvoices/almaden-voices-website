@@ -113,7 +113,7 @@ export const ourWork = [
             {
                 src: "/images/dorcas-and-anjika.jpg",
                 alt: "Anjika Bansal and Dorcas side by side on a video call during a one-on-one coaching session",
-                caption: "A session with Dorcas, joining from Kenya",
+                caption: "A session with Dorcas, who joins from Kenya. These are free one-on-one video sessions built around interview practice — run on their schedule, across time zones.",
             },
         ],
     },

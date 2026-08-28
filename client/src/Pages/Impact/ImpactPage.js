@@ -21,7 +21,7 @@ const metrics = [
     { number: "12", label: "Sessions Completed", description: "Beginner through advanced" },
     { number: "150", label: "Students Served", description: "Across multiple levels" },
     { number: "K–9", label: "Grades Served", description: "Kindergarten through 9th grade" },
-    { number: "$1,500", label: "Raised", description: "In community donations" },
+    { number: "$1,710", label: "Raised", description: "In community donations" },
     { number: "3x", label: "Class Sizes", description: "Tripled through targeted outreach & marketing" },
     { number: "High", label: "Retention Rate", description: "Students return for higher-level sessions" },
 ];
