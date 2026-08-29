@@ -1636,9 +1636,12 @@ app.post("/api/coaching/waitlist", async (req, res) => {
             return res.status(400).json({ error: "Please enter a valid email address." });
         }
 
+        if (preferredFormat !== "online" && preferredFormat !== "inPerson") {
+            return res.status(400).json({ error: "Choose online or in person." });
+        }
+
         const cleanEmail = String(email).trim().toLowerCase();
-        const formatLabel = preferredFormat === "inPerson" ? "In person"
-            : preferredFormat === "online" ? "Online" : "Either";
+        const formatLabel = preferredFormat === "inPerson" ? "In person" : "Online";
 
         // Refresh first: our upload replaces the whole file, so we must start
         // from whatever another instance has already written.
