@@ -37,7 +37,7 @@ export const POSITIONS = [
         id: "outreach",
         title: "Outreach & Partnerships",
         summary: "You'll reach out to nonprofits and other organizations to find partnerships where we can teach.",
-        intro: "This role is for someone who isn't afraid to send the email or make the call, and who can keep track of a lot of conversations at once.",
+        intro: "This role is for someone who enjoys starting conversations, building relationships, and helping us find new communities where we can teach.",
         doing: [
             "Research nonprofits, community centers, libraries, and youth organizations that could host a free workshop",
             "Reach out by email and phone to introduce Almaden Voices and propose a partnership",
@@ -47,7 +47,7 @@ export const POSITIONS = [
         looking: [
             "Comfortable writing professional emails and speaking on the phone",
             "Persistent without being pushy",
-            "Organized enough to remember who you contacted three weeks ago",
+            "Organized enough to keep track of conversations and next steps",
             "Good-to-have: Spanish, since a lot of San José communities are Spanish-speaking",
         ],
     },
@@ -55,7 +55,7 @@ export const POSITIONS = [
         id: "grants",
         title: "Grants Researcher",
         summary: "Funding is what turns free workshops into something we can run all year. This role finds the money.",
-        intro: "Funding is what turns free workshops from something we can do a few times into something we can do all year. This role finds the money.",
+        intro: "This role helps us find the funding that allows Almaden Voices to offer more free workshops throughout the year.",
         doing: [
             "Search for grant opportunities that fit a small youth-education nonprofit in Santa Clara County",
             "Build and maintain a spreadsheet of opportunities: funder, amount, deadline, eligibility, status",
@@ -65,7 +65,7 @@ export const POSITIONS = [
         ],
         looking: [
             "Genuinely enjoys research and doesn't mind reading eligibility fine print",
-            "Detail-oriented — a missed deadline or a missed eligibility rule costs us the whole opportunity",
+            "Detail-oriented— small details matter when we're evaluating grant opportunities",
             "Comfortable in Google Sheets",
             "Clear writer",
         ],
@@ -74,7 +74,7 @@ export const POSITIONS = [
         id: "donor-outreach",
         title: "Donor Outreach & Thank-Yous",
         summary: "The families we've already taught are the people most likely to give. This role is how we ask.",
-        intro: "Hundreds of families have been through a free Almaden Voices workshop, and most of them have never once been asked to help pay for the next one. This role writes to them and calls them — first to say thank you, then to ask.",
+        intro: "Our families, donors, and volunteers make our work possible. This role helps us build those relationships by thanking people for their support and inviting them to help us continue providing free workshops.",
         doing: [
             "Write and send handwritten thank-you cards to past families, donors, and volunteers",
             "Call families who've been through a workshop and ask whether they'd support the next one",
@@ -83,10 +83,10 @@ export const POSITIONS = [
             "Flag anyone worth asking again later, or who offered something other than money",
         ],
         looking: [
-            "Comfortable asking for money out loud — that's the whole role, and it's harder than it sounds",
+            "Comfortable having warm, respectful conversations about supporting our work",
             "Warm on the phone, and able to hear a no without taking it personally",
-            "Handwriting neat enough that a card reads as a thank-you rather than a chore",
-            "Organized — nobody should get the same call twice, and nobody should get one after asking us to stop",
+            "Handwriting neat enough to make a thoughtful thank-you card",
+            "Organized and respectful of each family's communication preferences",
         ],
         note: "You'll always contact a parent or guardian, never a student directly. Anyone who asks not to be contacted goes on a do-not-contact list and stays there.",
     },
@@ -103,7 +103,7 @@ export const POSITIONS = [
         ],
         looking: [
             "Organized and calm under a deadline",
-            "Willing to chase down details nobody else wants to chase",
+            "Proactive about following up on details and keeping things moving",
             "Some event or club-leadership experience is helpful but not required",
             "Available in the run-up to late October",
         ],
