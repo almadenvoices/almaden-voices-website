@@ -621,7 +621,7 @@ app.post("/api/volunteer", async (req, res) => {
             applyingAs, parentName, parentEmail, parentPhone,
             fullName, email, phone, ageOrGrade, location,
             resumeName, resumeType, resumeData,
-            positions, why, availability,
+            positions, why, availability, questions,
             mediaConsent, guardianConsent,
         } = req.body;
 
@@ -679,6 +679,7 @@ app.post("/api/volunteer", async (req, res) => {
             ]) +
             mailQuoteCard("Why this role, and what they&apos;d bring", escLines(why)) +
             mailQuoteCard("Availability (2–3 hrs/week, 3-month minimum)", escLines(availability)) +
+            (questions ? mailQuoteCard("Questions, comments or concerns", escLines(questions)) : "") +
             `<p style="margin:24px 0 0;font-size:14px;color:${MAIL_MUTED};">Reply to this email to answer ${esc(fullName)} directly.</p>`
         );
 

@@ -98,6 +98,9 @@ export default function VolunteerPage() {
     const [roles, setRoles] = useState([]);
     const [why, setWhy] = useState("");
     const [availability, setAvailability] = useState("");
+    // Optional, and deliberately the last thing on the form — somewhere to raise
+    // anything the fixed questions above didn't give them room for.
+    const [questions, setQuestions] = useState("");
     const [mediaConsent, setMediaConsent] = useState(false);
     const [guardianConsent, setGuardianConsent] = useState(false);
 
@@ -225,6 +228,7 @@ export default function VolunteerPage() {
             positions: roleTitles,
             why,
             availability,
+            questions,
             mediaConsent,
             guardianConsent: showGuardianConsent ? guardianConsent : null,
         };
@@ -736,6 +740,20 @@ export default function VolunteerPage() {
                                     disabled={isSubmitting}
                                 />
                                 {errors.availability && <p className={s.fieldErrorText}>{errors.availability}</p>}
+                            </div>
+
+                            <div className={s.field}>
+                                <label htmlFor="questions">
+                                    Any questions, comments or concerns for us? <span style={{ color: "#6B7280", fontWeight: 400 }}>(optional)</span>
+                                </label>
+                                <textarea
+                                    id="questions"
+                                    rows="4"
+                                    value={questions}
+                                    onChange={(e) => setQuestions(e.target.value)}
+                                    disabled={isSubmitting}
+                                    placeholder="Anything you'd like to ask, or anything you'd like us to know…"
+                                />
                             </div>
 
                             {/* Consent */}

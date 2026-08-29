@@ -31,7 +31,7 @@ const BCC_EMAIL = ADMIN_EMAIL;
 // Bump this whenever this file changes, then check it shows up at the web app
 // URL after redeploying. If the URL still reports the old version, the new
 // code is pasted but not deployed.
-const SCRIPT_VERSION = "2026-08-29";
+const SCRIPT_VERSION = "2026-08-30";
 
 // Desired column order for the Registrations sheet. New columns are appended
 // automatically to existing sheets, so this is safe to extend over time.
@@ -76,6 +76,7 @@ const VOL_HEADERS = [
   "Parent/Guardian Phone",
   "Why This Role",
   "Availability",
+  "Questions/Comments",
   "Photo/Video Consent",
   "Parent/Guardian Aware",
   "Status",
@@ -793,6 +794,7 @@ function handleVolunteerApplication(data) {
     "Parent/Guardian Phone": data.parentPhone || "",
     "Why This Role": data.why || "",
     "Availability": data.availability || "",
+    "Questions/Comments": data.questions || "",
     "Photo/Video Consent": data.mediaConsent ? "Yes" : "No",
     "Parent/Guardian Aware": data.guardianConsent === null || data.guardianConsent === undefined
       ? ""
@@ -982,6 +984,7 @@ function buildVolunteerAdminHtml(data, whoIsApplying, timestamp, sheetUrl, resum
     '</table>' +
     quoteBlockHtml('Why this role, and what they\'d bring', data.why) +
     quoteBlockHtml('Availability (2-3 hrs/week, 3-month minimum)', data.availability) +
+    (data.questions ? quoteBlockHtml('Questions, comments or concerns', data.questions) : '') +
     '<p style="margin:24px 0 0;font-size:14px;color:' + C_MUTED + ';">Reply to this email to answer ' +
       esc(data.fullName) + ' directly.' +
       (sheetUrl ? ' &middot; <a href="' + sheetUrl + '" style="color:' + C_ACCENT + ';text-decoration:none;">Open the applications sheet</a>' : '') +
