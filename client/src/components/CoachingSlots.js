@@ -30,7 +30,7 @@ function CoachingWaitlistForm() {
     const [phone, setPhone] = useState("");
     const [studentName, setStudentName] = useState("");
     const [studentAge, setStudentAge] = useState("");
-    const [preferredFormat, setPreferredFormat] = useState("either");
+    const [preferredFormat, setPreferredFormat] = useState("online");
     const [schoolName, setSchoolName] = useState("");
     const [zipCode, setZipCode] = useState("");
     const [notes, setNotes] = useState("");
@@ -153,7 +153,6 @@ function CoachingWaitlistForm() {
                     {[
                         { key: "online", title: "Online" },
                         { key: "inPerson", title: "In person" },
-                        { key: "either", title: "Either is fine" },
                     ].map(opt => (
                         <label key={opt.key} className={`${c.formatOpt} ${preferredFormat === opt.key ? c.formatOptOn : ""}`}>
                             <input
