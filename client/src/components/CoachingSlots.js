@@ -16,6 +16,182 @@ import c from "./CoachingSlots.module.css";
  * Flow: claim a slot -> pick online/in person -> fill in who it's for -> pay.
  * The booking is only recorded once PayPal confirms the payment.
  */
+/**
+ * Shown in place of the slot grid once every slot is taken. Collects enough to
+ * actually fill the next round — who the student is, how old, and whether they
+ * want online or in person — rather than just an email address.
+ *
+ * Nothing here takes payment. Signing up puts a family on a list and nothing
+ * more, which the copy says plainly so nobody thinks they have booked.
+ */
+function CoachingWaitlistForm() {
+    const [parentName, setParentName] = useState("");
+    const [email, setEmail] = useState("");
+    const [phone, setPhone] = useState("");
+    const [studentName, setStudentName] = useState("");
+    const [studentAge, setStudentAge] = useState("");
+    const [preferredFormat, setPreferredFormat] = useState("either");
+    const [schoolName, setSchoolName] = useState("");
+    const [zipCode, setZipCode] = useState("");
+    const [notes, setNotes] = useState("");
+
+    const [errors, setErrors] = useState({});
+    const [status, setStatus] = useState("idle"); // idle | sending | done | error
+    const [errorMsg, setErrorMsg] = useState("");
+    const [alreadyOn, setAlreadyOn] = useState(false);
+
+    const missing = () => {
+        const m = {};
+        if (!parentName.trim()) m.parentName = "Required.";
+        if (!studentName.trim()) m.studentName = "Required.";
+        if (!studentAge) m.studentAge = "Required.";
+        if (!email.trim()) m.email = "Required.";
+        else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) m.email = "Please enter a valid email address.";
+        if (!phone.trim()) m.phone = "Required.";
+        return m;
+    };
+
+    async function onSubmit(e) {
+        e.preventDefault();
+        const bad = missing();
+        if (Object.keys(bad).length) {
+            setErrors(bad);
+            document.querySelector(`.${c.fieldErrorText}`)
+                ?.scrollIntoView({ behavior: "smooth", block: "center" });
+            return;
+        }
+        setErrors({});
+        setStatus("sending");
+        setErrorMsg("");
+
+        try {
+            const res = await fetch("/api/coaching/waitlist", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    parentName, email, phone, studentName, studentAge,
+                    preferredFormat, schoolName, zipCode, notes
+                })
+            });
+            const data = await res.json().catch(() => ({}));
+            if (!res.ok || !data.success) throw new Error(data.error || "Please try again.");
+            setAlreadyOn(Boolean(data.alreadyOn));
+            setStatus("done");
+        } catch (err) {
+            setErrorMsg(err.message || "Something went wrong. Please try again.");
+            setStatus("error");
+        }
+    }
+
+    if (status === "done") {
+        return (
+            <div className={c.confirm}>
+                <CheckCircleIcon style={{ fontSize: 52, color: "#059669" }} />
+                <h3 className={c.confirmTitle}>
+                    {alreadyOn ? "You're already on the list" : "You're on the list!"}
+                </h3>
+                <p className={c.confirmLead}>
+                    {alreadyOn
+                        ? "We already had this email on the waitlist, so there's nothing more to do."
+                        : "Check your email — we've sent a confirmation."}
+                </p>
+                <p className={c.confirmBody}>
+                    We&apos;ll email you as soon as the next round of coaching slots opens, before
+                    they go up on the website. Nothing has been charged, and there&apos;s nothing
+                    else you need to do.
+                </p>
+            </div>
+        );
+    }
+
+    return (
+        <form className={c.bookingPanel} onSubmit={onSubmit} noValidate>
+            <h4 className={c.panelTitle}>Join the waitlist</h4>
+
+            <div className={c.fieldGrid}>
+                <div>
+                    <label className={c.fieldLabel} htmlFor="wl-parent">Parent/guardian name <span className={c.req}>*</span></label>
+                    <input id="wl-parent" className={`${c.input} ${errors.parentName ? c.inputError : ""}`} value={parentName} onChange={e => setParentName(e.target.value)} placeholder="Your name" />
+                    {errors.parentName && <p className={c.fieldErrorText}>{errors.parentName}</p>}
+                </div>
+                <div>
+                    <label className={c.fieldLabel} htmlFor="wl-student">Student&apos;s name <span className={c.req}>*</span></label>
+                    <input id="wl-student" className={`${c.input} ${errors.studentName ? c.inputError : ""}`} value={studentName} onChange={e => setStudentName(e.target.value)} placeholder="Child's name" />
+                    {errors.studentName && <p className={c.fieldErrorText}>{errors.studentName}</p>}
+                </div>
+                <div>
+                    <label className={c.fieldLabel} htmlFor="wl-age">Student&apos;s age <span className={c.req}>*</span></label>
+                    <select id="wl-age" className={`${c.input} ${errors.studentAge ? c.inputError : ""}`} value={studentAge} onChange={e => setStudentAge(e.target.value)}>
+                        <option value="">Select an age</option>
+                        {[5, 6, 7, 8, 9, 10, 11, 12, 13, 14].map(a => <option key={a} value={a}>{a}</option>)}
+                    </select>
+                    {errors.studentAge && <p className={c.fieldErrorText}>{errors.studentAge}</p>}
+                </div>
+                <div>
+                    <label className={c.fieldLabel} htmlFor="wl-email">Email <span className={c.req}>*</span></label>
+                    <input id="wl-email" type="email" className={`${c.input} ${errors.email ? c.inputError : ""}`} value={email} onChange={e => setEmail(e.target.value)} placeholder="you@email.com" />
+                    {errors.email && <p className={c.fieldErrorText}>{errors.email}</p>}
+                </div>
+                <div>
+                    <label className={c.fieldLabel} htmlFor="wl-phone">Phone number <span className={c.req}>*</span></label>
+                    <input id="wl-phone" type="tel" className={`${c.input} ${errors.phone ? c.inputError : ""}`} value={phone} onChange={e => setPhone(e.target.value)} placeholder="+1 (000) 000-0000" />
+                    {errors.phone && <p className={c.fieldErrorText}>{errors.phone}</p>}
+                </div>
+                <div>
+                    <label className={c.fieldLabel} htmlFor="wl-school">School name</label>
+                    <input id="wl-school" className={c.input} value={schoolName} onChange={e => setSchoolName(e.target.value)} placeholder="e.g. Graystone Elementary" />
+                </div>
+                <div>
+                    <label className={c.fieldLabel} htmlFor="wl-zip">Home ZIP code</label>
+                    <input id="wl-zip" className={c.input} value={zipCode} onChange={e => setZipCode(e.target.value)} placeholder="e.g. 95120" />
+                </div>
+            </div>
+
+            <fieldset className={c.formatSet}>
+                <legend className={c.fieldLabel}>Which would you prefer?</legend>
+                <div className={c.formatRow}>
+                    {[
+                        { key: "online", title: "Online" },
+                        { key: "inPerson", title: "In person" },
+                        { key: "either", title: "Either is fine" },
+                    ].map(opt => (
+                        <label key={opt.key} className={`${c.formatOpt} ${preferredFormat === opt.key ? c.formatOptOn : ""}`}>
+                            <input
+                                type="radio"
+                                name="waitlistFormat"
+                                value={opt.key}
+                                checked={preferredFormat === opt.key}
+                                onChange={() => setPreferredFormat(opt.key)}
+                            />
+                            <span>{opt.title}</span>
+                        </label>
+                    ))}
+                </div>
+            </fieldset>
+
+            <div className={c.notesField}>
+                <label className={c.fieldLabel} htmlFor="wl-notes">
+                    What would you like your student to work on?
+                </label>
+                <textarea id="wl-notes" rows="3" className={`${c.input} ${c.textarea}`} value={notes} onChange={e => setNotes(e.target.value)} placeholder="A speech they're preparing, stage nerves, a class presentation, anything else…" />
+            </div>
+
+            <p className={c.reqNote}><span className={c.req}>*</span> Required</p>
+
+            {status === "error" && <p className={c.statusError}>{errorMsg}</p>}
+
+            <button type="submit" className={c.submitBtn} disabled={status === "sending"}>
+                {status === "sending" ? "Adding you…" : "Join the waitlist"}
+            </button>
+
+            <p className={c.payNote}>
+                Joining the waitlist is free and doesn&apos;t book a slot — we&apos;ll email you
+                when the next round opens and you can book then.
+            </p>
+        </form>
+    );
+}
+
 export default function CoachingSlots() {
     const [slots, setSlots] = useState([]);
     // Only a placeholder for the moment before /api/coaching/slots answers —
@@ -324,11 +500,14 @@ export default function CoachingSlots() {
             {loadError && <p className={c.statusError}>{loadError}</p>}
 
             {allTaken ? (
-                <div className={c.waitlist}>
-                    All coaching slots are currently filled. Email{" "}
-                    <a className={c.waitlistLink} href="mailto:almadenvoices@gmail.com">almadenvoices@gmail.com</a>{" "}
-                    to join the waitlist for the next round.
-                </div>
+                <>
+                    <div className={c.waitlist}>
+                        All coaching slots are currently filled. Leave your details below and
+                        we&apos;ll email you as soon as the next round opens — before the slots
+                        go up on the website.
+                    </div>
+                    <CoachingWaitlistForm />
+                </>
             ) : slots.length > 0 && (
                 <>
                     <p className={c.remaining}>

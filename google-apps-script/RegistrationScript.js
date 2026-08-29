@@ -31,7 +31,7 @@ const BCC_EMAIL = ADMIN_EMAIL;
 // Bump this whenever this file changes, then check it shows up at the web app
 // URL after redeploying. If the URL still reports the old version, the new
 // code is pasted but not deployed.
-const SCRIPT_VERSION = "2026-08-27";
+const SCRIPT_VERSION = "2026-08-29";
 
 // Desired column order for the Registrations sheet. New columns are appended
 // automatically to existing sheets, so this is safe to extend over time.
@@ -91,6 +91,23 @@ const VOL_HEADERS = [
 // confirms the payment, not by the browser, so a row here always means money
 // actually changed hands. "Scheduled?" is left blank on purpose — it is for
 // you to fill in once you have agreed a time with the family.
+// Desired column order for the "Coaching Waitlist" tab — families who asked to
+// be told when the next round of coaching slots opens. No money involved;
+// "Contacted?" is blank for you to fill in once you have reached out.
+const COACH_WAITLIST_HEADERS = [
+  "Timestamp",
+  "Parent Name",
+  "Email",
+  "Phone",
+  "Student Name",
+  "Student Age",
+  "Preferred Format",
+  "School Name",
+  "Home ZIP",
+  "What They Want To Work On",
+  "Contacted?"
+];
+
 const COACH_HEADERS = [
   "Timestamp",
   "Slot",
@@ -198,6 +215,11 @@ function doPost(e) {
       return handleCoachingBooking(data);
     }
 
+    // Families waiting for the next round of coaching slots.
+    if (data.formType === "coaching-waitlist") {
+      return handleCoachingWaitlist(data);
+    }
+
     const ss = SpreadsheetApp.getActiveSpreadsheet();
     const sheet = getRegistrationsSheet(ss);
 
@@ -271,6 +293,13 @@ function doPost(e) {
 // ============================================================
 function getRegistrationsSheet(ss) {
   return getSheetWithHeaders(ss, "Registrations", REG_HEADERS);
+}
+
+// The coaching waitlist gets its own tab beside the bookings.
+function getCoachingWaitlistSheet(ss) {
+  const sheet = getSheetWithHeaders(ss, "Coaching Waitlist", COACH_WAITLIST_HEADERS);
+  sheet.setFrozenRows(1);
+  return sheet;
 }
 
 // Paid coaching bookings land on their own tab in the registration
@@ -709,6 +738,32 @@ function handleCoachingBooking(data) {
   } catch (err) {
     // The server logs this against the PayPal order id so a booking that never
     // reached the sheet can be found and added by hand.
+    return jsonOut({ success: false, error: err.message });
+  }
+}
+
+// Waitlist signups. Like handleCoachingBooking, this only writes the row —
+// the server sends both the confirmation and the admin notification.
+function handleCoachingWaitlist(data) {
+  try {
+    const sheet = getCoachingWaitlistSheet(SpreadsheetApp.getActiveSpreadsheet());
+
+    appendMappedRow(sheet, {
+      "Timestamp": data.timestamp ? new Date(data.timestamp) : new Date(),
+      "Parent Name": data.parentName || "",
+      "Email": data.parentEmail || "",
+      "Phone": data.phone || "",
+      "Student Name": data.studentName || "",
+      "Student Age": data.studentAge || "",
+      "Preferred Format": data.preferredFormat || "",
+      "School Name": data.schoolName || "",
+      "Home ZIP": data.zipCode || "",
+      "What They Want To Work On": data.notes || "",
+      "Contacted?": ""
+    });
+
+    return jsonOut({ success: true });
+  } catch (err) {
     return jsonOut({ success: false, error: err.message });
   }
 }

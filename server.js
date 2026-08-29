@@ -14,6 +14,7 @@ const { initConfig } = require("./config");
 const GCS_BUCKET = "almaden-voices-data";
 const GCS_FILE = "registrations.csv";
 const COACHING_GCS_FILE = "coaching-bookings.csv";
+const COACHING_WAITLIST_GCS_FILE = "coaching-waitlist.csv";
 const storage = new Storage();
 
 // Split one CSV line into fields, honouring double-quoted values.
@@ -46,6 +47,7 @@ function csvCell(value) {
 // every write.
 const registrationsPath = () => path.join(__dirname, 'registrations.csv');
 const coachingPath = () => path.join(__dirname, 'coaching-bookings.csv');
+const coachingWaitlistPath = () => path.join(__dirname, 'coaching-waitlist.csv');
 
 async function downloadFromGCS(gcsFile, destination, label) {
     try {
@@ -114,6 +116,17 @@ const refreshRegistrationsFromGCS = () =>
 const refreshCoachingFromGCS = () =>
     refreshFromGCS(COACHING_GCS_FILE, coachingPath(), "coaching bookings");
 
+const refreshCoachingWaitlistFromGCS = () =>
+    refreshFromGCS(COACHING_WAITLIST_GCS_FILE, coachingWaitlistPath(), "coaching waitlist");
+
+async function downloadCoachingWaitlistFromGCS() {
+    await downloadFromGCS(COACHING_WAITLIST_GCS_FILE, coachingWaitlistPath(), "coaching waitlist");
+}
+
+async function uploadCoachingWaitlistToGCS() {
+    await uploadToGCS(coachingWaitlistPath(), COACHING_WAITLIST_GCS_FILE, "coaching waitlist");
+}
+
 // ============================================================
 // 1-ON-1 COACHING SLOTS
 //
@@ -150,6 +163,11 @@ const coachingSlotLabel = (id) => `Coaching Slot ${id}`;
 // The browser sends the id as JSON, so accept "3" as well as 3.
 const findCoachingSlot = (slotId) =>
     COACHING_SLOTS.find(s => String(s.id) === String(slotId));
+
+const COACHING_WAITLIST_HEADERS = [
+    "Timestamp", "Parent Name", "Email", "Phone", "Student Name", "Student Age",
+    "Preferred Format", "School Name", "Home ZIP", "What They Want To Work On", "Contacted?"
+];
 
 const COACHING_HEADERS = [
     "Timestamp", "Slot ID", "Slot Label", "Format",
@@ -212,6 +230,31 @@ async function sendCoachingToSpreadsheet(booking) {
     } catch (err) {
         console.error("⚠️ Coaching booking not added to spreadsheet — order",
             booking.orderId, err.message);
+    }
+}
+
+// Same as sendCoachingToSpreadsheet, for the waitlist tab. Also swallows every
+// failure — someone's place on the list is already saved by the time this runs.
+async function sendCoachingWaitlistToSpreadsheet(entry) {
+    try {
+        const response = await fetch(APPS_SCRIPT_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ formType: "coaching-waitlist", ...entry }),
+            signal: AbortSignal.timeout(15000)
+        });
+        const text = await response.text();
+        let result = null;
+        try { result = JSON.parse(text); } catch (parseErr) { /* an HTML error page */ }
+        if (response.ok && result && result.success) {
+            console.log("Added coaching waitlist signup to spreadsheet —", entry.parentEmail);
+        } else {
+            console.error("⚠️ Coaching waitlist signup not added to spreadsheet —",
+                entry.parentEmail, (result && result.error) || text.slice(0, 200));
+        }
+    } catch (err) {
+        console.error("⚠️ Coaching waitlist signup not added to spreadsheet —",
+            entry.parentEmail, err.message);
     }
 }
 
@@ -1577,6 +1620,109 @@ app.post("/api/coaching/orders/:orderID/capture", async (req, res) => {
     }
 });
 
+// Join the waitlist for the next round of coaching. No payment involved — this
+// is just a list of families to contact when slots reopen.
+app.post("/api/coaching/waitlist", async (req, res) => {
+    try {
+        const { parentName, email, phone, studentName, studentAge,
+                preferredFormat, schoolName, zipCode, notes } = req.body;
+
+        const required = { parentName, email, phone, studentName, studentAge, preferredFormat };
+        const missing = Object.keys(required).filter(k => !String(required[k] || "").trim());
+        if (missing.length) {
+            return res.status(400).json({ error: "Please fill in every required field." });
+        }
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(email).trim())) {
+            return res.status(400).json({ error: "Please enter a valid email address." });
+        }
+
+        const cleanEmail = String(email).trim().toLowerCase();
+        const formatLabel = preferredFormat === "inPerson" ? "In person"
+            : preferredFormat === "online" ? "Online" : "Either";
+
+        // Refresh first: our upload replaces the whole file, so we must start
+        // from whatever another instance has already written.
+        await refreshCoachingWaitlistFromGCS();
+
+        const file = coachingWaitlistPath();
+        if (!fs.existsSync(file)) {
+            fs.writeFileSync(file, COACHING_WAITLIST_HEADERS.map(csvCell).join(",") + "\n");
+        }
+
+        // Someone signing up twice should not appear twice on the list.
+        const existing = fs.readFileSync(file, "utf-8").split("\n").filter(l => l.trim());
+        const emailIndex = COACHING_WAITLIST_HEADERS.indexOf("Email");
+        const already = existing.slice(1)
+            .some(line => (parseCSVLine(line)[emailIndex] || "").trim().toLowerCase() === cleanEmail);
+        if (already) {
+            return res.json({ success: true, alreadyOn: true });
+        }
+
+        const joinedAt = new Date();
+        fs.appendFileSync(file, [
+            joinedAt.toISOString(), parentName, cleanEmail, phone, studentName, studentAge,
+            formatLabel, schoolName, zipCode, notes, ""
+        ].map(csvCell).join(",") + "\n");
+        await uploadCoachingWaitlistToGCS();
+
+        // Onto the Coaching Waitlist tab, beside the bookings.
+        await sendCoachingWaitlistToSpreadsheet({
+            timestamp: joinedAt.toISOString(),
+            parentName, parentEmail: cleanEmail, phone, studentName, studentAge,
+            preferredFormat: formatLabel, schoolName, zipCode, notes
+        });
+
+        // Tell the admin, and confirm to the family. Neither failing should
+        // lose someone's place on the list, so both are logged and swallowed.
+        try {
+            if (emailTransporter) {
+                await emailTransporter.sendMail({
+                    from: `"Almaden Voices Coaching" <${EMAIL_USER}>`,
+                    replyTo: `"${parentName}" <${cleanEmail}>`,
+                    to: EMAIL_TO,
+                    subject: `Coaching waitlist: ${String(studentName).trim()} (${formatLabel})`,
+                    html: `
+                        <div style="font-family: 'DM Sans', Arial, sans-serif; max-width: 560px; margin: 0 auto; color: #111827; line-height: 1.6;">
+                            <h2 style="margin: 0 0 16px;">New coaching waitlist signup</h2>
+                            <table style="width: 100%; border-collapse: collapse; background: #F9FAFB; border-radius: 12px;">
+                                <tr><td style="padding: 10px 16px; color: #6B7280;">Student</td><td style="padding: 10px 16px; font-weight: 600; text-align: right;">${studentName}${studentAge ? `, age ${studentAge}` : ""}</td></tr>
+                                <tr><td style="padding: 10px 16px; color: #6B7280;">Prefers</td><td style="padding: 10px 16px; font-weight: 600; text-align: right;">${formatLabel}</td></tr>
+                                <tr><td style="padding: 10px 16px; color: #6B7280;">Parent</td><td style="padding: 10px 16px; font-weight: 600; text-align: right;">${parentName}</td></tr>
+                                <tr><td style="padding: 10px 16px; color: #6B7280;">Email</td><td style="padding: 10px 16px; font-weight: 600; text-align: right;">${cleanEmail}</td></tr>
+                                <tr><td style="padding: 10px 16px; color: #6B7280;">Phone</td><td style="padding: 10px 16px; font-weight: 600; text-align: right;">${phone}</td></tr>
+                                <tr><td style="padding: 10px 16px; color: #6B7280;">School</td><td style="padding: 10px 16px; font-weight: 600; text-align: right;">${schoolName || "—"}</td></tr>
+                                <tr><td style="padding: 10px 16px; color: #6B7280;">Home ZIP</td><td style="padding: 10px 16px; font-weight: 600; text-align: right;">${zipCode || "—"}</td></tr>
+                            </table>
+                            <p style="margin: 20px 0 4px; font-weight: 600;">What they'd like to work on</p>
+                            <p style="margin: 0; white-space: pre-wrap;">${notes || "—"}</p>
+                            <p style="margin: 24px 0 0; font-size: 13px; color: #6B7280;">Reply to this email to reach the parent directly.</p>
+                        </div>`
+                });
+
+                await emailTransporter.sendMail({
+                    from: `"Almaden Voices" <${EMAIL_USER}>`,
+                    to: cleanEmail,
+                    subject: "You're on the coaching waitlist",
+                    html: `
+                        <div style="font-family: 'DM Sans', Arial, sans-serif; max-width: 560px; margin: 0 auto; color: #111827; line-height: 1.6;">
+                            <h2 style="margin: 0 0 16px;">You&rsquo;re on the list</h2>
+                            <p style="margin: 0 0 16px;">Hi ${parentName || "there"}, thanks for your interest in 1-on-1 coaching for ${String(studentName).trim() || "your student"}. Our current slots are full, so we&rsquo;ve added you to the waitlist.</p>
+                            <p style="margin: 0 0 16px;">We&rsquo;ll email you as soon as the next round opens, before the slots go on the website. There&rsquo;s nothing to pay and nothing else to do for now.</p>
+                            <p style="margin: 0; font-size: 13px; color: #6B7280;">Questions? Just reply to this email.</p>
+                        </div>`
+                });
+            }
+        } catch (emailErr) {
+            console.error("Coaching waitlist email error:", emailErr);
+        }
+
+        res.json({ success: true });
+    } catch (err) {
+        console.error("Coaching waitlist error:", err);
+        res.status(500).json({ error: "Something went wrong. Please try again." });
+    }
+});
+
 app.post("/api/paypal/orders", async (req, res) => {
     try {
         const { amount, frequency } = req.body;
@@ -1756,6 +1902,7 @@ async function startServer() {
         // Download persistent registrations + coaching bookings from GCS
         await downloadRegistrationsFromGCS();
         await downloadCoachingFromGCS();
+        await downloadCoachingWaitlistFromGCS();
 
         // Start the server
         app.listen(PORT, () => {
