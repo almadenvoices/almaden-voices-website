@@ -499,19 +499,12 @@ export default function CoachingSlots() {
             {loading && <p className={c.status}>Loading coaching slots…</p>}
             {loadError && <p className={c.statusError}>{loadError}</p>}
 
-            {allTaken ? (
-                <>
-                    <div className={c.waitlist}>
-                        All coaching slots are currently filled. Leave your details below and
-                        we&apos;ll email you as soon as the next round opens — before the slots
-                        go up on the website.
-                    </div>
-                    <CoachingWaitlistForm />
-                </>
-            ) : slots.length > 0 && (
+            {slots.length > 0 && (
                 <>
                     <p className={c.remaining}>
-                        {openSlots} of {slots.length} slots remaining
+                        {allTaken
+                            ? `All ${slots.length} slots are booked`
+                            : `${openSlots} of ${slots.length} slots remaining`}
                     </p>
 
                     {slotNotice && <p className={c.statusError}>{slotNotice}</p>}
@@ -547,6 +540,19 @@ export default function CoachingSlots() {
                             );
                         })}
                     </div>
+                </>
+            )}
+
+            {/* Sold out — the booked slots stay on screen above this, so the
+                page still shows what was on offer and that it all went. */}
+            {allTaken && (
+                <>
+                    <div className={c.waitlist}>
+                        All coaching slots are currently filled. Leave your details below and
+                        we&apos;ll email you as soon as the next round opens — before the slots
+                        go up on the website.
+                    </div>
+                    <CoachingWaitlistForm />
                 </>
             )}
 
