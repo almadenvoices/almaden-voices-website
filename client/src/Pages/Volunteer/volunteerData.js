@@ -167,6 +167,27 @@ export const POSITIONS = [
         ],
     },
     {
+        id: "website",
+        title: "Website Development & Management",
+        summary: "Almost everyone who finds us finds us through almadenvoices.org. This role keeps it working and makes it better.",
+        intro: "Almost everyone who finds us finds us through the website. It's where families register for workshops, where volunteers apply, and where coaching gets booked and paid for. This role keeps it running and makes it better.",
+        doing: [
+            "Keep the site current — new workshops and dates, new photos, new volunteer roles",
+            "Fix what breaks, and check that registration and payment still work after every change",
+            "Improve how the site reads on a phone, which is how most families open it",
+            "Help keep pages fast, accessible, and clearly worded in both English and Spanish",
+            "Write down how things work, so the next person doesn't start from nothing",
+        ],
+        looking: [
+            "Comfortable with HTML, CSS and JavaScript. React is a real plus, since the site is built in it",
+            "Willing to learn the parts you haven't met yet — the site also uses Node and Google Cloud",
+            "Careful and unhurried around registration and payments. Real families and real money go through them",
+            "Able to explain a change in plain language to someone non-technical",
+            "Good-to-have: any experience with Git, or with making a site work properly on a phone",
+        ],
+        note: "Changes are reviewed before they go live, and you won't need access to payment or family data to do the work.",
+    },
+    {
         id: "bilingual",
         title: "Bilingual Communications Volunteer",
         summary: "Several of the communities we serve are primarily Spanish-speaking.",
