@@ -88,6 +88,11 @@ export default function VolunteerPage() {
     const [parentName, setParentName] = useState("");
     const [parentEmail, setParentEmail] = useState("");
     const [parentPhone, setParentPhone] = useState("");
+    // Second parent/guardian. Collected only from under-18 applicants applying
+    // for themselves, as a second emergency contact.
+    const [parent2Name, setParent2Name] = useState("");
+    const [parent2Email, setParent2Email] = useState("");
+    const [parent2Phone, setParent2Phone] = useState("");
     const [fullName, setFullName] = useState("");
     const [email, setEmail] = useState("");
     const [phone, setPhone] = useState("");
@@ -181,6 +186,12 @@ export default function VolunteerPage() {
             if (!parentName.trim()) next.parentName = "Required.";
             if (!parentEmail.trim()) next.parentEmail = "Required.";
             else if (!emailLooksValid(parentEmail)) next.parentEmail = "Please enter a valid email address.";
+            if (!parentPhone.trim()) next.parentPhone = "Required.";
+
+            if (!parent2Name.trim()) next.parent2Name = "Required.";
+            if (!parent2Email.trim()) next.parent2Email = "Required.";
+            else if (!emailLooksValid(parent2Email)) next.parent2Email = "Please enter a valid email address.";
+            if (!parent2Phone.trim()) next.parent2Phone = "Required.";
         }
 
         if (roles.length === 0) next.roles = "Please pick at least one position.";
@@ -216,7 +227,10 @@ export default function VolunteerPage() {
             applyingAs,
             parentName: showParentBlock || showUnder18Block ? parentName : "",
             parentEmail: showParentBlock || showUnder18Block ? parentEmail : "",
-            parentPhone: showParentBlock ? parentPhone : "",
+            parentPhone: showParentBlock || showUnder18Block ? parentPhone : "",
+            parent2Name: showUnder18Block ? parent2Name : "",
+            parent2Email: showUnder18Block ? parent2Email : "",
+            parent2Phone: showUnder18Block ? parent2Phone : "",
             fullName,
             email,
             phone,
@@ -289,7 +303,7 @@ export default function VolunteerPage() {
                         who want to help more kids find their voices.
                     </p>
                     <p className={s.heroNote}>
-                        All roles are volunteer and unpaid. Most are remote and flexible. The Instructor role is
+                        All roles are volunteer and unpaid, and most are remote and flexible. The Instructor role is
                         both online and in person, whichever is most convenient for you. We&apos;ll work around
                         school and work schedules, and we ask that you plan to stay with us for at least 3 months.
                         Plenty of our volunteers stay far longer, and several
@@ -645,12 +659,17 @@ export default function VolunteerPage() {
                             {showUnder18Block && (
                                 <div className={s.conditional}>
                                     <span className={s.conditionalLabel}>
-                                        Because you&apos;re under 18, we need a parent or guardian&apos;s details
+                                        Because you&apos;re under 18, we need details for two parents or
+                                        guardians, so we always have someone to reach in an emergency
                                     </span>
+
+                                    <p style={{ fontWeight: 600, color: "#111827", fontSize: "0.9rem", margin: "4px 0 8px" }}>
+                                        Parent/guardian 1
+                                    </p>
                                     <div className={s.grid}>
                                         <div className={`${s.field} ${errors.parentName ? s.fieldError : ""}`}>
                                             <label htmlFor="under18ParentName">
-                                                Parent/guardian name <span className={s.req}>*</span>
+                                                Name <span className={s.req}>*</span>
                                             </label>
                                             <input
                                                 id="under18ParentName"
@@ -663,7 +682,7 @@ export default function VolunteerPage() {
                                         </div>
                                         <div className={`${s.field} ${errors.parentEmail ? s.fieldError : ""}`}>
                                             <label htmlFor="under18ParentEmail">
-                                                Parent/guardian email <span className={s.req}>*</span>
+                                                Email <span className={s.req}>*</span>
                                             </label>
                                             <input
                                                 id="under18ParentEmail"
@@ -675,7 +694,74 @@ export default function VolunteerPage() {
                                             />
                                             {errors.parentEmail && <p className={s.fieldErrorText}>{errors.parentEmail}</p>}
                                         </div>
+                                        <div className={`${s.field} ${errors.parentPhone ? s.fieldError : ""}`}>
+                                            <label htmlFor="under18ParentPhone">
+                                                Phone <span className={s.req}>*</span>
+                                            </label>
+                                            <input
+                                                id="under18ParentPhone"
+                                                type="tel"
+                                                placeholder="+1 (000) 000-0000"
+                                                value={parentPhone}
+                                                onChange={(e) => setParentPhone(e.target.value)}
+                                                disabled={isSubmitting}
+                                            />
+                                            {errors.parentPhone && <p className={s.fieldErrorText}>{errors.parentPhone}</p>}
+                                        </div>
                                     </div>
+
+                                    <p style={{ fontWeight: 600, color: "#111827", fontSize: "0.9rem", margin: "16px 0 8px" }}>
+                                        Parent/guardian 2
+                                    </p>
+                                    <div className={s.grid}>
+                                        <div className={`${s.field} ${errors.parent2Name ? s.fieldError : ""}`}>
+                                            <label htmlFor="under18Parent2Name">
+                                                Name <span className={s.req}>*</span>
+                                            </label>
+                                            <input
+                                                id="under18Parent2Name"
+                                                type="text"
+                                                value={parent2Name}
+                                                onChange={(e) => setParent2Name(e.target.value)}
+                                                disabled={isSubmitting}
+                                            />
+                                            {errors.parent2Name && <p className={s.fieldErrorText}>{errors.parent2Name}</p>}
+                                        </div>
+                                        <div className={`${s.field} ${errors.parent2Email ? s.fieldError : ""}`}>
+                                            <label htmlFor="under18Parent2Email">
+                                                Email <span className={s.req}>*</span>
+                                            </label>
+                                            <input
+                                                id="under18Parent2Email"
+                                                type="email"
+                                                placeholder="parent@example.com"
+                                                value={parent2Email}
+                                                onChange={(e) => setParent2Email(e.target.value)}
+                                                disabled={isSubmitting}
+                                            />
+                                            {errors.parent2Email && <p className={s.fieldErrorText}>{errors.parent2Email}</p>}
+                                        </div>
+                                        <div className={`${s.field} ${errors.parent2Phone ? s.fieldError : ""}`}>
+                                            <label htmlFor="under18Parent2Phone">
+                                                Phone <span className={s.req}>*</span>
+                                            </label>
+                                            <input
+                                                id="under18Parent2Phone"
+                                                type="tel"
+                                                placeholder="+1 (000) 000-0000"
+                                                value={parent2Phone}
+                                                onChange={(e) => setParent2Phone(e.target.value)}
+                                                disabled={isSubmitting}
+                                            />
+                                            {errors.parent2Phone && <p className={s.fieldErrorText}>{errors.parent2Phone}</p>}
+                                        </div>
+                                    </div>
+
+                                    <p style={{ fontSize: "0.82rem", color: "#6B7280", margin: "12px 0 0", lineHeight: 1.6 }}>
+                                        If there isn&apos;t a second parent or guardian we can contact, email{" "}
+                                        <a href="mailto:almadenvoices@gmail.com" style={{ color: "#2563EB" }}>almadenvoices@gmail.com</a>{" "}
+                                        and we&apos;ll take your application that way instead.
+                                    </p>
                                 </div>
                             )}
 

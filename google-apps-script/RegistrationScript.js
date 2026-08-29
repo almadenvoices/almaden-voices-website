@@ -31,7 +31,7 @@ const BCC_EMAIL = ADMIN_EMAIL;
 // Bump this whenever this file changes, then check it shows up at the web app
 // URL after redeploying. If the URL still reports the old version, the new
 // code is pasted but not deployed.
-const SCRIPT_VERSION = "2026-08-30";
+const SCRIPT_VERSION = "2026-08-31";
 
 // Desired column order for the Registrations sheet. New columns are appended
 // automatically to existing sheets, so this is safe to extend over time.
@@ -74,6 +74,9 @@ const VOL_HEADERS = [
   "Parent/Guardian Name",
   "Parent/Guardian Email",
   "Parent/Guardian Phone",
+  "Parent/Guardian 2 Name",
+  "Parent/Guardian 2 Email",
+  "Parent/Guardian 2 Phone",
   "Why This Role",
   "Availability",
   "Questions/Comments",
@@ -792,6 +795,9 @@ function handleVolunteerApplication(data) {
     "Parent/Guardian Name": data.parentName || "",
     "Parent/Guardian Email": data.parentEmail || "",
     "Parent/Guardian Phone": data.parentPhone || "",
+    "Parent/Guardian 2 Name": data.parent2Name || "",
+    "Parent/Guardian 2 Email": data.parent2Email || "",
+    "Parent/Guardian 2 Phone": data.parent2Phone || "",
     "Why This Role": data.why || "",
     "Availability": data.availability || "",
     "Questions/Comments": data.questions || "",
@@ -950,6 +956,13 @@ function buildVolunteerAdminHtml(data, whoIsApplying, timestamp, sheetUrl, resum
       (data.parentPhone ? ' &middot; ' + esc(data.parentPhone) : '')
     : '';
 
+  // Second emergency contact, collected from under-18 applicants.
+  const guardian2 = (data.parent2Name || data.parent2Email || data.parent2Phone)
+    ? esc(data.parent2Name || '') +
+      (data.parent2Email ? ' &middot; ' + esc(data.parent2Email) : '') +
+      (data.parent2Phone ? ' &middot; ' + esc(data.parent2Phone) : '')
+    : '';
+
   const consent = 'Photo/video: ' + (data.mediaConsent ? 'Yes' : 'No') +
     (data.guardianConsent === null || data.guardianConsent === undefined
       ? ''
@@ -967,6 +980,7 @@ function buildVolunteerAdminHtml(data, whoIsApplying, timestamp, sheetUrl, resum
       ? '<a href="' + esc(resumeUrl) + '" style="color:' + C_ACCENT + ';font-weight:700;">Open resume</a>'
       : esc(resumeUrl || ''), true],
     ["Parent/guardian", guardian, true],
+    ["Parent/guardian 2", guardian2, true],
     ["Consent", consent, true],
     ["Received", timestamp.toLocaleString()]
   ].filter(function(r) { return r[1]; })

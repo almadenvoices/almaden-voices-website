@@ -619,6 +619,7 @@ app.post("/api/volunteer", async (req, res) => {
     try {
         const {
             applyingAs, parentName, parentEmail, parentPhone,
+            parent2Name, parent2Email, parent2Phone,
             fullName, email, phone, ageOrGrade, location,
             resumeName, resumeType, resumeData,
             positions, why, availability, questions,
@@ -651,6 +652,11 @@ app.post("/api/volunteer", async (req, res) => {
         // Line breaks the applicant typed should survive into the email.
         const escLines = (v) => esc(v).replace(/\r\n|\r|\n/g, "<br/>");
 
+        const guardian2Line = parent2Name || parent2Email || parent2Phone
+            ? esc(parent2Name) +
+              (parent2Email ? ` &middot; ${esc(parent2Email)}` : "") +
+              (parent2Phone ? ` &middot; ${esc(parent2Phone)}` : "")
+            : "";
         const guardianLine = parentName || parentEmail || parentPhone
             ? esc(parentName) +
               (parentEmail ? ` &middot; ${esc(parentEmail)}` : "") +
@@ -674,6 +680,7 @@ app.post("/api/volunteer", async (req, res) => {
                 ["Location", esc(location)],
                 ["Resume", resumeData ? esc(resumeName || "attached") + " (attached)" : "None"],
                 ["Parent/guardian", guardianLine],
+                ["Parent/guardian 2", guardian2Line],
                 ["Consent", consentLine],
                 ["Received", new Date().toLocaleString()],
             ]) +
