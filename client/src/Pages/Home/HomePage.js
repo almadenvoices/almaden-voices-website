@@ -322,6 +322,7 @@ export default function HomePage(){
     const [videoPlaying, setVideoPlaying] = useState(false);
     const missionVideoRef = useRef(null);
     const [missionVideoPlaying, setMissionVideoPlaying] = useState(false);
+    const [missionVideoError, setMissionVideoError] = useState(false);
     const navigate = useNavigate();
 
     const reviewCount = testimonials.length;
@@ -457,7 +458,7 @@ export default function HomePage(){
                                 controls={missionVideoPlaying}
                                 preload="metadata"
                                 playsInline
-                                onEnded={() => setMissionVideoPlaying(false)}
+                                onError={() => setMissionVideoError(true)}
                                 sx={{
                                     width: "100%",
                                     height: "100%",
@@ -468,8 +469,11 @@ export default function HomePage(){
                             {!missionVideoPlaying && (
                                 <Box
                                     onClick={() => {
+                                        // Controls stay on from here: the clip is only a few
+                                        // seconds, so without them there'd be no way to replay it.
                                         setMissionVideoPlaying(true);
-                                        missionVideoRef.current?.play();
+                                        const played = missionVideoRef.current?.play();
+                                        if (played?.catch) played.catch(() => setMissionVideoError(true));
                                     }}
                                     sx={{
                                         position: "absolute",
@@ -499,6 +503,15 @@ export default function HomePage(){
                                 </Box>
                             )}
                         </Box>
+
+                        <Typography
+                            align="center"
+                            sx={{ color: "#6B7280", fontSize: "0.9rem", mt: 2 }}
+                        >
+                            {missionVideoError
+                                ? "This video won't play in your browser right now. Please let us know."
+                                : "A few seconds, with sound."}
+                        </Typography>
                     </motion.div>
                 </Container>
             </Box>

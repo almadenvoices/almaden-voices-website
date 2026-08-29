@@ -36,7 +36,6 @@ export const POSITIONS = [
     {
         id: "outreach",
         title: "Outreach & Partnerships",
-        openings: "2 volunteers",
         summary: "You'll reach out to nonprofits and other organizations to find partnerships where we can teach.",
         intro: "This role is for someone who isn't afraid to send the email or make the call, and who can keep track of a lot of conversations at once.",
         doing: [
@@ -130,11 +129,10 @@ export const POSITIONS = [
     {
         id: "instructor",
         title: "Instructor",
-        inPerson: true,
         summary: "You'll be the person in the room with the kids.",
         intro: "You'll be the person in the room with the kids. This is the role that makes everything else worth doing.",
         doing: [
-            "Teach public speaking and confidence skills to students in grades K–9, in person",
+            "Teach public speaking and confidence skills to students in grades K–9",
             "Run interactive, activity-based sessions using our curriculum",
             "Help students prepare for end-of-session showcases",
             "Collect pre- and post-session surveys",
@@ -144,7 +142,7 @@ export const POSITIONS = [
             "Public speaking, debate, theater, or teaching/tutoring experience",
             "Reliable — students and families are counting on you to show up",
             "Spanish is a strong plus",
-            "Must be able to get to session locations around San José",
+            "For in-person sessions, able to get to locations around San José",
         ],
         note: "Volunteers working directly with students may be asked to complete a background check depending on the site, and instructors are never alone one-on-one with a student.",
     },

@@ -286,8 +286,9 @@ export default function VolunteerPage() {
                     </p>
                     <p className={s.heroNote}>
                         All roles are volunteer and unpaid. Most are remote and flexible. The Instructor role is
-                        in person. We&apos;ll work around school and work schedules, and we ask that you plan to
-                        stay with us for at least 3 months. Plenty of our volunteers stay far longer, and several
+                        both online and in person, whichever is most convenient for you. We&apos;ll work around
+                        school and work schedules, and we ask that you plan to stay with us for at least 3 months.
+                        Plenty of our volunteers stay far longer, and several
                         of these roles are ones we&apos;d love someone to grow into.{" "}
                         <strong>{GRADE_REQUIREMENT_LINE}</strong>
                     </p>
@@ -315,7 +316,7 @@ export default function VolunteerPage() {
                 <div className={s.sectionHead}>
                     <h2 className={s.sectionTitle}>Open positions</h2>
                     <p className={s.sectionSub}>
-                        Tap a role to read the whole thing. You can apply for more than one.
+                        Tap a role to learn more information. You can apply for more than one.
                     </p>
                 </div>
 
@@ -401,17 +402,18 @@ export default function VolunteerPage() {
                     <ul>
                         <li>{GRADE_REQUIREMENT_LINE} This applies to every role, including the remote ones.</li>
                         <li>
-                            We ask for a commitment of at least 3 months. These roles take a while to get good
-                            at, and the people we&apos;re reaching out to need to see the same name twice.
+                            We ask for a minimum commitment of 3 months so you have enough time to become
+                            comfortable with the role, build relationships, and see the impact of your outreach.
                         </li>
                         <li>Any email you send on behalf of Almaden Voices must cc almadenvoices@gmail.com</li>
                         <li>
-                            For your first month, send drafts to us for a quick look before they go out. Once
-                            you&apos;ve got the voice down, you&apos;ll send on your own.
+                            During your first month, please send drafts to us for a quick review before sending.
+                            This helps you get familiar with the Almaden Voices voice and approach. Once you’re
+                            comfortable, you’ll be able to send outreach independently.
                         </li>
                         <li>
-                            We&apos;ll give you templates, talking points, and whatever context you need. You
-                            won&apos;t be starting from a blank page.
+                            We&apos;ll provide templates, talking points, and the context you need to feel confident
+                            getting started. You&apos;ll have plenty of guidance and support along the way.
                         </li>
                     </ul>
                 </div>
@@ -720,8 +722,10 @@ export default function VolunteerPage() {
 
                             <div className={`${s.field} ${errors.availability ? s.fieldError : ""}`}>
                                 <label htmlFor="availability">
-                                    This role asks for about 2–3 hours a week, and we&apos;re looking for people who
-                                    can stay with us at least 3 months. Can you commit to that, and is there anything
+                                    This role typically takes about 2–3 hours per week, and we generally ask
+                                    for a commitment of at least 3 months. If you&apos;re not sure you can commit
+                                    to that timeline, no worries at all — please still apply! We&apos;re happy to
+                                    talk through your availability and see what might work. Is there anything
                                     about your schedule we should know? <span className={s.req}>*</span>
                                 </label>
                                 <input
