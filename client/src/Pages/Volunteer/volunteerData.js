@@ -37,8 +37,8 @@ export const POSITIONS = [
         id: "outreach",
         title: "Outreach & Partnerships",
         openings: "2 volunteers",
-        summary: "You'll be how Almaden Voices meets the rest of San José.",
-        intro: "You'll be how Almaden Voices meets the rest of San José. This role is for someone who isn't afraid to send the email or make the call, and who can keep track of a lot of conversations at once.",
+        summary: "You'll reach out to nonprofits and other organizations to find partnerships where we can teach.",
+        intro: "This role is for someone who isn't afraid to send the email or make the call, and who can keep track of a lot of conversations at once.",
         doing: [
             "Research nonprofits, community centers, libraries, and youth organizations that could host a free workshop",
             "Reach out by email and phone to introduce Almaden Voices and propose a partnership",
