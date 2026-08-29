@@ -815,8 +815,9 @@ export default function VolunteerPage() {
                                     This role typically takes about 2–3 hours per week, and we generally ask
                                     for a commitment of at least 3 months. If you&apos;re not sure you can commit
                                     to that timeline, no worries at all — please still apply! We&apos;re happy to
-                                    talk through your availability and see what might work. Is there anything
-                                    about your schedule we should know? <span className={s.req}>*</span>
+                                    talk through your availability and see what might work. <strong>What days
+                                    and times are you generally available? Please include as much detail as
+                                    possible (for example, Mondays from 5–7 PM or Saturdays from 2–4 PM).</strong> <span className={s.req}>*</span>
                                 </label>
                                 <input
                                     id="availability"

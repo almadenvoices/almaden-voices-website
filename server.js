@@ -1888,8 +1888,32 @@ app.post("/api/paypal/orders/:orderID/capture", async (req, res) => {
 // Path to React build
 const CLIENT_BUILD_PATH = path.join(__dirname, "client", "build");
 
-// Serve static files from React app
-app.use(express.static(CLIENT_BUILD_PATH));
+// Everything under /static carries a content hash in its filename — CRA emits
+// main.<hash>.js and friends, and a new build means a new filename rather than
+// new contents at the same URL. So these can be cached hard: a returning
+// visitor re-uses them instead of pulling roughly a megabyte of JavaScript on
+// every page load, and a deploy still can't serve anyone a stale copy.
+app.use("/static", express.static(path.join(CLIENT_BUILD_PATH, "static"), {
+    immutable: true,
+    maxAge: "1y"
+}));
+
+// Everything else in the build: index.html, the favicon, and the photos in
+// client/public/images. None of these carry a hash, and photos do get replaced
+// under the same filename, so they stay on revalidation — the browser asks
+// each time and usually gets a cheap 304 back. Correctness matters more here
+// than the few kilobytes it saves.
+app.use(express.static(CLIENT_BUILD_PATH, {
+    etag: true,
+    maxAge: 0,
+    setHeaders: (res, filePath) => {
+        // index.html points at the hashed bundles. If it were ever cached, a
+        // visitor would keep loading the previous deploy's JavaScript.
+        if (filePath.endsWith("index.html")) {
+            res.setHeader("Cache-Control", "no-cache");
+        }
+    }
+}));
 
 // For any non-API route, send React index.html
 app.get("*", (req, res) => {
@@ -1898,7 +1922,9 @@ app.get("*", (req, res) => {
         return res.status(404).json({ error: "Not found" });
     }
 
-    res.sendFile(path.join(CLIENT_BUILD_PATH, "index.html"));
+    res.sendFile(path.join(CLIENT_BUILD_PATH, "index.html"), {
+        headers: { "Cache-Control": "no-cache" }
+    });
 });
 
 // Initialize configuration and start server
