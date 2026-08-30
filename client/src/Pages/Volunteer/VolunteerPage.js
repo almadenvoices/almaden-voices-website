@@ -303,7 +303,7 @@ export default function VolunteerPage() {
                         who want to help more kids find their voices.
                     </p>
                     <p className={s.heroNote}>
-                        All roles are volunteer and unpaid, and most are remote and flexible. The Instructor role is
+                        All roles are volunteer roles, and most are remote and flexible. The Instructor role is
                         both online and in person, whichever is most convenient for you. We&apos;ll work around
                         school and work schedules, and we ask that you plan to stay with us for at least 3 months.
                         Plenty of our volunteers stay far longer, and several

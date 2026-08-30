@@ -165,6 +165,27 @@ export const POSITIONS = [
         ],
     },
     {
+        id: "social-media",
+        title: "Social Media Manager",
+        summary: "We do work worth seeing, and almost nobody sees it. This role is how families find us.",
+        intro: "Almaden Voices has very little presence on social media, which means families who would love our workshops never hear they exist. This role builds that presence from close to nothing — so there's a lot of room to shape it.",
+        doing: [
+            "Plan and post regularly, starting with Instagram and wherever else local families actually are",
+            "Turn workshop moments into posts worth sharing — a first speech, a showcase, a warm-up circle",
+            "Write short captions that sound like a person, in Spanish too wherever you can",
+            "Reply to comments and messages, and pass anything that needs us straight to us",
+            "Keep a simple posting calendar, so it doesn't stall the first busy week",
+        ],
+        looking: [
+            "Knows how these platforms actually work, not just how to scroll them",
+            "Can take and edit a decent photo or short video on a phone",
+            "Writes short and warm rather than formal",
+            "Reliable — an account that posts twice and goes quiet looks worse than no account at all",
+            "Good-to-have: Spanish, or having run an account for a club, team or school group",
+        ],
+        note: "Students appear online only when their family has given photo and video permission, which we record for every child and which you'll be able to check before anything goes out. First names only, never a surname.",
+    },
+    {
         id: "website",
         title: "Website Development & Management",
         summary: "Almost everyone who finds us finds us through almadenvoices.org. This role keeps it working and makes it better.",
