@@ -1963,6 +1963,7 @@ const NEWSLETTER = {
       paragraphs: [
         "Almaden Voices has officially opened 9 volunteer positions, with opportunities ranging from grants research and community outreach to newsletter writing and website development.",
         "There&rsquo;s a role for all kinds of interests and skills. Every role except Events Coordinator is remote, and the Instructor role has both online and in-person opportunities.",
+        "And these roles aren&rsquo;t just for students &mdash; we&rsquo;d love parent volunteers too! If you&rsquo;ve been looking for a way to get involved with Almaden Voices yourself, there&rsquo;s a place for you here as well.",
         "If you&rsquo;re interested in getting involved, you can learn more and apply here:",
       ],
       button: {
@@ -1976,7 +1977,7 @@ const NEWSLETTER = {
       // The tinted box with the blue left border.
       callout: {
         label: "Deadline",
-        text: "Applications close Thursday, September 4.",
+        text: "Applications close Friday, September 4.",
       },
     },
     {
@@ -2206,14 +2207,14 @@ function buildNewsletterHtml() {
     '<table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center" ' +
       'style="width:100%;max-width:600px;background-color:#FFFFFF;border:1px solid ' + NL_LINE + ';">' +
 
-    '<tr><td bgcolor="' + NL_ACCENT + '" style="background-color:' + NL_ACCENT + ';padding:18px ' + NL_PAD + ';">' +
+    '<tr><td bgcolor="' + NL_ACCENT + '" style="background-color:' + NL_ACCENT + ';padding:28px ' + NL_PAD + ';">' +
       '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;">' +
         '<tr>' +
           '<td align="left" valign="middle" style="padding:0 8px 0 0;">' +
             '<table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr>' +
               '<td valign="middle" bgcolor="#FFFFFF" style="background-color:#FFFFFF;padding:5px;">' +
-                '<img src="' + NL_LOGO + '" alt="' + ORG_NAME + '" width="48" ' +
-                  'style="display:block;width:48px;max-width:48px;height:auto;border:0;outline:none;text-decoration:none;">' +
+                '<img src="' + NL_LOGO + '" alt="' + ORG_NAME + '" width="64" ' +
+                  'style="display:block;width:64px;max-width:64px;height:auto;border:0;outline:none;text-decoration:none;">' +
               '</td>' +
             '</tr></table>' +
           '</td>' +

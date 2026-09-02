@@ -57,8 +57,8 @@ const upcomingSessions = [
         id: "intro-workshop-sep-2026",
         title: "Free Public Speaking Workshop",
         titleEs: "Taller gratuito de oratoria",
-        date: "September 4, 2026",
-        dateEs: "4 de septiembre de 2026",
+        date: "September 11, 2026",
+        dateEs: "11 de septiembre de 2026",
         time: "6–7 PM",
         timeEs: "6–7 PM",
         location: "To be announced",
@@ -68,8 +68,8 @@ const upcomingSessions = [
         // capacity: null means no limit — no seat count and it never shows as full.
         capacity: null,
         enrolled: 0,
-        description: "A free one-hour introduction to public speaking for kids. We cover the fundamentals — speaking clearly, standing with confidence, and settling the nerves that come with presenting to a group. No experience needed. Runs Friday, September 4 from 6–7 PM; we'll email you the location as soon as it's confirmed.",
-        descriptionEs: "Una introducción gratuita de una hora a la oratoria para niños. Cubrimos los fundamentos: hablar con claridad, mantener una postura segura y calmar los nervios de presentar ante un grupo. No se necesita experiencia. Se realiza el viernes 4 de septiembre de 6 a 7 PM; le enviaremos la ubicación por correo en cuanto esté confirmada.",
+        description: "A free one-hour introduction to public speaking for kids. We cover the fundamentals — speaking clearly, standing with confidence, and settling the nerves that come with presenting to a group. No experience needed. Runs Friday, September 11 from 6–7 PM; we'll email you the location as soon as it's confirmed.",
+        descriptionEs: "Una introducción gratuita de una hora a la oratoria para niños. Cubrimos los fundamentos: hablar con claridad, mantener una postura segura y calmar los nervios de presentar ante un grupo. No se necesita experiencia. Se realiza el viernes 11 de septiembre de 6 a 7 PM; le enviaremos la ubicación por correo en cuanto esté confirmada.",
         status: "Open",
         online: false,
         // No donation ask on this one — the form goes straight from the
