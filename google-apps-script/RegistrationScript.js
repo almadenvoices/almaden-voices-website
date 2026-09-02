@@ -31,7 +31,7 @@ const BCC_EMAIL = ADMIN_EMAIL;
 // Bump this whenever this file changes, then check it shows up at the web app
 // URL after redeploying. If the URL still reports the old version, the new
 // code is pasted but not deployed.
-const SCRIPT_VERSION = "2026-08-31";
+const SCRIPT_VERSION = "2026-09-02";
 
 // Desired column order for the Registrations sheet. New columns are appended
 // automatically to existing sheets, so this is safe to extend over time.
@@ -1867,14 +1867,23 @@ function recordSent(logSheet, email, workshopId, reminderKey) {
 // ============================================================
 // NEWSLETTER
 //
-// A formal newsletter in the same centered card as every other email this
-// script sends: blue header band with the Almaden Voices name, your headline,
-// the body, then the footer with the website and contact address.
+// The monthly newsletter. This is deliberately NOT built on emailShell() like
+// the registration and reminder emails: those pull in Google Fonts through a
+// <style> tag, and a <style> tag is stripped the moment anything is pasted
+// into a Gmail compose window. Everything below is table-based with the CSS
+// written onto each element, web-safe fonts only, and no media queries, so it
+// renders the same in Gmail, Apple Mail and Outlook and stays readable on a
+// 375px phone screen.
+//
+// The same markup lives in the repo at
+// newsletter/almaden-voices-newsletter-2026-09.html if you ever want to open
+// it in a browser or paste it somewhere by hand. Editing one does not change
+// the other — this file is what actually gets sent.
 //
 // ------------------------------------------------------------
 // HOW TO SEND ONE
 //
-//   1. Edit NEWSLETTER below — the subject, headline and paragraphs.
+//   1. Edit NEWSLETTER below — the subject, the issue line, the sections.
 //   2. Put the addresses in NEWSLETTER_TO, one per line.
 //   3. Change NEWSLETTER_ID to something new for this edition.
 //   4. Save (Cmd+S).
@@ -1898,11 +1907,11 @@ function recordSent(logSheet, email, workshopId, reminderKey) {
 // Change this for every new newsletter. It is what separates one edition from
 // the next in the "already sent" log — reusing an old id means nobody who got
 // that edition receives this one.
-const NEWSLETTER_ID = "2026-09-edition-1";
+const NEWSLETTER_ID = "2026-09-issue-1";
 
 // Who it goes to. One address per line, each in quotes with a comma after.
 const NEWSLETTER_TO = [
-  // "parent@example.com",
+  // "someone@example.com",
   // "someone.else@example.com",
 ];
 
@@ -1912,102 +1921,355 @@ const NEWSLETTER_INCLUDE_REGISTRANTS = false;
 
 // ---- The newsletter itself ----
 //
-// In the text you can use <strong>bold</strong>, <em>italics</em> and links
-// written as <a href="https://example.com">the words you want shown</a>.
-// Leave subhead, bullets or button as "" / null to leave that part out.
+// In any of the text below you can use <strong>bold</strong>, <em>italics</em>
+// and links written as <a href="https://example.com">the words to show</a>.
+// Curly quotes and dashes are written as &rsquo; and &mdash; so that older
+// versions of Outlook don't turn them into question marks.
 const NEWSLETTER = {
-  subject: "What's coming up at Almaden Voices",
+  subject: "Almaden Voices Newsletter — Issue #1, September 2026",
 
-  // The big line inside the blue header band.
-  headline: "What's coming up at Almaden Voices",
+  // Small text on the right of the blue header bar.
+  monthLabel: "Monthly Newsletter &middot; September 2026",
 
-  // Small supporting line under it. Use "" for none.
-  subhead: "Free workshops, 1-on-1 coaching, and how to join us",
+  // The line just under the rule at the top of the white area.
+  issueLine: "Issue #1 &middot; September 2026",
 
-  greeting: "Hi there,",
-
-  // Each string becomes its own paragraph.
-  paragraphs: [
-    "Thank you for being part of Almaden Voices. Here is what we have coming up.",
-    "Our next free workshop is on <strong>Friday, September 4th, 6–7 PM</strong>. It is a one-hour introduction to public speaking for students ages 5 to 14 — speaking clearly, standing with confidence, and settling the nerves that come with presenting to a group. No experience needed, and there is no cost.",
+  // Each string is its own paragraph.
+  greeting: [
+    "Hi everyone,",
+    "Welcome to the very first Almaden Voices monthly newsletter!",
+    "I have a few exciting updates to share with you this month, and I&rsquo;m so grateful that you&rsquo;re here to be part of what we&rsquo;re building.",
   ],
 
-  // An optional list. Set to null to leave it out entirely.
-  bullets: {
-    title: "What we cover",
-    items: [
-      "Speaking clearly and at the right pace",
-      "Standing and moving with confidence",
-      "Settling nerves before you begin",
-      "Answering questions on the spot",
-    ],
-  },
+  // One entry per story. Copy a whole { ... } block to add a section, delete
+  // one to remove it. Every field except heading and paragraphs is optional —
+  // leave it out and that piece simply isn't drawn.
+  sections: [
+    {
+      heading: "We Made the Front Page!",
+      paragraphs: [
+        "I&rsquo;m incredibly excited to share that Almaden Voices was just featured as a front-page cover story in the Almaden Times!",
+        "This is such a special milestone for us, and it truly would not have happened without the support of our community &mdash; whether you&rsquo;ve donated, registered for a workshop, attended one of our sessions, or simply followed along and cheered us on.",
+        "And speaking of exciting things, our recent 1-on-1 public speaking coaching sessions sold out almost immediately! If you missed them, keep an eye out &mdash; I&rsquo;m hoping to open more opportunities soon. In the meantime, join the waitlist at <a href=\"https://almadenvoices.org/register\" style=\"color:#2563EB;text-decoration:underline;\">almadenvoices.org/register</a>",
+      ],
+      // image: { src: "https://almadenvoices.org/images/your-photo.png", alt: "Describe the photo" },
+      button: {
+        label: "Read the Almaden Times feature",
+        url: "https://timesmedia.pageflip.site/publications/AlmadenTimes",
+      },
+    },
+    {
+      heading: "We&rsquo;re Looking for Volunteers!",
+      paragraphs: [
+        "Almaden Voices has officially opened 9 volunteer positions, with opportunities ranging from grants research and community outreach to newsletter writing and website development.",
+        "There&rsquo;s a role for all kinds of interests and skills. Every role except Events Coordinator is remote, and the Instructor role has both online and in-person opportunities.",
+        "If you&rsquo;re interested in getting involved, you can learn more and apply here:",
+      ],
+      button: {
+        label: "almadenvoices.org/volunteer",
+        url: "https://almadenvoices.org/volunteer",
+      },
+      // Paragraphs printed after the button.
+      paragraphsAfterButton: [
+        "Volunteers must be in 8th grade or higher, and applications are currently open until September 4th. If you&rsquo;re interested but aren&rsquo;t able to apply by the deadline, please reach out to me &mdash; I&rsquo;d still love to see if we can find a way for you to get involved!",
+      ],
+      // The tinted box with the blue left border.
+      callout: {
+        label: "Deadline",
+        text: "Applications close Thursday, September 4.",
+      },
+    },
+    {
+      heading: "Help Us Keep Workshops Free",
+      // tinted:true draws this section inside its own shaded, bordered box —
+      // that's what makes the donation ask look different from a normal story.
+      tinted: true,
+      paragraphs: [
+        "Our workshops are 100% free for students, and donations help us keep them that way.",
+        "Every contribution goes directly toward making our programs possible, including:",
+      ],
+      bullets: [
+        "Transportation and travel expenses",
+        "Student materials and supplies",
+        "Community room and venue bookings",
+      ],
+      paragraphsAfterBullets: [
+        "If you&rsquo;d like to support our work, you can donate here:",
+      ],
+      button: {
+        label: "Donate",
+        url: "https://almadenvoices.org/donate",
+        wide: true,
+      },
+    },
+    {
+      heading: "Thank You",
+      paragraphs: [
+        "Most importantly, thank you.",
+        "Whether you&rsquo;ve donated, attended a workshop, registered your child, joined our newsletter, shared our program with someone else, or simply supported us from the sidelines &mdash; you have helped Almaden Voices grow.",
+        "We truly would not be where we are today without this community, and I&rsquo;m incredibly grateful for every person who has played a part in our journey.",
+        "Once again, thank you for being part of Almaden Voices. I&rsquo;m so excited for everything we have ahead!",
+      ],
+    },
+  ],
 
-  // An optional button. Set to null to leave it out.
-  button: {
-    label: "Register for the workshop",
-    url: "https://almadenvoices.org/register",
-  },
+  // The closing block. Each line is printed on its own row.
+  signoff: [
+    "Warmly,",
+    "<span style=\"color:#111827;font-weight:bold;\">Anjika Bansal</span>",
+    "Founder, Almaden Voices",
+    "<a href=\"https://almadenvoices.org\" style=\"color:#2563EB;text-decoration:underline;\">almadenvoices.org</a>",
+    "<a href=\"mailto:almadenvoices@gmail.com\" style=\"color:#2563EB;text-decoration:underline;\">almadenvoices@gmail.com</a>",
+  ],
 
-  signoff: "Warmly,<br>Anjika Bansal<br>Almaden Voices",
-
-  // Adds a quiet line letting people ask to be taken off the list. Keep this
-  // true on anything that goes to more than a handful of people — it is what
-  // separates a newsletter from spam, both to a reader and to Gmail.
-  showUnsubscribe: true,
+  unsubscribe: "You&rsquo;re receiving this email because you signed up to hear from Almaden Voices. " +
+    "To unsubscribe, please contact <a href=\"mailto:almadenvoices@gmail.com?subject=Unsubscribe\" " +
+    "style=\"color:#6B7280;text-decoration:underline;\">almadenvoices@gmail.com</a>.",
 };
 
-// Renders the newsletter into the standard card.
-function buildNewsletterHtml() {
-  const n = NEWSLETTER;
-  let body = "";
+// ------------------------------------------------------------
+// NEWSLETTER RENDERING
+//
+// You should not need to touch anything below this line to send a newsletter.
+// ------------------------------------------------------------
 
-  if (n.greeting) {
-    body += '<p style="margin:0 0 16px;">' + n.greeting + '</p>';
-  }
+// Its own palette and font stacks, kept separate from the C_* constants used
+// by the other emails: those rely on Playfair Display and DM Sans arriving
+// over the web, and a newsletter has to look right even when they don't.
+const NL_ACCENT   = "#2563EB";  // header bar, headings, buttons, rules
+const NL_ACCENT_L = "#DBEAFE";  // the label text on the blue bar
+const NL_TINT     = "#EFF6FF";  // callout box fill
+const NL_SOFT     = "#F9FAFB";  // donation box fill
+const NL_PAGE     = "#F1F3F6";  // area around the card
+const NL_TEXT     = "#111827";
+const NL_BODY     = "#374151";
+const NL_MUTED    = "#6B7280";
+const NL_LINE     = "#E5E7EB";
+const NL_SANS  = "Helvetica,Arial,sans-serif";
+const NL_SERIF = "Georgia,'Times New Roman',Times,serif";  // available for headings if you want a serif
 
-  (n.paragraphs || []).forEach(function(text) {
-    body += '<p style="margin:0 0 16px;">' + text + '</p>';
+// The logo in the blue bar. It has to be a public web address — an image on
+// your laptop won't reach anyone. Anything in client/public on the site is
+// already public, e.g. https://almadenvoices.org/almaden_voices_logo.png
+const NL_LOGO = "https://almadenvoices.org/almaden_voices_logo.png";
+
+// Body copy and the small print — the only two sizes used for text.
+const NL_P     = "font-family:" + NL_SANS + ";font-size:16px;line-height:26px;color:" + NL_BODY + ";";
+const NL_SMALL = "font-family:" + NL_SANS + ";font-size:14px;line-height:22px;color:" + NL_MUTED + ";";
+const NL_PAD   = "28px";  // left/right padding inside the card
+
+// A horizontal rule. Drawn as a filled table cell rather than <hr>, which
+// Outlook renders with its own colour and margins.
+function nlRule(color, height) {
+  const h = height || 1;
+  return '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;">' +
+    '<tr><td height="' + h + '" style="height:' + h + 'px;line-height:' + h + 'px;font-size:' + h + 'px;' +
+    'background-color:' + color + ';">&nbsp;</td></tr></table>';
+}
+
+function nlParagraph(html, margin) {
+  return '<p style="margin:' + margin + ';' + NL_P + '">' + html + '</p>';
+}
+
+// Uppercase, letter-spaced, accent-coloured, with a thin rule underneath.
+function nlHeading(text) {
+  return '<p style="margin:0 0 10px 0;font-family:' + NL_SANS + ';font-size:15px;line-height:22px;' +
+      'font-weight:bold;letter-spacing:1.6px;text-transform:uppercase;color:' + NL_ACCENT + ';">' + text + '</p>' +
+    nlRule(NL_ACCENT, 1);
+}
+
+// A padded, bordered cell with a link inside — not a <button>, which email
+// clients strip, and not a styled <a>, which Outlook renders without padding.
+function nlButton(button) {
+  const sidePad = button.wide ? "36px" : "24px";
+  return '<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:24px 0 0 0;">' +
+    '<tr><td align="center" bgcolor="' + NL_ACCENT + '" style="background-color:' + NL_ACCENT + ';' +
+      'border:1px solid ' + NL_ACCENT + ';padding:14px ' + sidePad + ';">' +
+      '<a href="' + button.url + '" style="display:inline-block;font-family:' + NL_SANS + ';font-size:16px;' +
+        'line-height:20px;font-weight:bold;color:#FFFFFF;text-decoration:none;">' + button.label + '</a>' +
+    '</td></tr></table>';
+}
+
+function nlImage(image) {
+  return '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;">' +
+    '<tr><td style="padding:24px 0 0 0;">' +
+      '<img src="' + image.src + '" alt="' + image.alt + '" width="544" ' +
+        'style="display:block;width:100%;max-width:544px;height:auto;border:0;outline:none;text-decoration:none;">' +
+    '</td></tr></table>';
+}
+
+// Bullets as table rows, because Outlook indents <ul> unpredictably.
+function nlBullets(items) {
+  let html = '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;">';
+  items.forEach(function(item) {
+    html += '<tr>' +
+      '<td valign="top" width="18" style="width:18px;font-family:' + NL_SANS + ';font-size:16px;line-height:26px;color:' + NL_ACCENT + ';">&bull;</td>' +
+      '<td valign="top" style="' + NL_P + '">' + item + '</td>' +
+      '</tr>';
+  });
+  return html + '</table>';
+}
+
+function nlCallout(callout) {
+  return '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;">' +
+    '<tr><td bgcolor="' + NL_TINT + '" style="background-color:' + NL_TINT + ';border-left:4px solid ' + NL_ACCENT + ';padding:18px 20px;">' +
+      (callout.label
+        ? '<p style="margin:0 0 4px 0;font-family:' + NL_SANS + ';font-size:14px;line-height:20px;font-weight:bold;' +
+          'letter-spacing:1.2px;text-transform:uppercase;color:' + NL_ACCENT + ';">' + callout.label + '</p>'
+        : '') +
+      '<p style="margin:0;font-family:' + NL_SANS + ';font-size:16px;line-height:26px;font-weight:bold;color:' + NL_TEXT + ';">' +
+        callout.text + '</p>' +
+    '</td></tr></table>';
+}
+
+// Everything inside one story, in order. Used for both plain and tinted
+// sections; only the wrapper around it differs.
+function nlSectionInner(section) {
+  let html = nlHeading(section.heading);
+
+  // The last paragraph carries no bottom margin: whatever follows it (a list,
+  // an image, a button) brings its own top spacing, and doubling the two up is
+  // what leaves an awkward gap under the copy.
+  const paragraphs = section.paragraphs || [];
+  const hasBullets = !!(section.bullets && section.bullets.length);
+  paragraphs.forEach(function(text, i) {
+    const top = i === 0 ? "20px" : "0";
+    const bottom = (i === paragraphs.length - 1) ? (hasBullets ? "12px" : "0") : "16px";
+    html += nlParagraph(text, (top === "0" && bottom === "0") ? "0" : (top + " 0 " + bottom + " 0"));
   });
 
-  if (n.bullets && n.bullets.items && n.bullets.items.length) {
-    body += '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" ' +
-      'style="margin:24px 0;background:' + C_SOFT + ';border:1px solid ' + C_LINE + ';border-radius:12px;">' +
-      '<tr><td style="padding:20px 24px;">';
-    if (n.bullets.title) body += sectionTitle(n.bullets.title);
-    body += '<ul style="margin:0;padding-left:20px;color:' + C_BODY + ';font-size:15px;line-height:1.8;">';
-    n.bullets.items.forEach(function(item) {
-      body += '<li style="margin:0 0 6px;">' + item + '</li>';
-    });
-    body += '</ul></td></tr></table>';
+  if (hasBullets) html += nlBullets(section.bullets);
+
+  (section.paragraphsAfterBullets || []).forEach(function(text) {
+    html += nlParagraph(text, "16px 0 0 0");
+  });
+
+  if (section.image && section.image.src) html += nlImage(section.image);
+  if (section.button && section.button.url) html += nlButton(section.button);
+
+  (section.paragraphsAfterButton || []).forEach(function(text) {
+    html += nlParagraph(text, "24px 0 0 0");
+  });
+
+  return html;
+}
+
+// One table row per story, plus its callout on a row of its own.
+function nlSectionRow(section, isFirst, afterTinted) {
+  const padTop = (isFirst || afterTinted) ? "40px" : "36px";
+  let html = "";
+
+  if (section.tinted) {
+    html += '<tr><td style="background-color:#FFFFFF;padding:' + padTop + ' ' + NL_PAD + ' 0 ' + NL_PAD + ';">' +
+      '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;">' +
+        '<tr><td bgcolor="' + NL_SOFT + '" style="background-color:' + NL_SOFT + ';border:1px solid ' + NL_LINE + ';padding:28px 24px;">' +
+          nlSectionInner(section) +
+        '</td></tr>' +
+      '</table>' +
+      '</td></tr>';
+  } else {
+    html += '<tr><td style="background-color:#FFFFFF;padding:' + padTop + ' ' + NL_PAD + ' 0 ' + NL_PAD + ';">' +
+      nlSectionInner(section) +
+      '</td></tr>';
   }
 
-  if (n.button && n.button.url) {
-    // Table-wrapped rather than a styled <a>, because Outlook ignores padding
-    // on a link and the button collapses to plain blue text.
-    body += '<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:8px 0 24px;">' +
-      '<tr><td align="center" style="border-radius:10px;background:' + C_ACCENT + ';">' +
-        '<a href="' + n.button.url + '" ' +
-          'style="display:inline-block;padding:13px 28px;font-family:' + FONT_BODY + ';font-size:15px;' +
-          'font-weight:700;color:#FFFFFF;text-decoration:none;border-radius:10px;">' +
-          n.button.label + '</a>' +
-      '</td></tr></table>';
+  if (section.callout && section.callout.text) {
+    html += '<tr><td style="background-color:#FFFFFF;padding:24px ' + NL_PAD + ' 0 ' + NL_PAD + ';">' +
+      nlCallout(section.callout) +
+      '</td></tr>';
   }
 
-  if (n.signoff) {
-    body += '<p style="margin:24px 0 0;">' + n.signoff + '</p>';
+  return html;
+}
+
+// A grey line between two stories, on its own row so the spacing above and
+// below it stays even.
+function nlDividerRow() {
+  return '<tr><td style="background-color:#FFFFFF;padding:36px ' + NL_PAD + ' 0 ' + NL_PAD + ';">' +
+    nlRule(NL_LINE, 1) +
+    '</td></tr>';
+}
+
+// Builds the whole email: header bar, title block, every section, sign-off,
+// footer. 600px wide, centred, and fluid below that so it stays single-column
+// and full-size on a phone without needing a media query.
+function buildNewsletterHtml() {
+  const n = NEWSLETTER;
+
+  // ---- header bar ----
+  let html = '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" ' +
+      'style="width:100%;margin:0;padding:0;background-color:' + NL_PAGE + ';">' +
+    '<tr><td align="center" style="padding:24px 8px;background-color:' + NL_PAGE + ';">' +
+
+    // Outlook ignores max-width, so it gets a fixed 600px table of its own.
+    '<!--[if mso]><table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0"><tr><td><![endif]-->' +
+    '<table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center" ' +
+      'style="width:100%;max-width:600px;background-color:#FFFFFF;border:1px solid ' + NL_LINE + ';">' +
+
+    '<tr><td bgcolor="' + NL_ACCENT + '" style="background-color:' + NL_ACCENT + ';padding:18px ' + NL_PAD + ';">' +
+      '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;">' +
+        '<tr>' +
+          '<td align="left" valign="middle" style="padding:0 8px 0 0;">' +
+            '<table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr>' +
+              '<td valign="middle" bgcolor="#FFFFFF" style="background-color:#FFFFFF;padding:5px;">' +
+                '<img src="' + NL_LOGO + '" alt="' + ORG_NAME + '" width="48" ' +
+                  'style="display:block;width:48px;max-width:48px;height:auto;border:0;outline:none;text-decoration:none;">' +
+              '</td>' +
+            '</tr></table>' +
+          '</td>' +
+          '<td align="right" valign="middle" style="font-family:' + NL_SANS + ';font-size:14px;line-height:20px;color:' + NL_ACCENT_L + ';">' +
+            n.monthLabel +
+          '</td>' +
+        '</tr>' +
+      '</table>' +
+    '</td></tr>';
+
+  // ---- title block ----
+  html += '<tr><td style="background-color:#FFFFFF;padding:36px ' + NL_PAD + ' 0 ' + NL_PAD + ';">' +
+    nlRule(NL_ACCENT, 2) +
+    '<p style="margin:16px 0 0 0;font-family:' + NL_SANS + ';font-size:14px;line-height:20px;' +
+      'letter-spacing:1.5px;text-transform:uppercase;color:' + NL_MUTED + ';">' + n.issueLine + '</p>';
+
+  (n.greeting || []).forEach(function(text, i) {
+    html += nlParagraph(text, i === 0 ? "24px 0 16px 0" : (i === n.greeting.length - 1 ? "0" : "0 0 16px 0"));
+  });
+  html += '</td></tr>';
+
+  // ---- sections ----
+  const sections = n.sections || [];
+  sections.forEach(function(section, i) {
+    const prev = i > 0 ? sections[i - 1] : null;
+    // No divider straight after a tinted box — it already has its own border.
+    if (i > 0 && !prev.tinted) html += nlDividerRow();
+    html += nlSectionRow(section, i === 0, prev ? !!prev.tinted : false);
+  });
+
+  // ---- sign-off ----
+  if (n.signoff && n.signoff.length) {
+    html += '<tr><td style="background-color:#FFFFFF;padding:32px ' + NL_PAD + ' 40px ' + NL_PAD + ';">' +
+      '<p style="margin:0;' + NL_P + '">' + n.signoff.join("<br>") + '</p>' +
+      '</td></tr>';
   }
 
-  if (n.showUnsubscribe) {
-    body += '<p style="margin:28px 0 0;padding-top:16px;border-top:1px solid ' + C_LINE + ';' +
-      'font-size:12px;line-height:1.6;color:' + C_MUTED + ';">' +
-      'You are receiving this because you registered for an Almaden Voices workshop or asked us to keep you posted. ' +
-      'To stop receiving these, just <a href="mailto:' + ADMIN_EMAIL + '?subject=Unsubscribe" ' +
-      'style="color:' + C_ACCENT + ';">reply and say so</a> and we will take you off the list.' +
-      '</p>';
-  }
+  // ---- footer ----
+  html += '<tr><td style="background-color:#FFFFFF;padding:0 ' + NL_PAD + ' 32px ' + NL_PAD + ';">' +
+    nlRule(NL_LINE, 1) +
+    '<p style="margin:24px 0 6px 0;font-family:' + NL_SANS + ';font-size:14px;line-height:22px;font-weight:bold;' +
+      'letter-spacing:1.2px;text-transform:uppercase;color:' + NL_MUTED + ';">' + ORG_NAME + '</p>' +
+    '<p style="margin:0 0 6px 0;' + NL_SMALL + '">A California 501(c)(3) nonprofit</p>' +
+    '<p style="margin:0 0 14px 0;' + NL_SMALL + '">' +
+      '<a href="https://almadenvoices.org" style="color:' + NL_ACCENT + ';text-decoration:underline;">almadenvoices.org</a>' +
+      '&nbsp;&middot;&nbsp;' +
+      '<a href="mailto:' + ADMIN_EMAIL + '" style="color:' + NL_ACCENT + ';text-decoration:underline;">' + ADMIN_EMAIL + '</a>' +
+    '</p>' +
+    '<p style="margin:0;' + NL_SMALL + '">' + n.unsubscribe + '</p>' +
+    '</td></tr>';
 
-  return emailShell(n.headline, n.subhead, body);
+  html += '</table>' +
+    '<!--[if mso]></td></tr></table><![endif]-->' +
+    '</td></tr></table>';
+
+  return html;
 }
 
 // Every address this edition should go to, lowercased and de-duplicated so a
