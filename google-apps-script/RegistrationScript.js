@@ -663,7 +663,7 @@ const VOLUNTEER_SHEET_PROP = "volunteerSheetId";
 // someone attaches one, and lives in the almadenvoices@gmail.com Drive.
 const VOLUNTEER_RESUME_FOLDER = "Almaden Voices Volunteer Resumes";
 
-const VOLUNTEER_DEADLINE_TEXT = "Applications close September 4 at 9 PM PT.";
+const VOLUNTEER_DEADLINE_TEXT = "Applications close September 7 at 9 PM PT.";
 const VOLUNTEER_NEXT_STEP_TEXT =
   "We read every application ourselves. We'll be in touch the second week of September to let you know either way.";
 
@@ -1972,12 +1972,12 @@ const NEWSLETTER = {
       },
       // Paragraphs printed after the button.
       paragraphsAfterButton: [
-        "Volunteers must be in 8th grade or higher, and applications are currently open until September 4th. If you&rsquo;re interested but aren&rsquo;t able to apply by the deadline, please reach out to me &mdash; I&rsquo;d still love to see if we can find a way for you to get involved!",
+        "Volunteers must be in 8th grade or higher, and applications are currently open until September 7th. If you&rsquo;re interested but aren&rsquo;t able to apply by the deadline, please reach out to me &mdash; I&rsquo;d still love to see if we can find a way for you to get involved!",
       ],
       // The tinted box with the blue left border.
       callout: {
         label: "Deadline",
-        text: "Applications close Friday, September 4.",
+        text: "Applications close Monday, September 7.",
       },
     },
     {
@@ -2209,16 +2209,26 @@ function buildNewsletterHtml() {
 
     '<tr><td bgcolor="' + NL_ACCENT + '" style="background-color:' + NL_ACCENT + ';padding:28px ' + NL_PAD + ';">' +
       '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;">' +
+        // Logo and organisation name on their own row, the newsletter label on
+        // the row beneath: a 375px phone cannot fit the name and the label
+        // side by side, and squeezing them wraps the label onto four lines.
         '<tr>' +
-          '<td align="left" valign="middle" style="padding:0 8px 0 0;">' +
+          '<td align="left" valign="middle">' +
             '<table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr>' +
               '<td valign="middle" bgcolor="#FFFFFF" style="background-color:#FFFFFF;padding:5px;">' +
-                '<img src="' + NL_LOGO + '" alt="' + ORG_NAME + '" width="64" ' +
-                  'style="display:block;width:64px;max-width:64px;height:auto;border:0;outline:none;text-decoration:none;">' +
+                '<img src="' + NL_LOGO + '" alt="' + ORG_NAME + '" width="60" ' +
+                  'style="display:block;width:60px;max-width:60px;height:auto;border:0;outline:none;text-decoration:none;">' +
+              '</td>' +
+              '<td valign="middle" style="padding:0 0 0 14px;font-family:' + NL_SERIF + ';font-size:20px;' +
+                'line-height:26px;font-weight:bold;letter-spacing:1px;color:#FFFFFF;">' +
+                ORG_NAME.toUpperCase() +
               '</td>' +
             '</tr></table>' +
           '</td>' +
-          '<td align="right" valign="middle" style="font-family:' + NL_SANS + ';font-size:14px;line-height:20px;color:' + NL_ACCENT_L + ';">' +
+        '</tr>' +
+        '<tr>' +
+          '<td align="right" valign="top" style="padding:14px 0 0 0;font-family:' + NL_SANS + ';' +
+            'font-size:14px;line-height:20px;color:' + NL_ACCENT_L + ';">' +
             n.monthLabel +
           '</td>' +
         '</tr>' +
