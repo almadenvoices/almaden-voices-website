@@ -214,8 +214,9 @@ export default function CoachingSlots() {
     // PayPal buttons have been unlocked yet.
     const [errors, setErrors] = useState({});
     const [showPayment, setShowPayment] = useState(false);
-    // Photo/video permission is opt-in and required: "" until the parent picks.
-    const [photoConsent, setPhotoConsent] = useState("");
+    // Photo/video permission is a single opt-in box; unchecked means no, so it
+    // is never a blocking field.
+    const [photoConsent, setPhotoConsent] = useState(false);
 
     const [payError, setPayError] = useState("");
     // Shown above the slot grid when a slot is taken out from under someone.
@@ -280,9 +281,8 @@ export default function CoachingSlots() {
         else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) missing.email = "Please enter a valid email address.";
         if (!phone.trim()) missing.phone = "Required.";
         if (!notes.trim()) missing.notes = "Required.";
-        if (!photoConsent) missing.photoConsent = "Please choose one.";
         return missing;
-    }, [parentName, studentName, studentAge, email, phone, notes, photoConsent]);
+    }, [parentName, studentName, studentAge, email, phone, notes]);
 
     const detailsComplete = Object.keys(missingFields).length === 0;
     const readyToPay = Boolean(selectedSlot) && !selectedSlot?.booked && detailsComplete && showPayment;
@@ -347,7 +347,7 @@ export default function CoachingSlots() {
             details: {
                 parentName, email, phone, studentName, studentAge, schoolName, zipCode,
                 notes, comments,
-                photoConsent: photoConsent === "yes",
+                photoConsent: photoConsent,
                 pressConsent: false,
             },
         };
@@ -642,40 +642,25 @@ export default function CoachingSlots() {
                         <textarea id="coach-comments" rows="3" className={`${c.input} ${c.textarea}`} value={comments} onChange={e => setComments(e.target.value)} placeholder="Anything else you'd like us to know…" />
                     </div>
 
-                    {/* Same opt-in photo permission as the registration form. */}
+                    {/* Same opt-in photo permission as the registration form:
+                        one box, and leaving it unchecked means no. */}
                     <fieldset className={c.consentBlock}>
                         <legend className={c.consentTitle}>
-                            Photo and video permission <span className={c.req}>*</span>
+                            Photo and video permission
                         </legend>
                         <p className={c.consentIntro}>
                             We sometimes photograph or record students during sessions and showcases.
-                            Please choose one:
+                            Leave this unchecked if you would rather we did not.
                         </p>
                         <label className={c.check}>
                             <input
-                                type="radio"
+                                type="checkbox"
                                 name="coachPhotoConsent"
-                                value="yes"
-                                checked={photoConsent === "yes"}
-                                onChange={() => setPhotoConsent("yes")}
+                                checked={photoConsent}
+                                onChange={e => setPhotoConsent(e.target.checked)}
                             />
-                            <span>
-                                Yes, I give permission for photos or video of my child to appear on the
-                                Almaden Voices website, program materials, and social media, identified
-                                by first name only.
-                            </span>
+                            <span>I give permission for my child to be photographed or recorded.</span>
                         </label>
-                        <label className={c.check}>
-                            <input
-                                type="radio"
-                                name="coachPhotoConsent"
-                                value="no"
-                                checked={photoConsent === "no"}
-                                onChange={() => setPhotoConsent("no")}
-                            />
-                            <span>No, please do not photograph or record my child.</span>
-                        </label>
-                        {errors.photoConsent && <p className={c.fieldErrorText}>{errors.photoConsent}</p>}
                     </fieldset>
 
                     <div className={c.payArea} id="coaching-pay-area">

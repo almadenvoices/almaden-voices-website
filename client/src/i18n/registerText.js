@@ -166,16 +166,12 @@ export const T = {
     // ---- Consent + submit ----
     photoTitle: { en: "Photo and video permission", es: "Permiso de fotos y video" },
     photoIntro: {
-        en: "We sometimes photograph or record students during sessions and showcases. Please choose one:",
-        es: "A veces tomamos fotos o grabamos a los estudiantes durante las sesiones y presentaciones. Por favor elija una opción:",
+        en: "We sometimes photograph or record students during sessions and showcases. Leave this unchecked if you would rather we did not.",
+        es: "A veces tomamos fotos o grabamos a los estudiantes durante las sesiones y presentaciones. Deje esta casilla sin marcar si prefiere que no lo hagamos.",
     },
-    photoYes: {
-        en: "Yes, I give permission for photos or video of my child to appear on the Almaden Voices website, program materials, and social media, identified by first name only.",
-        es: "Sí, doy permiso para que aparezcan fotos o videos de mi hijo/a en el sitio web, los materiales del programa y las redes sociales de Almaden Voices, identificado/a solo por su nombre de pila.",
-    },
-    photoNo: {
-        en: "No, please do not photograph or record my child.",
-        es: "No, por favor no fotografíen ni graben a mi hijo/a.",
+    photoConsentLabel: {
+        en: "I give permission for my child to be photographed or recorded.",
+        es: "Doy permiso para que mi hijo/a sea fotografiado/a o grabado/a.",
     },
     futureContact: {
         en: "I would like to be contacted about future Almaden Voices sessions and events, and to receive the Almaden Voices newsletter.",
@@ -191,10 +187,6 @@ export const T = {
     registerCount: { en: "Register {n} Children", es: "Inscribir a {n} niños" },
 
     // ---- Errors ----
-    errPhotoConsent: {
-        en: "Please choose a photo and video permission option to continue.",
-        es: "Por favor elija una opción de permiso de fotos y video para continuar.",
-    },
     errAgree: {
         en: "Please agree to the Privacy Policy to continue.",
         es: "Por favor acepte la Política de Privacidad para continuar.",

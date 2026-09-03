@@ -96,8 +96,9 @@ const emptyStudent = () => ({ firstName: "", lastName: "", age: "" });
 
 export default function RegisterPage() {
     const [agreed, setAgreed] = useState(false);
-    // Photo/video permission is opt-in and required: "" until the parent picks.
-    const [photoConsent, setPhotoConsent] = useState("");
+    // Photo/video permission is a single opt-in box. Leaving it unchecked is a
+    // valid answer meaning "no", so it never blocks the form.
+    const [photoConsent, setPhotoConsent] = useState(false);
     const [futureContact, setFutureContact] = useState(false);
     const [showToast, setShowToast] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -214,11 +215,6 @@ export default function RegisterPage() {
             return;
         }
 
-        if (!photoConsent) {
-            setError(t(T.errPhotoConsent, lang));
-            return;
-        }
-
         if (!agreed) {
             setError(t(T.errAgree, lang));
             return;
@@ -245,7 +241,7 @@ export default function RegisterPage() {
             zipCode: formData.get("zipCode"),
             additionalInfo: formData.get("additionalInfo"),
             privacyAgreed: agreed,
-            photoConsent: photoConsent === "yes",
+            photoConsent: photoConsent,
             futureContact: futureContact,
         };
 
@@ -267,7 +263,7 @@ export default function RegisterPage() {
                 const donateAmt = donationAmount;
                 e.target.reset();
                 setAgreed(false);
-                setPhotoConsent("");
+                setPhotoConsent(false);
                 setFutureContact(false);
                 setStudents([emptyStudent()]);
                 setDonationAmount(5);
@@ -778,38 +774,26 @@ export default function RegisterPage() {
                                 </div>}
 
                                 <div className={s.actions}>
-                                    {/* Radios (required): photo/video permission, opt-in */}
+                                    {/* Checkbox (optional): photo/video permission.
+                                        Unchecked is a real answer — it means no — so
+                                        this never blocks submission. */}
                                     <fieldset className={s.consentBlock}>
                                         <legend className={s.consentTitle}>
-                                            <Bi entry={T.photoTitle} lang={lang} /> <span className={s.req}>*</span>
+                                            <Bi entry={T.photoTitle} lang={lang} />
                                         </legend>
                                         <p className={s.consentIntro}>
                                             <Bi entry={T.photoIntro} lang={lang} block />
                                         </p>
                                         <label className={s.check}>
                                             <input
-                                                type="radio"
+                                                type="checkbox"
                                                 name="photoConsent"
-                                                value="yes"
-                                                checked={photoConsent === "yes"}
-                                                onChange={() => setPhotoConsent("yes")}
+                                                checked={photoConsent}
+                                                onChange={(e) => setPhotoConsent(e.target.checked)}
                                                 disabled={isSubmitting}
                                             />
                                             <span>
-                                                <Bi entry={T.photoYes} lang={lang} block />
-                                            </span>
-                                        </label>
-                                        <label className={s.check}>
-                                            <input
-                                                type="radio"
-                                                name="photoConsent"
-                                                value="no"
-                                                checked={photoConsent === "no"}
-                                                onChange={() => setPhotoConsent("no")}
-                                                disabled={isSubmitting}
-                                            />
-                                            <span>
-                                                <Bi entry={T.photoNo} lang={lang} block />
+                                                <Bi entry={T.photoConsentLabel} lang={lang} block />
                                             </span>
                                         </label>
                                     </fieldset>
@@ -840,7 +824,7 @@ export default function RegisterPage() {
                                         </span>
                                     </label>
 
-                                    <button className={s.btn} disabled={!agreed || !photoConsent || isSubmitting || hasNameConflict}>
+                                    <button className={s.btn} disabled={!agreed || isSubmitting || hasNameConflict}>
                                         <span>{isSubmitting
                                             ? t(T.submitting, lang)
                                             : students.length > 1
