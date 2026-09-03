@@ -50,7 +50,7 @@ const CoursesPage = () => {
     const upcomingSessions = [
         {
             id: "intro-workshop-sep-2026",
-            title: "Free Public Speaking Workshop",
+            title: "Free Public Speaking Workshop (intended for residents of the Hoffman Via Monte community)",
             date: "September 11, 2026",
             time: "6–7 PM",
             location: "To be announced",
@@ -252,7 +252,7 @@ const CoursesPage = () => {
                             Free Public Speaking Workshop
                         </h2>
                         <p style={{ textAlign: 'center', color: '#6B7280', fontSize: '1rem', marginBottom: '0' }}>
-                            A free introduction to public speaking for kids. Register below and we&apos;ll email you all the details before the workshop.
+                            A free introduction to public speaking for kids, intended for residents of the Hoffman Via Monte community. Register below and we&apos;ll email you all the details before the workshop.
                         </p>
                     </div>
 
