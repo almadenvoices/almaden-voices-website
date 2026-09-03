@@ -55,8 +55,11 @@ const SHOW_COACHING = true;
 const upcomingSessions = [
     {
         id: "intro-workshop-sep-2026",
-        title: "Free Public Speaking Workshop",
-        titleEs: "Taller gratuito de oratoria",
+        // The yellow chooser button strips a leading "Free ", so this reads
+        // there as "Public Speaking Workshop (intended for residents of the
+        // Hoffman Via Monte community)".
+        title: "Free Public Speaking Workshop (intended for residents of the Hoffman Via Monte community)",
+        titleEs: "Taller gratuito de oratoria (dirigido a los residentes de la comunidad Hoffman Via Monte)",
         date: "September 11, 2026",
         dateEs: "11 de septiembre de 2026",
         time: "6–7 PM",
