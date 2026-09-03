@@ -235,13 +235,13 @@ export const MIN_GRADE = 8;
 export const GRADE_REQUIREMENT_LINE =
     "Volunteers must be in 8th grade or higher.";
 
-export const DEADLINE_LINE = "Applications close Friday, September 4 at 9:00 PM PT";
+export const DEADLINE_LINE = "Applications close Monday, September 7 at 9:00 PM PT";
 export const COMMITMENT_LINE = "About 2–3 hours a week, for at least 3 months";
 
 export const CLOSED_MESSAGE = {
     title: "Applications are closed",
-    body: "Thanks to everyone who applied. Applications for our fall volunteer roles closed on September 4. We're reading through them now and will be in touch with applicants directly. If you'd still like to help, email us at almadenvoices@gmail.com and we'll keep you in mind for the next round.",
+    body: "Thanks to everyone who applied. Applications for our fall volunteer roles closed on September 7. We're reading through them now and will be in touch with applicants directly. If you'd still like to help, email us at almadenvoices@gmail.com and we'll keep you in mind for the next round.",
 };
 
 export const CONFIRMATION_MESSAGE =
-    "Thanks for applying! Applications close September 4 at 9 PM PT. We'll be in touch the second week of September.";
+    "Thanks for applying! Applications close September 7 at 9 PM PT. We'll be in touch the second week of September.";

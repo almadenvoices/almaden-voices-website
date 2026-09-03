@@ -692,7 +692,7 @@ app.post("/api/volunteer", async (req, res) => {
 
         const firstName = String(fullName).trim().split(/\s+/)[0] || "there";
         const steps = [
-            ["1. We review your application", "Applications close September 4 at 9 PM PT."],
+            ["1. We review your application", "Applications close September 7 at 9 PM PT."],
             ["2. We get back to you", "We read every application ourselves. We&apos;ll be in touch the second week of September to let you know either way."],
             ["3. Getting started", "If it&apos;s a fit, we&apos;ll walk you through onboarding and pair you with someone on the team."],
         ].map(([title, body], i) => `
