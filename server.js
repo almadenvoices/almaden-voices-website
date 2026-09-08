@@ -258,6 +258,66 @@ async function sendCoachingWaitlistToSpreadsheet(entry) {
     }
 }
 
+// Newsletter sign-ups go to the "Newsletter Subscribers" tab of the same
+// spreadsheet. This is the durable copy of the mailing list: subscribers.csv
+// sits on the container's own disk, which Cloud Run wipes on every deploy.
+//
+// Every failure is logged and swallowed. Somebody joining a mailing list
+// should never see an error because a Google service was slow, and the
+// notification email to almadenvoices@gmail.com is sent either way.
+async function sendNewsletterSubscriberToSpreadsheet(entry) {
+    try {
+        const response = await fetch(APPS_SCRIPT_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ formType: "newsletter", ...entry }),
+            signal: AbortSignal.timeout(15000)
+        });
+        const text = await response.text();
+        let result = null;
+        try { result = JSON.parse(text); } catch (parseErr) { /* an HTML error page */ }
+        if (response.ok && result && result.success) {
+            console.log("Added newsletter subscriber to spreadsheet —", entry.email,
+                result.duplicate ? "(already on the list)" : "");
+        } else {
+            console.error("⚠️ Newsletter subscriber not added to spreadsheet —",
+                entry.email, (result && result.error) || text.slice(0, 200));
+        }
+    } catch (err) {
+        console.error("⚠️ Newsletter subscriber not added to spreadsheet —",
+            entry.email, err.message);
+    }
+}
+
+// Marks somebody Unsubscribed on that tab. Their row stays put, so there is
+// always a record of who asked to come off the list and when.
+async function sendNewsletterUnsubscribeToSpreadsheet(email) {
+    try {
+        const response = await fetch(APPS_SCRIPT_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                formType: "newsletter-unsubscribe",
+                email,
+                timestamp: new Date().toISOString()
+            }),
+            signal: AbortSignal.timeout(15000)
+        });
+        const text = await response.text();
+        let result = null;
+        try { result = JSON.parse(text); } catch (parseErr) { /* an HTML error page */ }
+        if (response.ok && result && result.success) {
+            console.log("Marked newsletter unsubscribe on spreadsheet —", email);
+        } else {
+            console.error("⚠️ Newsletter unsubscribe not recorded on spreadsheet —",
+                email, (result && result.error) || text.slice(0, 200));
+        }
+    } catch (err) {
+        console.error("⚠️ Newsletter unsubscribe not recorded on spreadsheet —",
+            email, err.message);
+    }
+}
+
 // Slot ids that already have a paid booking recorded.
 function bookedCoachingSlotIds() {
     try {
@@ -779,6 +839,21 @@ app.post("/api/subscribe", async (req, res) => {
         const subscriberZip = (zipCode || "").toString().trim().replace(/,/g, " ");
         const subscriberInterest = (interest || "Newsletter").toString().trim().replace(/,/g, " ");
 
+        // Everything the spreadsheet tab needs. The tab is the durable list —
+        // subscribers.csv below sits on the container's own disk, which Cloud
+        // Run wipes on every deploy.
+        const spreadsheetEntry = {
+            email: normalizedEmail,
+            name: subscriberName,
+            phone: subscriberPhone,
+            childName: subscriberChildName,
+            childGrade: subscriberChildGrade,
+            schoolName: subscriberSchool,
+            zipCode: subscriberZip,
+            interest: subscriberInterest,
+            timestamp: new Date().toISOString()
+        };
+
         // Path to subscribers file
         const subscribersFile = path.join(__dirname, 'subscribers.csv');
 
@@ -795,6 +870,10 @@ app.post("/api/subscribe", async (req, res) => {
             });
 
             if (emailExists) {
+                // Still tell the spreadsheet. This container's copy of the CSV
+                // may be the only place they exist — the script keeps one row
+                // per person, so a repeat sign-up can't duplicate anyone.
+                sendNewsletterSubscriberToSpreadsheet(spreadsheetEntry);
                 return res.json({
                     success: true,
                     message: "You're already subscribed to our newsletter!"
@@ -809,6 +888,11 @@ app.post("/api/subscribe", async (req, res) => {
         const newSubscriber = `${normalizedEmail},${subscriberName},${subscriberPhone},${subscriberChildName},${subscriberChildGrade},${subscriberInterest},${timestamp},${subscriberSchool},${subscriberZip}\n`;
 
         fs.appendFileSync(subscribersFile, newSubscriber);
+
+        // Add them to the Newsletter Subscribers tab. Deliberately not awaited:
+        // the sign-up is already recorded, and a slow Apps Script must not keep
+        // somebody staring at a spinner.
+        sendNewsletterSubscriberToSpreadsheet(spreadsheetEntry);
 
         // Send notification email to admin
         if (emailTransporter) {
@@ -1203,6 +1287,12 @@ app.get("/unsubscribe", async (req, res) => {
                 </html>
             `);
         }
+
+        // Mark them Unsubscribed on the spreadsheet first. The token has been
+        // verified by this point, and the tab is the durable list — the CSV
+        // below may have been wiped by a deploy, in which case it is the only
+        // place the request would otherwise be recorded.
+        sendNewsletterUnsubscribeToSpreadsheet(String(email).toLowerCase().trim());
 
         // Path to subscribers file
         const subscribersFile = path.join(__dirname, 'subscribers.csv');

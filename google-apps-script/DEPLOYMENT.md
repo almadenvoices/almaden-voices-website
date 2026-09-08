@@ -193,6 +193,52 @@ the sheet, tagged with its PayPal order id.
 
 ---
 
+## Newsletter Subscribers
+
+Everyone who joins the mailing list from the website — the sign-up box in the
+footer, and the workshop interest form — lands on a tab called **Newsletter
+Subscribers** in the same registrations spreadsheet. The tab and its headers
+are created automatically the first time somebody signs up.
+
+Like coaching bookings, these rows are posted by the **website's own server**,
+not the browser, right after it emails you the "New Newsletter Subscriber"
+notification. This tab is the list that lasts: the server also keeps a
+`subscribers.csv`, but that file sits on a disk Google wipes every time the
+website is deployed.
+
+| Column | Description |
+|--------|-------------|
+| Timestamp | When they first joined |
+| Email | Their address, lower-cased |
+| Name, Phone | If the form they used asked for them |
+| Child Name, Child Grade | From the workshop interest form only |
+| School Name, Home ZIP | As given on the form |
+| Signed Up For | "Newsletter" from the footer box, or the workshop they were interested in |
+| Status | Subscribed, or Unsubscribed if they used the unsubscribe link |
+| Last Signed Up | Refreshed when somebody signs up again |
+| Unsubscribed On | When they came off the list |
+| Notes | Empty, for you |
+
+One row per person. Signing up twice keeps the original row and refreshes
+"Last Signed Up" instead of adding a duplicate — and it puts anyone who had
+unsubscribed back on the list, since signing up again is them asking to be.
+Unsubscribing marks the row rather than deleting it, so you can always see who
+asked to come off and when.
+
+**Sending the newsletter to them:** `sendNewsletterToAll()` now mails everyone
+on this tab automatically, on top of the addresses in `NEWSLETTER_TO`, and
+always skips rows marked Unsubscribed. To turn that off, set
+`NEWSLETTER_INCLUDE_SUBSCRIBERS = false` near the top of the newsletter
+section. `sendTestNewsletter()` reports the real total before you send.
+
+**One-time, after you first paste this script:** choose
+`backfillNewsletterSubscribersFromList` from the function dropdown in the
+editor and press Run. It copies the addresses already in `NEWSLETTER_TO` onto
+the tab so it starts out complete. It is safe to run more than once — anyone
+already there is skipped.
+
+---
+
 ## Updating the Script Later
 
 If you need to update the script after deployment:
