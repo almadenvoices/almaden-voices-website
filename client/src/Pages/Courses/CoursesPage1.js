@@ -63,6 +63,22 @@ const CoursesPage = () => {
             online: false,
             cover: "/images/teaching-beginner.JPG",
         },
+        {
+            id: "nj-intro-workshop-sep-2026",
+            title: "Free Introductory Public Speaking Workshop (New Jersey)",
+            date: "September 19, 2026",
+            // September is daylight time in New Jersey, so this is ET rather
+            // than the EST people usually say.
+            time: "5:30–7:30 PM ET",
+            location: "New Jersey — venue to be announced",
+            ageGroup: "Ages 5–14",
+            capacity: null,
+            enrolled: 0,
+            description: "A free two-hour introduction to public speaking for kids: speaking clearly, standing with confidence, and settling the nerves that come with presenting to a group. Every child gets time on their feet, and no experience is needed.",
+            status: "Open",
+            online: false,
+            cover: "/images/teaching-glasses.jpg",
+        },
     ];
 
     const sessions = upcomingSessions.map(ses => ({
@@ -249,10 +265,10 @@ const CoursesPage = () => {
                             Now Enrolling
                         </p>
                         <h2 style={{ fontSize: 'clamp(1.9rem, 3.6vw, 2.5rem)', fontWeight: 800, color: '#111827', textAlign: 'center', letterSpacing: '-0.02em', lineHeight: 1.15, margin: '0 0 16px' }}>
-                            Free Public Speaking Workshop
+                            {sessions.length > 1 ? "Free Public Speaking Workshops" : "Free Public Speaking Workshop"}
                         </h2>
                         <p style={{ textAlign: 'center', color: '#6B7280', fontSize: '1rem', marginBottom: '0' }}>
-                            A free introduction to public speaking for kids, intended for residents of the Hoffman Via Monte community. Register below and we&apos;ll email you all the details before the workshop.
+                            Free introductions to public speaking for kids. Register below and we&apos;ll email you all the details before the workshop.
                         </p>
                     </div>
 

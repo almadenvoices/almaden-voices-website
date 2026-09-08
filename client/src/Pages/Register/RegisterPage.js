@@ -80,6 +80,27 @@ const upcomingSessions = [
         // on a session that should still show it.
         askDonation: false,
     },
+    {
+        id: "nj-intro-workshop-sep-2026",
+        title: "Free Introductory Public Speaking Workshop (New Jersey)",
+        titleEs: "Taller introductorio gratuito de oratoria (Nueva Jersey)",
+        date: "September 19, 2026",
+        dateEs: "19 de septiembre de 2026",
+        // September is daylight time in New Jersey, so this is ET rather than
+        // the EST people usually say.
+        time: "5:30–7:30 PM ET",
+        timeEs: "5:30–7:30 PM ET",
+        location: "New Jersey — venue to be announced",
+        locationEs: "Nueva Jersey — lugar por confirmar",
+        grades: "Ages 5–14",
+        gradesEs: "Edades 5 a 14",
+        capacity: null,
+        enrolled: 0,
+        description: "A free two-hour introduction to public speaking for kids. We cover the fundamentals — speaking clearly, standing with confidence, and settling the nerves that come with presenting to a group — and every child gets time on their feet. No experience needed. Runs Saturday, September 19 from 5:30–7:30 PM ET; we'll email you the venue as soon as it's confirmed.",
+        descriptionEs: "Una introducción gratuita de dos horas a la oratoria para niños. Cubrimos los fundamentos: hablar con claridad, mantener una postura segura y calmar los nervios de presentar ante un grupo, y cada niño tiene tiempo para practicar de pie. No se necesita experiencia. Se realiza el sábado 19 de septiembre de 5:30 a 7:30 PM ET; le enviaremos el lugar por correo en cuanto esté confirmado.",
+        status: "Open",
+        online: false,
+    },
 ];
 
 // Wraps a session field and its Spanish twin into the {en, es} shape <Bi> wants.
