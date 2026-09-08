@@ -31,7 +31,7 @@ const BCC_EMAIL = ADMIN_EMAIL;
 // Bump this whenever this file changes, then check it shows up at the web app
 // URL after redeploying. If the URL still reports the old version, the new
 // code is pasted but not deployed.
-const SCRIPT_VERSION = "2026-09-02";
+const SCRIPT_VERSION = "2026-09-08";
 
 // Desired column order for the Registrations sheet. New columns are appended
 // automatically to existing sheets, so this is safe to extend over time.
@@ -131,6 +131,31 @@ const COACH_HEADERS = [
   "Scheduled?"
 ];
 
+// Desired column order for the "Newsletter Subscribers" tab — everyone who
+// joined the mailing list from the website (the footer sign-up box and the
+// workshop interest form). Same rules as the lists above: columns are matched
+// by name, so new ones are appended rather than shifting existing data.
+//
+// One row per person. Somebody who signs up twice keeps their original row and
+// has "Last Signed Up" refreshed instead of getting a duplicate. Unsubscribing
+// through the link in a newsletter flips "Status" to Unsubscribed rather than
+// deleting the row, so there is always a record of who asked to be removed.
+const NEWSLETTER_HEADERS = [
+  "Timestamp",
+  "Email",
+  "Name",
+  "Phone",
+  "Child Name",
+  "Child Grade",
+  "School Name",
+  "Home ZIP",
+  "Signed Up For",
+  "Status",
+  "Last Signed Up",
+  "Unsubscribed On",
+  "Notes"
+];
+
 // ============================================================
 // WORKSHOPS — keyed by the session "id" used on the website.
 // Any registration whose sessionType matches a key here gets the detailed
@@ -224,6 +249,17 @@ function doPost(e) {
       return handleCoachingWaitlist(data);
     }
 
+    // Newsletter sign-ups from the footer box and the workshop interest form,
+    // forwarded by the website's server after it emails the notification.
+    if (data.formType === "newsletter") {
+      return handleNewsletterSubscriber(data);
+    }
+
+    // Somebody using the unsubscribe link in a newsletter.
+    if (data.formType === "newsletter-unsubscribe") {
+      return handleNewsletterUnsubscribe(data);
+    }
+
     const ss = SpreadsheetApp.getActiveSpreadsheet();
     const sheet = getRegistrationsSheet(ss);
 
@@ -310,6 +346,13 @@ function getCoachingWaitlistSheet(ss) {
 // spreadsheet, beside the workshop registrations.
 function getCoachingSheet(ss) {
   const sheet = getSheetWithHeaders(ss, "Coaching Sessions", COACH_HEADERS);
+  sheet.setFrozenRows(1);
+  return sheet;
+}
+
+// Newsletter subscribers get their own tab in the registrations spreadsheet.
+function getNewsletterSheet(ss) {
+  const sheet = getSheetWithHeaders(ss, "Newsletter Subscribers", NEWSLETTER_HEADERS);
   sheet.setFrozenRows(1);
   return sheet;
 }
@@ -766,6 +809,108 @@ function handleCoachingWaitlist(data) {
       "Contacted?": ""
     });
 
+    return jsonOut({ success: true });
+  } catch (err) {
+    return jsonOut({ success: false, error: err.message });
+  }
+}
+
+// ============================================================
+// NEWSLETTER SUBSCRIBERS
+//
+// Everyone who joins the mailing list from the website lands on the
+// "Newsletter Subscribers" tab of the registrations spreadsheet. The tab and
+// its headers are created automatically the first time somebody signs up.
+//
+// The rows are posted by the website's own server (server.js), not the
+// browser, right after it sends you the "New Newsletter Subscriber" email.
+// That tab is the durable list -- the server's own subscribers.csv lives on a
+// disk that is wiped every time the site is deployed.
+//
+// To mail everyone on the tab, copy the Email column into NEWSLETTER_TO in the
+// newsletter section further down this file.
+// ============================================================
+
+// Find the row number (1-based, as the sheet counts them) for an email
+// address, or 0 when it isn't on the tab yet. Case and stray spaces are
+// ignored, since people type their address differently each time.
+function findNewsletterRow(sheet, email) {
+  const wanted = String(email || "").trim().toLowerCase();
+  if (!wanted) return 0;
+
+  const lastRow = sheet.getLastRow();
+  if (lastRow < 2) return 0;
+
+  const cols = headerIndexMap(sheet);
+  const emailCol = cols["Email"];
+  if (emailCol === undefined) return 0;
+
+  const values = sheet.getRange(2, emailCol + 1, lastRow - 1, 1).getValues();
+  for (let i = 0; i < values.length; i++) {
+    if (String(values[i][0] || "").trim().toLowerCase() === wanted) return i + 2;
+  }
+  return 0;
+}
+
+// Write one value into a named column of an existing row, quietly doing
+// nothing if that column isn't on the sheet.
+function setNewsletterCell(sheet, rowNumber, header, value) {
+  const cols = headerIndexMap(sheet);
+  if (cols[header] === undefined) return;
+  sheet.getRange(rowNumber, cols[header] + 1).setValue(value);
+}
+
+function handleNewsletterSubscriber(data) {
+  try {
+    const sheet = getNewsletterSheet(SpreadsheetApp.getActiveSpreadsheet());
+    const email = String(data.email || "").trim().toLowerCase();
+    if (!email) return jsonOut({ success: false, error: "No email address" });
+
+    const timestamp = data.timestamp ? new Date(data.timestamp) : new Date();
+    const existingRow = findNewsletterRow(sheet, email);
+
+    // Already on the list. Keep the original row -- and the date they first
+    // joined -- but note that they signed up again, and put anyone who had
+    // unsubscribed back on the list, since signing up again is them asking.
+    if (existingRow) {
+      setNewsletterCell(sheet, existingRow, "Last Signed Up", timestamp);
+      setNewsletterCell(sheet, existingRow, "Status", "Subscribed");
+      setNewsletterCell(sheet, existingRow, "Unsubscribed On", "");
+      return jsonOut({ success: true, duplicate: true });
+    }
+
+    appendMappedRow(sheet, {
+      "Timestamp": timestamp,
+      "Email": email,
+      "Name": data.name || "",
+      "Phone": data.phone || "",
+      "Child Name": data.childName || "",
+      "Child Grade": data.childGrade || "",
+      "School Name": data.schoolName || "",
+      "Home ZIP": data.zipCode || "",
+      "Signed Up For": data.interest || "Newsletter",
+      "Status": "Subscribed",
+      "Last Signed Up": timestamp,
+      "Unsubscribed On": "",
+      "Notes": ""
+    });
+
+    return jsonOut({ success: true });
+  } catch (err) {
+    return jsonOut({ success: false, error: err.message });
+  }
+}
+
+// The unsubscribe link marks the row rather than deleting it, so you can still
+// see who asked to be taken off and when.
+function handleNewsletterUnsubscribe(data) {
+  try {
+    const sheet = getNewsletterSheet(SpreadsheetApp.getActiveSpreadsheet());
+    const row = findNewsletterRow(sheet, data.email);
+    if (!row) return jsonOut({ success: true, notFound: true });
+
+    setNewsletterCell(sheet, row, "Status", "Unsubscribed");
+    setNewsletterCell(sheet, row, "Unsubscribed On", data.timestamp ? new Date(data.timestamp) : new Date());
     return jsonOut({ success: true });
   } catch (err) {
     return jsonOut({ success: false, error: err.message });
@@ -2014,6 +2159,12 @@ const NEWSLETTER_TO = [
 // false to mail only the addresses listed above.
 const NEWSLETTER_INCLUDE_REGISTRANTS = false;
 
+// Also send to everyone on the "Newsletter Subscribers" tab -- the people who
+// joined the mailing list from the website. Rows marked Unsubscribed are
+// always left out. Leave this true so new sign-ups get the newsletter without
+// you having to copy their address into the list above.
+const NEWSLETTER_INCLUDE_SUBSCRIBERS = true;
+
 // ---- The newsletter itself ----
 //
 // In any of the text below you can use <strong>bold</strong>, <em>italics</em>
@@ -2389,6 +2540,25 @@ function newsletterRecipients() {
 
   NEWSLETTER_TO.forEach(add);
 
+  // Everyone who signed up on the website, minus anyone who has unsubscribed.
+  if (NEWSLETTER_INCLUDE_SUBSCRIBERS) {
+    const subs = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Newsletter Subscribers");
+    if (subs && subs.getLastRow() > 1) {
+      const idx = headerIndexMap(subs);
+      const emailCol = idx["Email"];
+      const statusCol = idx["Status"];
+      if (emailCol !== undefined) {
+        subs.getRange(2, 1, subs.getLastRow() - 1, subs.getLastColumn())
+          .getValues()
+          .forEach(function(row) {
+            const status = statusCol === undefined ? "" : String(row[statusCol] || "").trim().toLowerCase();
+            if (status === "unsubscribed") return;
+            add(row[emailCol]);
+          });
+      }
+    }
+  }
+
   if (NEWSLETTER_INCLUDE_REGISTRANTS) {
     const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Registrations");
     if (sheet && sheet.getLastRow() > 1) {
@@ -2403,6 +2573,40 @@ function newsletterRecipients() {
   }
 
   return out;
+}
+
+// ONE-TIME: copies every address in NEWSLETTER_TO above onto the
+// "Newsletter Subscribers" tab, so the tab starts out holding the list you
+// already had. Choose it from the function dropdown in the editor and press
+// Run. Safe to run more than once -- anyone already on the tab is skipped, and
+// nobody's Status is changed.
+function backfillNewsletterSubscribersFromList() {
+  const sheet = getNewsletterSheet(SpreadsheetApp.getActiveSpreadsheet());
+  const now = new Date();
+  let added = 0, skipped = 0;
+
+  NEWSLETTER_TO.forEach(function(address) {
+    const email = String(address || "").trim().toLowerCase();
+    if (!email || email.indexOf("@") < 1) return;
+
+    if (findNewsletterRow(sheet, email)) {
+      skipped++;
+      return;
+    }
+
+    appendMappedRow(sheet, {
+      "Timestamp": now,
+      "Email": email,
+      "Signed Up For": "Newsletter",
+      "Status": "Subscribed",
+      "Last Signed Up": "",
+      "Unsubscribed On": "",
+      "Notes": "Imported from the NEWSLETTER_TO list"
+    });
+    added++;
+  });
+
+  Logger.log("Newsletter Subscribers tab: added " + added + ", already there " + skipped + ".");
 }
 
 // Sends one copy to yourself. Never touches the real list, and never writes to
