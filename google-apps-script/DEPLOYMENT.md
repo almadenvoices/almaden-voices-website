@@ -137,17 +137,17 @@ The spreadsheet has one row per applicant:
 | Photo/Video Consent, Parent/Guardian Aware | Yes/No |
 | Status, Notes | Empty columns for you to track where each applicant got to |
 
-Two emails go out for every application: a branded confirmation to the
-applicant, and a notification to almadenvoices@gmail.com that you can reply to
-directly to reach them.
+Two emails go out for every sign-up: a branded confirmation to the volunteer,
+and a notification to almadenvoices@gmail.com that you can reply to directly to
+reach them.
 
-To change the wording about deadlines and what happens next, edit these two lines near
-the top of the "VOLUNTEER APPLICATIONS" section of `RegistrationScript.js`, then
+To change the wording about what happens next, edit these two lines near
+the top of the "VOLUNTEER SIGN-UPS" section of `RegistrationScript.js`, then
 re-deploy the script (see below):
 
 ```javascript
-const VOLUNTEER_DEADLINE_TEXT = "Applications close August 31 at 9 PM PT.";
-const VOLUNTEER_NEXT_STEP_TEXT = "We read every application ourselves. ...";
+const VOLUNTEER_REVIEW_TEXT = "We read every sign-up ourselves, usually within a few days.";
+const VOLUNTEER_NEXT_STEP_TEXT = "We'll email you to say hello ...";
 ```
 
 ---

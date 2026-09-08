@@ -610,10 +610,10 @@ app.post("/api/contact", async (req, res) => {
     }
 });
 
-// Volunteer application endpoint — the FALLBACK path for the "Volunteer With
-// Us" page. Applications normally go to the Google Apps Script, which also
+// Volunteer sign-up endpoint — the FALLBACK path for the "Volunteer With
+// Us" page. Sign-ups normally go to the Google Apps Script, which also
 // writes them to the volunteer spreadsheet; the page only posts here when
-// Google can't be reached, so the application still lands in the inbox.
+// Google can't be reached, so the sign-up still lands in the inbox.
 // Emails use the same branded layout as the Apps Script ones.
 app.post("/api/volunteer", async (req, res) => {
     try {
@@ -638,7 +638,7 @@ app.post("/api/volunteer", async (req, res) => {
             return res.status(500).json({ error: "Email service not configured" });
         }
 
-        // Applications land in an inbox as HTML, so escape anything typed in.
+        // Sign-ups land in an inbox as HTML, so escape anything typed in.
         const esc = (v) => String(v == null ? "" : v)
             .replace(/&/g, "&amp;")
             .replace(/</g, "&lt;")
@@ -646,10 +646,10 @@ app.post("/api/volunteer", async (req, res) => {
             .replace(/"/g, "&quot;");
 
         const appliedFor = applyingAs === "parent"
-            ? "Parent/guardian applying on behalf of their child"
-            : "Applying for themselves";
+            ? "Parent/guardian signing up on behalf of their child"
+            : "Signing up for themselves";
 
-        // Line breaks the applicant typed should survive into the email.
+        // Line breaks the volunteer typed should survive into the email.
         const escLines = (v) => esc(v).replace(/\r\n|\r|\n/g, "<br/>");
 
         const guardian2Line = parent2Name || parent2Email || parent2Phone
@@ -669,11 +669,11 @@ app.post("/api/volunteer", async (req, res) => {
                 : ` &middot; Parent/guardian aware: ${guardianConsent ? "Yes" : "No"}`);
 
         const adminEmailHtml = brandedEmail(
-            "New volunteer application",
+            "New volunteer sign-up",
             `${esc(fullName)}${positions ? ` &mdash; ${esc(positions)}` : ""}`,
-            mailDetailCard("Applicant", [
-                ["Applying for", esc(positions)],
-                ["Who is applying", appliedFor],
+            mailDetailCard("Volunteer", [
+                ["Signing up for", esc(positions)],
+                ["Who is signing up", appliedFor],
                 ["Email", esc(email)],
                 ["Phone", esc(phone)],
                 ["Age / grade", esc(ageOrGrade)],
@@ -692,8 +692,8 @@ app.post("/api/volunteer", async (req, res) => {
 
         const firstName = String(fullName).trim().split(/\s+/)[0] || "there";
         const steps = [
-            ["1. We review your application", "Applications close September 7 at 9 PM PT."],
-            ["2. We get back to you", "We read every application ourselves. We&apos;ll be in touch the second week of September to let you know either way."],
+            ["1. We read your sign-up", "We read every sign-up ourselves, usually within a few days."],
+            ["2. We get back to you", "We&apos;ll email you to say hello and talk through which role is the best fit."],
             ["3. Getting started", "If it&apos;s a fit, we&apos;ll walk you through onboarding and pair you with someone on the team."],
         ].map(([title, body], i) => `
               <tr><td style="padding:14px 0;${i ? `border-top:1px solid ${MAIL_LINE};` : ""}">
@@ -702,12 +702,12 @@ app.post("/api/volunteer", async (req, res) => {
               </td></tr>`).join("");
 
         const applicantEmailHtml = brandedEmail(
-            "Application received",
+            "Sign-up received",
             esc(positions),
             `<p style="margin:0 0 16px;">Hi ${esc(firstName)},</p>` +
-            `<p style="margin:0 0 24px;">Thank you for applying to volunteer with Almaden Voices. Your application is in, and nothing more is needed from you right now.</p>` +
-            mailDetailCard("Your application", [
-                ["Applying for", esc(positions)],
+            `<p style="margin:0 0 24px;">Thank you for signing up to volunteer with Almaden Voices. Your sign-up is in, and nothing more is needed from you right now.</p>` +
+            mailDetailCard("Your sign-up", [
+                ["Signing up for", esc(positions)],
                 ["Name", esc(fullName)],
                 ["Email", esc(email)],
                 ["Phone", esc(phone)],
@@ -726,7 +726,7 @@ app.post("/api/volunteer", async (req, res) => {
             from: `"Almaden Voices Volunteer Form" <${EMAIL_USER}>`,
             replyTo: `"${fullName}" <${email}>`,
             to: EMAIL_TO,
-            subject: `Volunteer Application: ${fullName} — ${positions}`,
+            subject: `Volunteer Sign-Up: ${fullName} — ${positions}`,
             html: adminEmailHtml,
             ...(resumeData ? {
                 attachments: [{
@@ -737,12 +737,12 @@ app.post("/api/volunteer", async (req, res) => {
             } : {})
         });
 
-        // A bad applicant address shouldn't lose us the application itself.
+        // A bad volunteer address shouldn't lose us the sign-up itself.
         try {
             await emailTransporter.sendMail({
                 from: `"Almaden Voices" <${EMAIL_USER}>`,
                 to: email,
-                subject: "We got your volunteer application",
+                subject: "We got your volunteer sign-up",
                 html: applicantEmailHtml
             });
         } catch (receiptErr) {
@@ -753,7 +753,7 @@ app.post("/api/volunteer", async (req, res) => {
 
     } catch (err) {
         console.error("Volunteer form error:", err);
-        res.status(500).json({ error: "Error sending your application. Please try again." });
+        res.status(500).json({ error: "Error sending your sign-up. Please try again." });
     }
 });
 
