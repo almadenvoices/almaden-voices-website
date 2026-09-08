@@ -258,6 +258,45 @@ async function sendCoachingWaitlistToSpreadsheet(entry) {
     }
 }
 
+// The newsletter rows need a version of the Apps Script that knows what to do
+// with formType "newsletter". An older deployment would fall through to its
+// registration branch instead, and mail a bogus "Registration Confirmed" to
+// somebody who only joined a mailing list — so ask the script what version it
+// is before sending it anything.
+//
+// The answer is cached: a "yes" forever, a "no" for ten minutes, so pasting
+// the new script into the Apps Script editor starts these rows flowing without
+// anybody having to redeploy the website.
+const NEWSLETTER_SCRIPT_MIN_VERSION = "2026-09-08";
+let newsletterScriptCheck = { ready: false, checkedAt: 0 };
+const NEWSLETTER_SCRIPT_RECHECK_MS = 10 * 60 * 1000;
+
+async function appsScriptHandlesNewsletter() {
+    if (newsletterScriptCheck.ready) return true;
+    if (Date.now() - newsletterScriptCheck.checkedAt < NEWSLETTER_SCRIPT_RECHECK_MS) return false;
+    newsletterScriptCheck.checkedAt = Date.now();
+
+    try {
+        const response = await fetch(APPS_SCRIPT_URL, { signal: AbortSignal.timeout(15000) });
+        const text = await response.text();
+        let result = null;
+        try { result = JSON.parse(text); } catch (parseErr) { /* an HTML error page */ }
+        // Versions are ISO dates, so a plain string comparison orders them.
+        const version = (result && result.version) || "";
+        if (version && version >= NEWSLETTER_SCRIPT_MIN_VERSION) {
+            newsletterScriptCheck.ready = true;
+            return true;
+        }
+        console.warn("Apps Script version", version || "unknown",
+            "is older than", NEWSLETTER_SCRIPT_MIN_VERSION,
+            "— newsletter subscribers are not being written to the spreadsheet yet.");
+        return false;
+    } catch (err) {
+        console.error("Could not check the Apps Script version:", err.message);
+        return false;
+    }
+}
+
 // Newsletter sign-ups go to the "Newsletter Subscribers" tab of the same
 // spreadsheet. This is the durable copy of the mailing list: subscribers.csv
 // sits on the container's own disk, which Cloud Run wipes on every deploy.
@@ -266,6 +305,7 @@ async function sendCoachingWaitlistToSpreadsheet(entry) {
 // should never see an error because a Google service was slow, and the
 // notification email to almadenvoices@gmail.com is sent either way.
 async function sendNewsletterSubscriberToSpreadsheet(entry) {
+    if (!(await appsScriptHandlesNewsletter())) return;
     try {
         const response = await fetch(APPS_SCRIPT_URL, {
             method: "POST",
@@ -292,6 +332,7 @@ async function sendNewsletterSubscriberToSpreadsheet(entry) {
 // Marks somebody Unsubscribed on that tab. Their row stays put, so there is
 // always a record of who asked to come off the list and when.
 async function sendNewsletterUnsubscribeToSpreadsheet(email) {
+    if (!(await appsScriptHandlesNewsletter())) return;
     try {
         const response = await fetch(APPS_SCRIPT_URL, {
             method: "POST",
