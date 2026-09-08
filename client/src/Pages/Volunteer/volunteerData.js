@@ -9,7 +9,7 @@
 //  Where things are, top to bottom:
 //    POSITIONS ............ the roles and their bullet lists
 //    MIN_GRADE ............ the grade floor (currently 8th)
-//    APPLICATIONS_OPEN .... true = form showing, false = "closed" message
+//    SIGNUPS_OPEN ......... true = form showing, false = "closed" message
 //    The banner lines, closed message, and confirmation message
 //
 //  To add a role, copy one whole { ... } block inside POSITIONS, paste it,
@@ -17,8 +17,8 @@
 //  To remove a role, delete its whole { ... } block.
 //
 //  Two things to be careful with:
-//    - Don't change an "id" once applications are coming in. It's what
-//      shows up in the application emails.
+//    - Don't change an "id" once sign-ups are coming in. It's what
+//      shows up in the sign-up emails.
 //    - Apostrophes inside text need a backslash: 'you\'ll' or use "you'll".
 //
 //  When you're done, tell me and I'll put it live. Nothing changes on the
@@ -29,8 +29,8 @@
 // ============================================================
 // VOLUNTEER POSITIONS — edit here to change the cards
 // ============================================================
-// `id` is what gets stored in the application form's checkbox list and shown
-// in the email, so keep it stable once applications start coming in.
+// `id` is what gets stored in the sign-up form's checkbox list and shown
+// in the email, so keep it stable once sign-ups start coming in.
 
 export const POSITIONS = [
     {
@@ -224,10 +224,10 @@ export const POSITIONS = [
 ];
 
 // ============================================================
-// DEADLINE — after applications close, flip this to false and the
-// form is replaced by the "applications are closed" message below.
+// SIGN-UPS — set this to false and the form is replaced by the
+// "sign-ups are closed" message below. Leave it true to keep the form up.
 // ============================================================
-export const APPLICATIONS_OPEN = true;
+export const SIGNUPS_OPEN = true;
 
 // Minimum grade level for every role. The form checks what's typed into the
 // age/grade box against this and blocks anything clearly below it.
@@ -235,13 +235,13 @@ export const MIN_GRADE = 8;
 export const GRADE_REQUIREMENT_LINE =
     "Volunteers must be in 8th grade or higher.";
 
-export const DEADLINE_LINE = "Applications close Monday, September 7 at 9:00 PM PT";
-export const COMMITMENT_LINE = "About 2–3 hours a week, for at least 3 months";
+export const SIGNUP_OPEN_LINE = "Volunteer sign-ups are open";
+export const COMMITMENT_LINE = "About 2\u20133 hours a week, for at least 3 months";
 
 export const CLOSED_MESSAGE = {
-    title: "Applications are closed",
-    body: "Thanks to everyone who applied. Applications for our fall volunteer roles closed on September 7. We're reading through them now and will be in touch with applicants directly. If you'd still like to help, email us at almadenvoices@gmail.com and we'll keep you in mind for the next round.",
+    title: "Sign-ups are closed",
+    body: "Thanks to everyone who signed up. We're not taking new volunteer sign-ups right now. If you'd still like to help, email us at almadenvoices@gmail.com and we'll keep you in mind for the next round.",
 };
 
 export const CONFIRMATION_MESSAGE =
-    "Thanks for applying! Applications close September 7 at 9 PM PT. We'll be in touch the second week of September.";
+    "Thanks for signing up! We've got your details and we'll be in touch soon.";

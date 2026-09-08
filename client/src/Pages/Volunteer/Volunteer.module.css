@@ -42,7 +42,7 @@
     margin: 0 auto;
 }
 
-/* ====== Deadline note ====== */
+/* ====== Sign-up banner ====== */
 .banner {
     max-width: 820px;
     margin: 0 auto clamp(32px, 5vw, 56px);
@@ -96,7 +96,7 @@
 
 @media (max-width: 700px) {
     /* Stack on a phone so the button gets a full-width tap target instead of
-       squeezing the deadline text into two words per line. */
+       squeezing the banner text into two words per line. */
     .banner {
         flex-wrap: wrap;
         gap: 14px;
@@ -678,7 +678,7 @@
     line-height: 1.7;
 }
 
-/* ====== Applications closed ====== */
+/* ====== Sign-ups closed ====== */
 .closed {
     background: #F9FAFB;
     border: 2px solid #E5E7EB;

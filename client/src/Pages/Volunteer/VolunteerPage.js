@@ -9,8 +9,8 @@ import PersonIcon from "@mui/icons-material/Person";
 import HowToRegIcon from "@mui/icons-material/HowToReg";
 import {
     POSITIONS,
-    APPLICATIONS_OPEN,
-    DEADLINE_LINE,
+    SIGNUPS_OPEN,
+    SIGNUP_OPEN_LINE,
     COMMITMENT_LINE,
     MIN_GRADE,
     GRADE_REQUIREMENT_LINE,
@@ -88,7 +88,7 @@ export default function VolunteerPage() {
     const [parentName, setParentName] = useState("");
     const [parentEmail, setParentEmail] = useState("");
     const [parentPhone, setParentPhone] = useState("");
-    // Second parent/guardian. Collected only from under-18 applicants applying
+    // Second parent/guardian. Collected only from under-18 volunteers signing up
     // for themselves, as a second emergency contact.
     const [parent2Name, setParent2Name] = useState("");
     const [parent2Email, setParent2Email] = useState("");
@@ -150,7 +150,7 @@ export default function VolunteerPage() {
         }
     }
 
-    function openApplication(roleId) {
+    function openSignupForm(roleId) {
         if (roleId && !roles.includes(roleId)) setRoles((prev) => [...prev, roleId]);
         setTimeout(() => {
             formRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -222,7 +222,7 @@ export default function VolunteerPage() {
             .map((id) => POSITIONS.find((p) => p.id === id)?.title || id)
             .join(", ");
 
-        const application = {
+        const signup = {
             formType: "volunteer",
             applyingAs,
             parentName: showParentBlock || showUnder18Block ? parentName : "",
@@ -256,7 +256,7 @@ export default function VolunteerPage() {
                 const response = await fetch(APPS_SCRIPT_URL, {
                     method: "POST",
                     headers: { "Content-Type": "text/plain;charset=utf-8" },
-                    body: JSON.stringify(application),
+                    body: JSON.stringify(signup),
                 });
                 const result = response.ok ? await response.json().catch(() => null) : null;
                 ok = Boolean(result && result.success);
@@ -265,17 +265,17 @@ export default function VolunteerPage() {
             }
 
             // If Google is unreachable, fall back to our own server so the
-            // application still reaches the inbox rather than being lost.
+            // sign-up still reaches the inbox rather than being lost.
             if (!ok) {
                 const response = await fetch("/api/volunteer", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(application),
+                    body: JSON.stringify(signup),
                 });
                 const result = await response.json().catch(() => null);
                 ok = Boolean(response.ok && result && result.success);
                 if (!ok) {
-                    setFormError((result && result.error) || "Something went wrong sending your application. Please try again.");
+                    setFormError((result && result.error) || "Something went wrong sending your sign-up. Please try again.");
                 }
             }
 
@@ -313,17 +313,17 @@ export default function VolunteerPage() {
                 </div>
             </section>
 
-            {/* ---------- Deadline banner ---------- */}
+            {/* ---------- Sign-up banner ---------- */}
             <div className="container">
                 <div className={s.banner}>
                     <div className={s.bannerText}>
-                        <span className={s.bannerLine1}>{DEADLINE_LINE}</span>
+                        <span className={s.bannerLine1}>{SIGNUP_OPEN_LINE}</span>
                         <span className={s.bannerLine2}>{COMMITMENT_LINE}</span>
                         <span className={s.bannerLine2}>{GRADE_REQUIREMENT_LINE}</span>
                     </div>
-                    {APPLICATIONS_OPEN && (
-                        <button type="button" className={s.bannerBtn} onClick={() => openApplication("")}>
-                            Apply now
+                    {SIGNUPS_OPEN && (
+                        <button type="button" className={s.bannerBtn} onClick={() => openSignupForm("")}>
+                            Sign up now
                         </button>
                     )}
                 </div>
@@ -334,7 +334,7 @@ export default function VolunteerPage() {
                 <div className={s.sectionHead}>
                     <h2 className={s.sectionTitle}>Open positions</h2>
                     <p className={s.sectionSub}>
-                        Tap a role to learn more information. You can apply for more than one.
+                        Tap a role to learn more information. You can sign up for more than one.
                     </p>
                 </div>
 
@@ -398,13 +398,13 @@ export default function VolunteerPage() {
                                         {position.note && (
                                             <p className={s.detailNote}><strong>Note:</strong> {position.note}</p>
                                         )}
-                                        {APPLICATIONS_OPEN && (
+                                        {SIGNUPS_OPEN && (
                                             <button
                                                 type="button"
                                                 className={s.detailApply}
-                                                onClick={() => openApplication(position.id)}
+                                                onClick={() => openSignupForm(position.id)}
                                             >
-                                                <HowToRegIcon fontSize="small" /> Apply for this role
+                                                <HowToRegIcon fontSize="small" /> Sign up for this role
                                             </button>
                                         )}
                                     </div>
@@ -436,9 +436,9 @@ export default function VolunteerPage() {
                     </ul>
                 </div>
 
-                {/* ---------- Application form ---------- */}
+                {/* ---------- Sign-up form ---------- */}
                 <div className={s.formCard} ref={formRef} id="apply">
-                    {!APPLICATIONS_OPEN ? (
+                    {!SIGNUPS_OPEN ? (
                         <div className={s.closed}>
                             <LockClockIcon sx={{ fontSize: 56 }} className={s.closedIcon} />
                             <h2>{CLOSED_MESSAGE.title}</h2>
@@ -447,22 +447,22 @@ export default function VolunteerPage() {
                     ) : submitted ? (
                         <div className={s.success}>
                             <CheckCircleIcon sx={{ fontSize: 56 }} className={s.successIcon} />
-                            <h2>Application received</h2>
+                            <h2>Sign-up received</h2>
                             <p>{CONFIRMATION_MESSAGE}</p>
                         </div>
                     ) : (
                         <form className={s.form} onSubmit={onSubmit} noValidate>
                             <div className={s.sectionHead} style={{ marginBottom: 0 }}>
-                                <h2 className={s.sectionTitle}>Apply</h2>
+                                <h2 className={s.sectionTitle}>Volunteer sign-up form</h2>
                                 <p className={s.sectionSub}>
                                     Everything marked <span className={s.req}>*</span> is required.
                                 </p>
                             </div>
 
-                            {/* Who is applying */}
+                            {/* Who is signing up */}
                             <div className={`${s.field} ${errors.applyingAs ? s.fieldError : ""}`}>
                                 <label>
-                                    Are you applying for yourself, or as a parent/guardian on behalf of your child?{" "}
+                                    Are you signing up for yourself, or as a parent/guardian on behalf of your child?{" "}
                                     <span className={s.req}>*</span>
                                 </label>
                                 <div className={s.optionGroup}>
@@ -475,7 +475,7 @@ export default function VolunteerPage() {
                                             onChange={() => setApplyingAs("self")}
                                             disabled={isSubmitting}
                                         />
-                                        <span className={s.optionLabel}>I&apos;m applying for myself</span>
+                                        <span className={s.optionLabel}>I&apos;m signing up for myself</span>
                                     </label>
                                     <label className={`${s.option} ${applyingAs === "parent" ? s.optionChecked : ""}`}>
                                         <input
@@ -487,14 +487,14 @@ export default function VolunteerPage() {
                                             disabled={isSubmitting}
                                         />
                                         <span className={s.optionLabel}>
-                                            I&apos;m a parent or guardian applying on behalf of my child
+                                            I&apos;m a parent or guardian signing up on behalf of my child
                                         </span>
                                     </label>
                                 </div>
                                 {errors.applyingAs && <p className={s.fieldErrorText}>{errors.applyingAs}</p>}
                             </div>
 
-                            {/* Parent block — parent/guardian applying */}
+                            {/* Parent block — parent/guardian signing up */}
                             {showParentBlock && (
                                 <div className={s.conditional}>
                                     <span className={s.conditionalLabel}>Your details (parent or guardian)</span>
@@ -655,7 +655,7 @@ export default function VolunteerPage() {
                                 {errors.resume && <p className={s.fieldErrorText}>{errors.resume}</p>}
                             </div>
 
-                            {/* Under-18 guardian details when applying for yourself */}
+                            {/* Under-18 guardian details when signing up for yourself */}
                             {showUnder18Block && (
                                 <div className={s.conditional}>
                                     <span className={s.conditionalLabel}>
@@ -760,7 +760,7 @@ export default function VolunteerPage() {
                                     <p style={{ fontSize: "0.82rem", color: "#6B7280", margin: "12px 0 0", lineHeight: 1.6 }}>
                                         If there isn&apos;t a second parent or guardian we can contact, email{" "}
                                         <a href="mailto:almadenvoices@gmail.com" style={{ color: "#2563EB" }}>almadenvoices@gmail.com</a>{" "}
-                                        and we&apos;ll take your application that way instead.
+                                        and we&apos;ll take your sign-up that way instead.
                                     </p>
                                 </div>
                             )}
@@ -772,7 +772,7 @@ export default function VolunteerPage() {
 
                             <div className={`${s.field} ${errors.roles ? s.fieldError : ""}`}>
                                 <label>
-                                    Which position(s) are you applying for? <span className={s.req}>*</span>
+                                    Which position(s) are you signing up for? <span className={s.req}>*</span>
                                 </label>
                                 <div className={s.optionGrid}>
                                     {POSITIONS.map((position) => (
@@ -814,7 +814,7 @@ export default function VolunteerPage() {
                                 <label htmlFor="availability">
                                     This role typically takes about 2–3 hours per week, and we generally ask
                                     for a commitment of at least 3 months. If you&apos;re not sure you can commit
-                                    to that timeline, no worries at all — please still apply! We&apos;re happy to
+                                    to that timeline, no worries at all — please still sign up! We&apos;re happy to
                                     talk through your availability and see what might work. <strong>What days
                                     and times are you generally available? Please include as much detail as
                                     possible (for example, Mondays from 5–7 PM or Saturdays from 2–4 PM).</strong> <span className={s.req}>*</span>
@@ -868,7 +868,7 @@ export default function VolunteerPage() {
                                             disabled={isSubmitting}
                                         />
                                         <span>
-                                            My parent or guardian knows I am applying and has agreed to the above.{" "}
+                                            My parent or guardian knows I am signing up and has agreed to the above.{" "}
                                             <span className={s.req}>*</span>
                                         </span>
                                     </label>
@@ -877,7 +877,7 @@ export default function VolunteerPage() {
                                 {formError && <div className={s.errorBox}>{formError}</div>}
 
                                 <button type="submit" className={s.btn} disabled={isSubmitting}>
-                                    {isSubmitting ? "Sending…" : <>Submit application <SendIcon fontSize="small" /></>}
+                                    {isSubmitting ? "Sending…" : <>Submit sign-up <SendIcon fontSize="small" /></>}
                                 </button>
                             </div>
                         </form>

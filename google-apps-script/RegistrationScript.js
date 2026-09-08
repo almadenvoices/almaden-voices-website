@@ -640,15 +640,15 @@ function buildAdminHtml(data, students, studentListHtml, childWord, timestamp) {
 }
 
 // ============================================================
-// VOLUNTEER APPLICATIONS
+// VOLUNTEER SIGN-UPS
 //
 // The "Volunteer With Us" page (almadenvoices.org/volunteer) posts here with
-// formType: "volunteer". Each application becomes one row on the
+// formType: "volunteer". Each sign-up becomes one row on the
 // "Volunteer Applications" tab, and two emails go out: a branded confirmation
-// to the applicant and a notification to ADMIN_EMAIL.
+// to the volunteer and a notification to ADMIN_EMAIL.
 //
 // The two lines below are the only wording you normally need to change --
-// they appear in the applicant's confirmation email.
+// they appear in the volunteer's confirmation email.
 // ============================================================
 // The spreadsheet volunteer applications are written to. Leave VOLUNTEER_SHEET_ID
 // empty and the script makes the spreadsheet itself the first time someone
@@ -663,9 +663,9 @@ const VOLUNTEER_SHEET_PROP = "volunteerSheetId";
 // someone attaches one, and lives in the almadenvoices@gmail.com Drive.
 const VOLUNTEER_RESUME_FOLDER = "Almaden Voices Volunteer Resumes";
 
-const VOLUNTEER_DEADLINE_TEXT = "Applications close September 7 at 9 PM PT.";
+const VOLUNTEER_REVIEW_TEXT = "We read every sign-up ourselves, usually within a few days.";
 const VOLUNTEER_NEXT_STEP_TEXT =
-  "We read every application ourselves. We'll be in touch the second week of September to let you know either way.";
+  "We'll email you to say hello and talk through which role is the best fit.";
 
 // Resumes arrive base64-encoded in the JSON payload. Each one is saved into a
 // "Volunteer Resumes" folder in the same Drive as the spreadsheet, and the
@@ -780,7 +780,7 @@ function handleVolunteerApplication(data) {
   const resumeUrl = saveVolunteerResume(data);
   const whoIsApplying = data.applyingAs === "parent"
     ? "Parent/guardian, on behalf of their child"
-    : "Applying for themselves";
+    : "Signing up for themselves";
 
   appendMappedRow(sheet, {
     "Timestamp": timestamp,
@@ -811,8 +811,8 @@ function handleVolunteerApplication(data) {
 
   // Admin notification -- reply goes straight to the applicant.
   GmailApp.sendEmail(ADMIN_EMAIL,
-    "Volunteer application: " + (data.fullName || "") + " - " + (data.positions || ""),
-    "New volunteer application received. See the HTML version for details.",
+    "Volunteer sign-up: " + (data.fullName || "") + " - " + (data.positions || ""),
+    "New volunteer sign-up received. See the HTML version for details.",
     {
       htmlBody: buildVolunteerAdminHtml(data, whoIsApplying, timestamp, ss.getUrl(), resumeUrl),
       name: ORG_NAME + " Volunteer Form",
@@ -824,8 +824,8 @@ function handleVolunteerApplication(data) {
   // which is already safely on the sheet.
   try {
     GmailApp.sendEmail(data.email,
-      "We got your volunteer application",
-      "Thanks for applying to volunteer with Almaden Voices. See the HTML version of this email for details.",
+      "We got your volunteer sign-up",
+      "Thanks for signing up to volunteer with Almaden Voices. See the HTML version of this email for details.",
       {
         htmlBody: buildVolunteerApplicantHtml(data),
         name: ORG_NAME,
@@ -900,7 +900,7 @@ function volunteerDetailsHtml(rows) {
       'style="background:#FFFFFF;border:1px solid ' + C_LINE + ';border-radius:12px;margin:0 0 24px;">' +
       '<tr><td style="padding:6px 22px 18px;">' +
         '<p style="margin:16px 0 2px;font-family:' + FONT_BODY + ';font-size:12px;letter-spacing:1.2px;' +
-          'text-transform:uppercase;color:' + C_MUTED + ';font-weight:700;">Your application</p>' +
+          'text-transform:uppercase;color:' + C_MUTED + ';font-weight:700;">Your sign-up</p>' +
         '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">' + body + '</table>' +
       '</td></tr>' +
     '</table>';
@@ -910,7 +910,7 @@ function buildVolunteerApplicantHtml(data) {
   const firstName = String(data.fullName || "").trim().split(/\s+/)[0] || "there";
 
   const steps = [
-    ["1. We review your application", VOLUNTEER_DEADLINE_TEXT],
+    ["1. We read your sign-up", VOLUNTEER_REVIEW_TEXT],
     ["2. We get back to you", VOLUNTEER_NEXT_STEP_TEXT],
     ["3. Getting started", "If it's a fit, we'll walk you through onboarding and pair you with someone on the team."]
   ].map(function(step, i) {
@@ -923,11 +923,11 @@ function buildVolunteerApplicantHtml(data) {
 
   const inner = '' +
     '<p style="margin:0 0 16px;">Hi ' + esc(firstName) + ',</p>' +
-    '<p style="margin:0 0 24px;">Thank you for applying to volunteer with ' + ORG_NAME + '. Your application is in, ' +
+    '<p style="margin:0 0 24px;">Thank you for signing up to volunteer with ' + ORG_NAME + '. Your sign-up is in, ' +
       'and nothing more is needed from you right now.</p>' +
 
     volunteerDetailsHtml([
-      ["Applying for", data.positions],
+      ["Signing up for", data.positions],
       ["Name", data.fullName],
       ["Email", data.email],
       ["Phone", data.phone],
@@ -946,7 +946,7 @@ function buildVolunteerApplicantHtml(data) {
       'We\'re glad you want to be part of that.</p>' +
     '<p style="margin:0;">Questions in the meantime? Just reply to this email.</p>';
 
-  return emailShell("Application received", data.positions ? esc(data.positions) : "", inner);
+  return emailShell("Sign-up received", data.positions ? esc(data.positions) : "", inner);
 }
 
 function buildVolunteerAdminHtml(data, whoIsApplying, timestamp, sheetUrl, resumeUrl) {
@@ -970,8 +970,8 @@ function buildVolunteerAdminHtml(data, whoIsApplying, timestamp, sheetUrl, resum
 
   // Third slot marks a value that is already HTML, so it isn't escaped twice.
   const rows = [
-    ["Applying for", data.positions],
-    ["Who is applying", whoIsApplying],
+    ["Signing up for", data.positions],
+    ["Who is signing up", whoIsApplying],
     ["Email", data.email],
     ["Phone", data.phone],
     ["Age / grade", data.ageOrGrade],
@@ -992,7 +992,7 @@ function buildVolunteerAdminHtml(data, whoIsApplying, timestamp, sheetUrl, resum
       'style="background:#FFFFFF;border:1px solid ' + C_LINE + ';border-radius:12px;margin:0 0 24px;">' +
       '<tr><td style="padding:6px 22px 18px;">' +
         '<p style="margin:16px 0 2px;font-family:' + FONT_BODY + ';font-size:12px;letter-spacing:1.2px;' +
-          'text-transform:uppercase;color:' + C_MUTED + ';font-weight:700;">Applicant</p>' +
+          'text-transform:uppercase;color:' + C_MUTED + ';font-weight:700;">Volunteer</p>' +
         '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">' + rows + '</table>' +
       '</td></tr>' +
     '</table>' +
@@ -1004,7 +1004,7 @@ function buildVolunteerAdminHtml(data, whoIsApplying, timestamp, sheetUrl, resum
       (sheetUrl ? ' &middot; <a href="' + sheetUrl + '" style="color:' + C_ACCENT + ';text-decoration:none;">Open the applications sheet</a>' : '') +
     '</p>';
 
-  return emailShell("New volunteer application",
+  return emailShell("New volunteer sign-up",
     esc(data.fullName) + (data.positions ? ' &mdash; ' + esc(data.positions) : ''),
     inner);
 }
@@ -2059,7 +2059,7 @@ const NEWSLETTER = {
         "Almaden Voices has officially opened 9 volunteer positions, with opportunities ranging from grants research and community outreach to newsletter writing and website development.",
         "There&rsquo;s a role for all kinds of interests and skills. Every role except Events Coordinator is remote, and the Instructor role has both online and in-person opportunities.",
         "And these roles aren&rsquo;t just for students &mdash; we&rsquo;d love parent volunteers too! If you&rsquo;ve been looking for a way to get involved with Almaden Voices yourself, there&rsquo;s a place for you here as well.",
-        "If you&rsquo;re interested in getting involved, you can learn more and apply here:",
+        "If you&rsquo;re interested in getting involved, you can learn more and sign up here:",
       ],
       button: {
         label: "almadenvoices.org/volunteer",
@@ -2067,13 +2067,8 @@ const NEWSLETTER = {
       },
       // Paragraphs printed after the button.
       paragraphsAfterButton: [
-        "Volunteers must be in 8th grade or higher, and applications are currently open until September 7th. If you&rsquo;re interested but aren&rsquo;t able to apply by the deadline, please reach out to me &mdash; I&rsquo;d still love to see if we can find a way for you to get involved!",
+        "Volunteers must be in 8th grade or higher. If you&rsquo;re interested but aren&rsquo;t sure a role is the right fit, please reach out to me &mdash; I&rsquo;d still love to see if we can find a way for you to get involved!",
       ],
-      // The tinted box with the blue left border.
-      callout: {
-        label: "Deadline",
-        text: "Applications close Monday, September 7.",
-      },
     },
     {
       heading: "Help Us Keep Workshops Free",
