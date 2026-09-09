@@ -100,6 +100,11 @@ const upcomingSessions = [
         descriptionEs: "Una introducción gratuita de dos horas a la oratoria para niños. Cubrimos los fundamentos: hablar con claridad, mantener una postura segura y calmar los nervios de presentar ante un grupo, y cada niño tiene tiempo para practicar de pie. No se necesita experiencia. Se realiza el sábado 19 de septiembre de 5:30 a 7:30 PM ET; le enviaremos el lugar por correo en cuanto esté confirmado.",
         status: "Open",
         online: false,
+        // Shown in a highlighted box under the session details, and again on
+        // the thank-you screen after someone registers. Leave it off a session
+        // that doesn't need it.
+        shareNote: "We had to cancel our last New Jersey workshop because not enough families signed up in time — and we'd hate for that to happen again. If your child would like to come, please forward this to your friends, family, and neighbours and ask them to sign up too. Every extra registration makes it more certain this one goes ahead.",
+        shareNoteEs: "Tuvimos que cancelar nuestro taller anterior en Nueva Jersey porque no se inscribieron suficientes familias a tiempo, y no quisiéramos que vuelva a ocurrir. Si su hijo desea asistir, por favor comparta esta información con sus amigos, familiares y vecinos, y pídales que también se inscriban. Cada inscripción adicional hace más seguro que este taller se lleve a cabo.",
     },
 ];
 
@@ -537,6 +542,22 @@ export default function RegisterPage() {
                                         <GroupsIcon style={{ fontSize: 16, color: "#2563EB" }} /> <Bi entry={bi(selectedSession.grades, selectedSession.gradesEs)} lang={lang} />
                                     </span>
                                 </div>
+                                {selectedSession.shareNote && (
+                                    <div style={{
+                                        margin: "16px 0 0",
+                                        padding: "14px 16px",
+                                        background: "#FFFBEB",
+                                        border: "1px solid #FDE68A",
+                                        borderRadius: "10px",
+                                    }}>
+                                        <p style={{ margin: "0 0 4px", fontSize: "0.8rem", letterSpacing: "0.08em", textTransform: "uppercase", fontWeight: 800, color: "#B45309" }}>
+                                            <Bi entry={T.spreadTheWord} lang={lang} />
+                                        </p>
+                                        <p style={{ margin: 0, fontSize: "0.9rem", lineHeight: 1.65, color: "#78350F" }}>
+                                            <Bi entry={bi(selectedSession.shareNote, selectedSession.shareNoteEs)} lang={lang} block />
+                                        </p>
+                                    </div>
+                                )}
                                 {selectedSession.status !== "Open" && (
                                     <p style={{ margin: "12px 0 0", fontSize: "0.85rem", color: "#DC2626", fontWeight: 600 }}>
                                         <Bi entry={T.waitlistNote} lang={lang} block />
@@ -884,6 +905,23 @@ export default function RegisterPage() {
                         </div>
                         <h2 id="register-success-title"><Bi entry={T.successTitle} lang={lang} block /></h2>
                         <p><Bi entry={T.successBody} lang={lang} block /></p>
+                        {selectedSession && selectedSession.shareNote && (
+                            <div style={{
+                                marginTop: "16px",
+                                padding: "14px 16px",
+                                background: "#FFFBEB",
+                                border: "1px solid #FDE68A",
+                                borderRadius: "10px",
+                                textAlign: "left",
+                            }}>
+                                <p style={{ margin: "0 0 4px", fontSize: "0.8rem", letterSpacing: "0.08em", textTransform: "uppercase", fontWeight: 800, color: "#B45309" }}>
+                                    <Bi entry={T.spreadTheWord} lang={lang} />
+                                </p>
+                                <p style={{ margin: 0, fontSize: "0.9rem", lineHeight: 1.65, color: "#78350F" }}>
+                                    <Bi entry={bi(selectedSession.shareNote, selectedSession.shareNoteEs)} lang={lang} block />
+                                </p>
+                            </div>
+                        )}
                     </div>
                 </div>
             )}

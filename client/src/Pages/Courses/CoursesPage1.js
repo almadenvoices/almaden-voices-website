@@ -78,6 +78,9 @@ const CoursesPage = () => {
             status: "Open",
             online: false,
             cover: "/images/teaching-glasses.jpg",
+            // Shown as a highlighted box on the card. Leave it off a session
+            // that doesn't need it.
+            note: "We had to cancel our last New Jersey workshop because not enough families signed up in time. If your child would like to come, please forward this to friends, family, and neighbours and ask them to sign up too — every extra registration makes it more certain this one goes ahead.",
         },
     ];
 
@@ -102,6 +105,23 @@ const CoursesPage = () => {
             <div className={s.body}>
                 <h3 className={s.title}>{session.title}</h3>
                 <p className={s.blurb}>{session.description || session.feedback}</p>
+
+                {session.note && (
+                    <div style={{
+                        margin: "0 0 14px",
+                        padding: "12px 14px",
+                        background: "#FFFBEB",
+                        border: "1px solid #FDE68A",
+                        borderRadius: "10px",
+                    }}>
+                        <p style={{ margin: "0 0 4px", fontSize: "0.72rem", letterSpacing: "0.08em", textTransform: "uppercase", fontWeight: 800, color: "#B45309" }}>
+                            Please spread the word
+                        </p>
+                        <p style={{ margin: 0, fontSize: "0.85rem", lineHeight: 1.6, color: "#78350F" }}>
+                            {session.note}
+                        </p>
+                    </div>
+                )}
 
                 <ul className={s.meta}>
                     <li><CalendarMonthIcon /> {session.date}</li>
