@@ -198,6 +198,19 @@ export default function RegisterPage() {
         }, 60);
     }
 
+    // Each open session has its own chooser button, so clicking one both opens
+    // the sign-up panel and picks that session in the form. Clicking the button
+    // for the session already showing closes the panel again.
+    function pickSession(id) {
+        const opening = !(choice === "workshop" && selectedSessionId === id);
+        setSelectedSessionId(opening ? id : "");
+        setChoice(opening ? "workshop" : "");
+        if (!opening) return;
+        setTimeout(() => {
+            document.getElementById(PANEL_IDS.workshop)?.scrollIntoView({ behavior: "smooth", block: "start" });
+        }, 60);
+    }
+
     const sessions = upcomingSessions.map(ses => ({
         ...ses,
         enrolled: ses.enrolled + (enrollmentCounts[ses.id] || 0),
@@ -358,27 +371,35 @@ export default function RegisterPage() {
                     there's more than one thing to pick; with no session open and
                     coaching off, the interest form renders on its own below. */}
                 {showChooser && <div className={s.chooser}>
-                    {/* The open session leads, highlighted — it's the thing most
-                        visitors are here to do. */}
-                    {hasOpenSessions && <button
-                        type="button"
-                        onClick={() => pickChoice("workshop")}
-                        className={`${s.chooseBtn} ${s.chooseBtnYellow} ${choice === "workshop" ? s.chooseBtnActive : ""}`}
-                        aria-expanded={choice === "workshop"}
-                        aria-controls="session-signup"
-                    >
-                        <span className={s.chooseIcon}><HowToRegIcon /></span>
-                        <span className={s.chooseText}>
-                            <span className={s.chooseTitle}>
-                                <Bi entry={T.chooseWorkshopPrefix} lang={lang} block />{" "}
-                                <Bi entry={bi(sessions[0].title.replace(/^Free\s+/i, ""), sessions[0].titleEs)} lang={lang} />
+                    {/* The open sessions lead, highlighted — one button each, since
+                        signing up for one of them is what most visitors are here to
+                        do. A full session still gets a button so people can see the
+                        date, but it's tagged and can't be opened. */}
+                    {sessions.map(ses => {
+                        const full = isSessionFull(ses);
+                        const open = choice === "workshop" && selectedSessionId === ses.id;
+                        return <button
+                            key={ses.id}
+                            type="button"
+                            disabled={full}
+                            onClick={() => pickSession(ses.id)}
+                            className={`${s.chooseBtn} ${s.chooseBtnYellow} ${open ? s.chooseBtnActive : ""}`}
+                            aria-expanded={open}
+                            aria-controls="session-signup"
+                        >
+                            <span className={s.chooseIcon}><HowToRegIcon /></span>
+                            <span className={s.chooseText}>
+                                <span className={s.chooseTitle}>
+                                    <Bi entry={T.chooseWorkshopPrefix} lang={lang} block />{" "}
+                                    <Bi entry={bi(ses.title.replace(/^Free\s+/i, ""), ses.titleEs)} lang={lang} />
+                                </span>
+                                <span className={s.chooseSub}>
+                                    <Bi entry={bi(ses.date, ses.dateEs)} lang={lang} /> · <Bi entry={bi(ses.time, ses.timeEs)} lang={lang} />{full ? " " + t(T.fullTag, lang) : ""}
+                                </span>
                             </span>
-                            <span className={s.chooseSub}>
-                                <Bi entry={bi(sessions[0].date, sessions[0].dateEs)} lang={lang} /> · <Bi entry={bi(sessions[0].time, sessions[0].timeEs)} lang={lang} />
-                            </span>
-                        </span>
-                        <ChevronRightIcon className={s.chooseArrow} />
-                    </button>}
+                            <ChevronRightIcon className={s.chooseArrow} />
+                        </button>;
+                    })}
 
                     <button
                         type="button"
