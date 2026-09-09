@@ -81,6 +81,8 @@ export const T = {
         en: "This session is full — submit your form to join the waitlist",
         es: "Esta sesión está llena: envíe el formulario para unirse a la lista de espera",
     },
+    // Heading on the amber box a session shows when it carries a shareNote.
+    spreadTheWord: { en: "Please spread the word", es: "Por favor, corra la voz" },
 
     // ---- Student info ----
     studentInfo: { en: "Student Information", es: "Información del estudiante" },
