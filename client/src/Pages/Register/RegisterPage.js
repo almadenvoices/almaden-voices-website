@@ -54,33 +54,6 @@ const SHOW_COACHING = true;
 // ============================================================
 const upcomingSessions = [
     {
-        id: "intro-workshop-sep-2026",
-        // The yellow chooser button strips a leading "Free ", so this reads
-        // there as "Public Speaking Workshop (intended for residents of the
-        // Hoffman Via Monte community)".
-        title: "Free Public Speaking Workshop (intended for residents of the Hoffman Via Monte community)",
-        titleEs: "Taller gratuito de oratoria (dirigido a los residentes de la comunidad Hoffman Via Monte)",
-        date: "September 11, 2026",
-        dateEs: "11 de septiembre de 2026",
-        time: "6–7 PM",
-        timeEs: "6–7 PM",
-        location: "To be announced",
-        locationEs: "Por confirmar",
-        grades: "Ages 5–14",
-        gradesEs: "Edades 5 a 14",
-        // capacity: null means no limit — no seat count and it never shows as full.
-        capacity: null,
-        enrolled: 0,
-        description: "A free one-hour introduction to public speaking for kids. We cover the fundamentals — speaking clearly, standing with confidence, and settling the nerves that come with presenting to a group. No experience needed. Runs Friday, September 11 from 6–7 PM; we'll email you the location as soon as it's confirmed.",
-        descriptionEs: "Una introducción gratuita de una hora a la oratoria para niños. Cubrimos los fundamentos: hablar con claridad, mantener una postura segura y calmar los nervios de presentar ante un grupo. No se necesita experiencia. Se realiza el viernes 11 de septiembre de 6 a 7 PM; le enviaremos la ubicación por correo en cuanto esté confirmada.",
-        status: "Open",
-        online: false,
-        // No donation ask on this one — the form goes straight from the
-        // details to the consent boxes. Leave the flag off (or set it true)
-        // on a session that should still show it.
-        askDonation: false,
-    },
-    {
         id: "nj-intro-workshop-sep-2026",
         title: "Free Introductory Public Speaking Workshop (New Jersey)",
         titleEs: "Taller introductorio gratuito de oratoria (Nueva Jersey)",
@@ -94,6 +67,7 @@ const upcomingSessions = [
         locationEs: "Nueva Jersey — lugar por confirmar",
         grades: "Ages 5–14",
         gradesEs: "Edades 5 a 14",
+        // capacity: null means no limit — no seat count and it never shows as full.
         capacity: null,
         enrolled: 0,
         description: "A free two-hour introduction to public speaking for kids. We cover the fundamentals — speaking clearly, standing with confidence, and settling the nerves that come with presenting to a group — and every child gets time on their feet. No experience needed. Runs Saturday, September 19 from 5:30–7:30 PM ET; we'll email you the venue as soon as it's confirmed.",

@@ -49,21 +49,6 @@ const CoursesPage = () => {
     // ============================================================
     const upcomingSessions = [
         {
-            id: "intro-workshop-sep-2026",
-            title: "Free Public Speaking Workshop (intended for residents of the Hoffman Via Monte community)",
-            date: "September 11, 2026",
-            time: "6–7 PM",
-            location: "To be announced",
-            ageGroup: "Ages 5–14",
-            // capacity: null means no limit — no seat count and it never shows as full.
-            capacity: null,
-            enrolled: 0,
-            description: "A free one-hour introduction to public speaking for kids: speaking clearly, standing with confidence, and settling the nerves that come with presenting to a group. No experience needed.",
-            status: "Open",
-            online: false,
-            cover: "/images/teaching-beginner.JPG",
-        },
-        {
             id: "nj-intro-workshop-sep-2026",
             title: "Free Introductory Public Speaking Workshop (New Jersey)",
             date: "September 19, 2026",
@@ -72,6 +57,7 @@ const CoursesPage = () => {
             time: "5:30–7:30 PM ET",
             location: "New Jersey — venue to be announced",
             ageGroup: "Ages 5–14",
+            // capacity: null means no limit — no seat count and it never shows as full.
             capacity: null,
             enrolled: 0,
             description: "A free two-hour introduction to public speaking for kids: speaking clearly, standing with confidence, and settling the nerves that come with presenting to a group. Every child gets time on their feet, and no experience is needed.",
