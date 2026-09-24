@@ -43,6 +43,52 @@ const boardMembers = [
     },
 ];
 
+// Volunteers, in the order their photos are numbered.
+const volunteers = [
+    {
+        name: "Tara Sundaralingam",
+        role: "Chapter/Outreach Lead, Workshop Coordinator",
+        intro: "Hi! I'm Tara, a junior at Leland High School, and I'm passionate about speaking, volunteering, and making a difference in my community. I joined Almaden Voices because I truly believe that the power of public speaking is something incredibly crucial for everyone to learn, and I want to help make it more accessible to students everywhere. I'm especially looking forward to holding workshops and creating more national chapters. A fun fact about me—I love trying new food, and frequently try new restaurants!",
+        photo: "/images/tara-s-volunteer-1.JPG",
+    },
+    {
+        name: "Avika Chaudhary",
+        role: "Global Outreach & Partnership Liaison, Newsletter Editor",
+        intro: "Hey! I'm Avika, a junior at Leland High School who fell in love with debate in 8th grade and can't wait to help others do the same. I decided to join Almaden Voices because public speaking was my biggest struggle as a kid, and I would've loved a program that worked on building my confidence. I'm especially excited for the opportunity to lead some workshops and help kids develop their speaking voice. Fun fact: I've jumped off a boat before!",
+        photo: "/images/avika-chaudhary-volunteer-2.JPG",
+    },
+    {
+        name: "Saesha Pal",
+        role: "Funding Volunteer & District Outreach Volunteer",
+        intro: "Hi! My name is Saesha, and I'm a junior at Leland High School. I joined Almaden Voices because I love public speaking and working with other students. I'm really looking forward to connecting with my community and being more involved! Fun fact: I love crocheting gifts for other people!",
+        photo: "/images/saesha-pal-volunteer-3.png",
+    },
+    {
+        name: "Tina Kaul",
+        role: "Fundraising & Outreach Lead",
+        intro: "Hi! I'm Tina, a junior at Leland High School who loves to dance, bake, spend time with friends, and make meaningful impacts in the community. I joined Almaden Voices because I want to help make an impact all over the world through making public speaking classes more accessible. Additionally, I joined to be part of a positive community which I can learn from and collaborate with. I'm looking forward to organizing fundraisers and producing outreach posts to expand this nonprofit even further. Fun fact: I love to cook/bake, but I've literally burnt kraft mac n cheese before.",
+        photo: "/images/tina-kaul-volunteer-5.png",
+    },
+    {
+        name: "Diana Mistry",
+        role: "Grant Researcher & Social Media Manager",
+        intro: "Hello! I'm Diana, a junior at Leland High School who enjoys research, problem-solving, and debate. I joined Almaden Voices because I wanted to help students in my community find their voice and be more confident in who they are. I'm looking forward to raising money for the organization and helping create our first social media pages! Fun fact about me: I've hung sideways off of the fourth tallest building in Chicago!",
+        photo: "/images/diana-mistry-volunteer-4.jpg",
+    },
+    {
+        name: "Laya Arun",
+        role: "Chapter Lead & Social Media Manager",
+        intro: "Hi! I'm Laya, a junior at Leland High School. I'm on the Speech and Debate team at Leland, and I wanted to volunteer with Almaden Voices to help spread the skill of public speaking to kids who are just starting out. I'm excited to help kids build the confidence to speak up and find their own voice. Fun fact: I can say the alphabet backwards!",
+        photo: "/images/laya-arun-volunteer-6.jpeg",
+    },
+    {
+        name: "Rhea Bambawale",
+        role: "Workshops Developer & District Outreach Lead",
+        intro: "Hi! I'm Rhea, a junior at Leland High School who loves speech, robotics, physics, and teaching others. I joined Almaden Voices because I want to help make public speaking feel approachable so that no kid finds it intimidating. I'm looking forward to teaching, creating and hosting workshops, and meeting new students! Fun fact: I've been in a helicopter!",
+        photo: "/images/rhea-b-volunteer-7.jpeg",
+    },
+];
+
 // "Deepti Agrawal" -> "DA". Used when a director has no photo yet.
 const initialsOf = (name) =>
     name.split(" ").filter(Boolean).slice(0, 2).map(part => part[0]).join("").toUpperCase();
@@ -261,6 +307,141 @@ function MeetTheTeam() {
                                     }}
                                 >
                                     {member.intro}
+                                </Typography>
+                            </Box>
+                        </motion.div>
+                    ))}
+                </Box>
+            </Container>
+
+            {/* Our Volunteers - four to a row, the last three centered */}
+            <Container id="volunteers" maxWidth="lg" sx={{ mt: 10 }}>
+                <Typography
+                    sx={{
+                        fontSize: "0.8rem",
+                        letterSpacing: "0.14em",
+                        textTransform: "uppercase",
+                        fontWeight: 800,
+                        color: "#2563EB",
+                        textAlign: "center",
+                        mb: 1.5,
+                    }}
+                >
+                    Student Leaders
+                </Typography>
+                <Typography
+                    align="center"
+                    sx={{
+                        fontSize: { xs: "1.9rem", md: "2.5rem" },
+                        fontWeight: 800,
+                        color: "#111827",
+                        letterSpacing: "-0.02em",
+                        lineHeight: 1.15,
+                        mb: 6,
+                    }}
+                >
+                    Our Volunteers
+                </Typography>
+
+                <Box
+                    sx={{
+                        display: "flex",
+                        flexWrap: "wrap",
+                        justifyContent: "center",
+                        alignItems: "flex-start",
+                        gap: 4,
+                    }}
+                >
+                    {volunteers.map((volunteer, index) => (
+                        <motion.div
+                            key={volunteer.name}
+                            initial={{ opacity: 0, y: 40 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ duration: 0.5, delay: (index % 4) * 0.1 }}
+                            style={{ display: "flex" }}
+                        >
+                            <Box
+                                sx={{
+                                    width: { xs: 260, sm: 240 },
+                                    textAlign: "center",
+                                }}
+                            >
+                                {/* Vertical portrait, or initials while we wait on a photo */}
+                                {volunteer.photo && !missingPhotos[volunteer.name] ? (
+                                    <Box
+                                        component="img"
+                                        src={volunteer.photo}
+                                        alt={volunteer.name}
+                                        onError={() => markPhotoMissing(volunteer.name)}
+                                        sx={{
+                                            width: "100%",
+                                            aspectRatio: "3 / 4",
+                                            // Shown whole, never cropped - portraits that
+                                            // aren't 3:4 simply sit narrower in the box.
+                                            objectFit: "contain",
+                                            borderRadius: 3,
+                                            display: "block",
+                                        }}
+                                    />
+                                ) : (
+                                    <Box
+                                        aria-label={volunteer.name}
+                                        sx={{
+                                            width: "100%",
+                                            aspectRatio: "3 / 4",
+                                            display: "flex",
+                                            alignItems: "center",
+                                            justifyContent: "center",
+                                            borderRadius: 3,
+                                            boxShadow: "0 4px 16px rgba(0,0,0,0.1)",
+                                            bgcolor: "#E8EEFB",
+                                            color: "#2563EB",
+                                            fontSize: "3.4rem",
+                                            fontWeight: 700,
+                                            letterSpacing: "0.02em",
+                                        }}
+                                    >
+                                        {initialsOf(volunteer.name)}
+                                    </Box>
+                                )}
+
+                                {/* Name */}
+                                <Typography
+                                    sx={{
+                                        mt: 2,
+                                        fontSize: "1.05rem",
+                                        fontWeight: "bold",
+                                        color: "#111827",
+                                    }}
+                                >
+                                    {volunteer.name}
+                                </Typography>
+
+                                {/* Role - smaller than the name */}
+                                <Typography
+                                    sx={{
+                                        mt: 0.5,
+                                        fontSize: "0.8rem",
+                                        fontWeight: 500,
+                                        color: "#2563EB",
+                                        lineHeight: 1.4,
+                                    }}
+                                >
+                                    {volunteer.role}
+                                </Typography>
+
+                                {/* Bio */}
+                                <Typography
+                                    variant="body2"
+                                    sx={{
+                                        mt: 1.5,
+                                        color: "#6B7280",
+                                        lineHeight: 1.7,
+                                        fontSize: "0.85rem",
+                                    }}
+                                >
+                                    {volunteer.intro}
                                 </Typography>
                             </Box>
                         </motion.div>
