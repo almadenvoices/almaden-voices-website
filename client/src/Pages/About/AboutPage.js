@@ -392,10 +392,11 @@ function MeetTheTeam() {
                                         sx={{
                                             width: "100%",
                                             aspectRatio: "3 / 4",
-                                            // Shown whole, never cropped - portraits that
-                                            // aren't 3:4 simply sit narrower in the box.
-                                            objectFit: "contain",
-                                            borderRadius: 3,
+                                            // Every portrait fills the same square-cornered
+                                            // 3:4 frame, trimming a little off the edges
+                                            // of photos that are a different shape.
+                                            objectFit: "cover",
+                                            objectPosition: "center",
                                             display: "block",
                                         }}
                                     />
@@ -408,7 +409,6 @@ function MeetTheTeam() {
                                             display: "flex",
                                             alignItems: "center",
                                             justifyContent: "center",
-                                            borderRadius: 3,
                                             boxShadow: "0 4px 16px rgba(0,0,0,0.1)",
                                             bgcolor: "#E8EEFB",
                                             color: "#2563EB",
