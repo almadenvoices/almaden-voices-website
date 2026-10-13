@@ -650,7 +650,6 @@ export default function CoachingSlots() {
                         </legend>
                         <p className={c.consentIntro}>
                             We sometimes photograph or record students during sessions and showcases.
-                            Leave this unchecked if you would rather we did not.
                         </p>
                         <label className={c.check}>
                             <input
