@@ -54,31 +54,24 @@ const SHOW_COACHING = true;
 // ============================================================
 const upcomingSessions = [
     {
-        id: "nj-intro-workshop-sep-2026",
-        title: "Free Introductory Public Speaking Workshop (New Jersey)",
-        titleEs: "Taller introductorio gratuito de oratoria (Nueva Jersey)",
-        date: "September 19, 2026",
-        dateEs: "19 de septiembre de 2026",
-        // September is daylight time in New Jersey, so this is ET rather than
-        // the EST people usually say.
-        time: "5:30–7:30 PM ET",
-        timeEs: "5:30–7:30 PM ET",
-        location: "New Jersey — venue to be announced",
-        locationEs: "Nueva Jersey — lugar por confirmar",
-        grades: "Ages 5–14",
-        gradesEs: "Edades 5 a 14",
+        id: "storytelling-workshop-oct28-2026",
+        title: "Free Storytelling & Speech Writing Workshop",
+        titleEs: "Taller gratuito de narración y redacción de discursos",
+        date: "Wednesday, October 28, 2026",
+        dateEs: "Miércoles 28 de octubre de 2026",
+        time: "5:30–6:30 PM",
+        timeEs: "5:30–6:30 PM",
+        location: "6392 Lillian Way, San Jose",
+        locationEs: "6392 Lillian Way, San José",
+        grades: "Open to all students",
+        gradesEs: "Abierto a todos los estudiantes",
         // capacity: null means no limit — no seat count and it never shows as full.
         capacity: null,
         enrolled: 0,
-        description: "A free two-hour introduction to public speaking for kids. We cover the fundamentals — speaking clearly, standing with confidence, and settling the nerves that come with presenting to a group — and every child gets time on their feet. No experience needed. Runs Saturday, September 19 from 5:30–7:30 PM ET; we'll email you the venue as soon as it's confirmed.",
-        descriptionEs: "Una introducción gratuita de dos horas a la oratoria para niños. Cubrimos los fundamentos: hablar con claridad, mantener una postura segura y calmar los nervios de presentar ante un grupo, y cada niño tiene tiempo para practicar de pie. No se necesita experiencia. Se realiza el sábado 19 de septiembre de 5:30 a 7:30 PM ET; le enviaremos el lugar por correo en cuanto esté confirmado.",
+        description: "A free one-hour workshop on storytelling and speech writing. Students will learn the basics of how to write a speech. If possible, please bring a notebook and some pens to write on and with.",
+        descriptionEs: "Un taller gratuito de una hora sobre narración y redacción de discursos. Los estudiantes aprenderán los conceptos básicos para escribir un discurso. Si es posible, por favor traigan un cuaderno y algunos bolígrafos para escribir.",
         status: "Open",
         online: false,
-        // Shown in a highlighted box under the session details, and again on
-        // the thank-you screen after someone registers. Leave it off a session
-        // that doesn't need it.
-        shareNote: "We had to cancel our last New Jersey workshop because not enough families signed up in time — and we'd hate for that to happen again. If your child would like to come, please forward this to your friends, family, and neighbours and ask them to sign up too. Every extra registration makes it more certain this one goes ahead.",
-        shareNoteEs: "Tuvimos que cancelar nuestro taller anterior en Nueva Jersey porque no se inscribieron suficientes familias a tiempo, y no quisiéramos que vuelva a ocurrir. Si su hijo desea asistir, por favor comparta esta información con sus amigos, familiares y vecinos, y pídales que también se inscriban. Cada inscripción adicional hace más seguro que este taller se lleve a cabo.",
     },
 ];
 

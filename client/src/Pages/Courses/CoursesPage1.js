@@ -47,7 +47,23 @@ const CoursesPage = () => {
     //     cover: "/images/your-image.jpg"
     // }
     // ============================================================
-    const upcomingSessions = [];
+    const upcomingSessions = [
+        {
+            id: "storytelling-workshop-oct28-2026",
+            title: "Free Storytelling & Speech Writing Workshop",
+            date: "Wednesday, October 28, 2026",
+            time: "5:30–6:30 PM",
+            location: "6392 Lillian Way, San Jose",
+            ageGroup: "Open to all students",
+            // capacity: null means no limit — no seat count and it never shows as full.
+            capacity: null,
+            enrolled: 0,
+            description: "A free one-hour workshop on storytelling and speech writing. Students will learn the basics of how to write a speech. If possible, please bring a notebook and some pens to write on and with.",
+            status: "Open",
+            online: false,
+            cover: "/images/s7-practice-paragraphs.png",
+        },
+    ];
 
     const sessions = upcomingSessions.map(ses => ({
         ...ses,
