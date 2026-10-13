@@ -152,8 +152,8 @@ export const T = {
         es: "Sin embargo, una pequeña contribución de $5 a $10 nos ayuda a cubrir el costo de realizar el taller en línea. ¡Cada aporte nos ayuda a mantener estos talleres gratuitos y accesibles para familias de todo el mundo!",
     },
     supportInPerson: {
-        en: "However, a small $5–$10 contribution helps us cover the cost of the library room, materials, and supplies. Every bit helps us keep these workshops accessible for all families!",
-        es: "Sin embargo, una pequeña contribución de $5 a $10 nos ayuda a cubrir el costo del salón de la biblioteca, los materiales y los suministros. ¡Cada aporte nos ayuda a mantener estos talleres accesibles para todas las familias!",
+        en: "However, a small $5–$10 contribution helps us cover the cost of the room, materials, and supplies. Every bit helps us keep these workshops accessible for all families!",
+        es: "Sin embargo, una pequeña contribución de $5 a $10 nos ayuda a cubrir el costo del salón, los materiales y los suministros. ¡Cada aporte nos ayuda a mantener estos talleres accesibles para todas las familias!",
     },
     noThanks: { en: "No thanks", es: "No, gracias" },
     donateThanks: {
@@ -168,8 +168,8 @@ export const T = {
     // ---- Consent + submit ----
     photoTitle: { en: "Photo and video permission", es: "Permiso de fotos y video" },
     photoIntro: {
-        en: "We sometimes photograph or record students during sessions and showcases. Leave this unchecked if you would rather we did not.",
-        es: "A veces tomamos fotos o grabamos a los estudiantes durante las sesiones y presentaciones. Deje esta casilla sin marcar si prefiere que no lo hagamos.",
+        en: "We sometimes photograph or record students during sessions and showcases.",
+        es: "A veces tomamos fotos o grabamos a los estudiantes durante las sesiones y presentaciones.",
     },
     photoConsentLabel: {
         en: "I give permission for my child to be photographed or recorded.",
