@@ -47,28 +47,7 @@ const CoursesPage = () => {
     //     cover: "/images/your-image.jpg"
     // }
     // ============================================================
-    const upcomingSessions = [
-        {
-            id: "nj-intro-workshop-sep-2026",
-            title: "Free Introductory Public Speaking Workshop (New Jersey)",
-            date: "September 19, 2026",
-            // September is daylight time in New Jersey, so this is ET rather
-            // than the EST people usually say.
-            time: "5:30–7:30 PM ET",
-            location: "New Jersey — venue to be announced",
-            ageGroup: "Ages 5–14",
-            // capacity: null means no limit — no seat count and it never shows as full.
-            capacity: null,
-            enrolled: 0,
-            description: "A free two-hour introduction to public speaking for kids: speaking clearly, standing with confidence, and settling the nerves that come with presenting to a group. Every child gets time on their feet, and no experience is needed.",
-            status: "Open",
-            online: false,
-            cover: "/images/teaching-glasses.jpg",
-            // Shown as a highlighted box on the card. Leave it off a session
-            // that doesn't need it.
-            note: "We had to cancel our last New Jersey workshop because not enough families signed up in time. If your child would like to come, please forward this to friends, family, and neighbours and ask them to sign up too — every extra registration makes it more certain this one goes ahead.",
-        },
-    ];
+    const upcomingSessions = [];
 
     const sessions = upcomingSessions.map(ses => ({
         ...ses,
