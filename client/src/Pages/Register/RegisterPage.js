@@ -52,28 +52,7 @@ const SHOW_COACHING = true;
 //     status: "Open",  // "Open" or "Full"
 // }
 // ============================================================
-const upcomingSessions = [
-    {
-        id: "storytelling-workshop-oct28-2026",
-        title: "Free Storytelling & Speech Writing Workshop",
-        titleEs: "Taller gratuito de narración y redacción de discursos",
-        date: "Wednesday, October 28, 2026",
-        dateEs: "Miércoles 28 de octubre de 2026",
-        time: "5:30–6:30 PM",
-        timeEs: "5:30–6:30 PM",
-        location: "6392 Lillian Way, San Jose",
-        locationEs: "6392 Lillian Way, San José",
-        grades: "Open to all students",
-        gradesEs: "Abierto a todos los estudiantes",
-        // capacity: null means no limit — no seat count and it never shows as full.
-        capacity: null,
-        enrolled: 0,
-        description: "A free one-hour workshop on storytelling and speech writing. Students will learn the basics of how to write a speech. If possible, please bring a notebook and some pens to write on and with.",
-        descriptionEs: "Un taller gratuito de una hora sobre narración y redacción de discursos. Los estudiantes aprenderán los conceptos básicos para escribir un discurso. Si es posible, por favor traigan un cuaderno y algunos bolígrafos para escribir.",
-        status: "Open",
-        online: false,
-    },
-];
+const upcomingSessions = [];
 
 // Wraps a session field and its Spanish twin into the {en, es} shape <Bi> wants.
 // Sessions keep plain English fields as well, because those are what get written
