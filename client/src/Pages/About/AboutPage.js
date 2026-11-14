@@ -97,7 +97,7 @@ const volunteers = [
         name: "Samanvitha Sundaram",
         role: "New Jersey Chapter Lead & Workshops Manager",
         intro: "Hi, my name is Samanvitha and I am an 8th grader at Pond Road Middle School in NJ who loves singing, art, writing, and public speaking. I joined Almaden Voices because I want to be able to help kids who are afraid of speaking up find their voice. I'm definitely looking forward to teaching students and helping to run workshops and sessions. Fun fact: I am bilingual (working on being trilingual!)",
-        // No photo yet - her initials show until one arrives.
+        photo: "/images/samanvitha-sundaram-volunteer-9.jpg",
     },
 ];
 
