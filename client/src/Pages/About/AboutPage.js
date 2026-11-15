@@ -82,18 +82,6 @@ const volunteers = [
         photo: "/images/laya-arun-volunteer-6.jpeg",
     },
     {
-        name: "Rhea Bambawale",
-        role: "Workshops Developer & District Outreach Lead",
-        intro: "Hi! I'm Rhea, a junior at Leland High School who loves speech, robotics, physics, and teaching others. I joined Almaden Voices because I want to help make public speaking feel approachable so that no kid finds it intimidating. I'm looking forward to teaching, creating and hosting workshops, and meeting new students! Fun fact: I've been in a helicopter!",
-        photo: "/images/rhea-b-volunteer-7.jpeg",
-    },
-    {
-        name: "Sophia Hao",
-        role: "Public Speaking Programs & Tournament Coordinator",
-        intro: "Hi! I'm Sophia, a sophomore at Leland High School who loves speech and debate, teaching, and getting involved in my community. I joined Almaden Voices because I'm passionate about public speaking and want to help make it more approachable and accessible to younger students. I'm especially excited to help create workshops, teach students, and grow the organization's reach in the community. Fun fact: I've been to Cancun, Mexico 5 times!",
-        photo: "/images/sophia-hao-volunteer-8.jpeg",
-    },
-    {
         name: "Samanvitha Sundaram",
         role: "New Jersey Chapter Lead & Workshops Manager",
         intro: "Hi, my name is Samanvitha and I am an 8th grader at Pond Road Middle School in NJ who loves singing, art, writing, and public speaking. I joined Almaden Voices because I want to be able to help kids who are afraid of speaking up find their voice. I'm definitely looking forward to teaching students and helping to run workshops and sessions. Fun fact: I am bilingual (working on being trilingual!)",
