@@ -40,11 +40,8 @@ const WHAT_YOU_GET = [
 ];
 
 const STEPS = [
-    ["Get familiar with us", "Read the chapter guide below and explore almadenvoices.org."],
-    ["Choose your chapter type", "Decide whether a school or local chapter fits your community best."],
-    ["Complete the application", "Fill out the chapter application at the bottom of this page."],
-    ["Meet with our team", "If your application moves forward, we'll invite you to a 20-minute interview."],
-    ["Receive your decision", "We'll email you within 5–10 business days of your interview."],
+    ["Read the chapter guide", "Learn what running a chapter involves and decide whether a school or local chapter fits your community best."],
+    ["Apply and interview", "Fill out the application below. If it moves forward, we'll invite you to a 20-minute interview and email you a decision within 5–10 business days."],
     ["Get started!", "Sign a short chapter agreement, complete onboarding, and we'll set you up with a chapter email, shared drive, curriculum, and your first check-in."],
 ];
 
@@ -67,7 +64,7 @@ export default function ChaptersPage() {
                 sx={{
                     position: "relative",
                     width: "100%",
-                    minHeight: 380,
+                    minHeight: 320,
                     overflow: "hidden",
                     background: "linear-gradient(135deg, #1e3a8a 0%, #2563EB 50%, #3b82f6 100%)",
                     display: "flex",
@@ -116,8 +113,85 @@ export default function ChaptersPage() {
                 </Button>
             </Box>
 
+            {/* How to apply - kept short so the form is right below */}
+            <Box sx={{ pt: { xs: 6, md: 8 }, pb: 2, bgcolor: "#FFFFFF" }}>
+                <Container maxWidth="lg">
+                    <SectionTitle>How to apply</SectionTitle>
+                    <Box
+                        sx={{
+                            display: "grid",
+                            gridTemplateColumns: { xs: "1fr", md: "1fr 1fr 1fr" },
+                            gap: 3,
+                        }}
+                    >
+                        {STEPS.map(([title, body], index) => (
+                            <Box key={title} sx={{ bgcolor: "#F9FAFB", border: "1px solid #E5E7EB", borderRadius: 3, p: 3 }}>
+                                <Box
+                                    sx={{
+                                        width: 40,
+                                        height: 40,
+                                        borderRadius: "50%",
+                                        bgcolor: "#2563EB",
+                                        color: "#FFFFFF",
+                                        fontWeight: 800,
+                                        display: "flex",
+                                        alignItems: "center",
+                                        justifyContent: "center",
+                                        mb: 1.5,
+                                    }}
+                                >
+                                    {index + 1}
+                                </Box>
+                                <Typography sx={{ fontWeight: 700, color: "#111827", mb: 0.5 }}>{title}</Typography>
+                                <Typography sx={{ color: "#4B5563", lineHeight: 1.7 }}>{body}</Typography>
+                            </Box>
+                        ))}
+                    </Box>
+                    <Typography sx={{ color: "#6B7280", textAlign: "center", mt: 3 }}>
+                        New to Almaden Voices chapters?{" "}
+                        <a href="#learn-more" style={{ color: "#2563EB", fontWeight: 600 }}>
+                            Read the chapter guide and details below the form
+                        </a>
+                        .
+                    </Typography>
+                </Container>
+            </Box>
+
+            {/* Application form */}
+            <Box id="apply" sx={{ pt: { xs: 4, md: 6 }, pb: { xs: 8, md: 10 }, bgcolor: "#FFFFFF", scrollMarginTop: "90px" }}>
+                <Container maxWidth="md">
+                    <SectionTitle>Apply to start a chapter</SectionTitle>
+                    <Box
+                        sx={{
+                            borderRadius: 3,
+                            overflow: "hidden",
+                            border: "1px solid #E5E7EB",
+                            bgcolor: "#FFFFFF",
+                        }}
+                    >
+                        <iframe
+                            src={FORM_EMBED_URL}
+                            title="Almaden Voices chapter application"
+                            style={{ width: "100%", height: "min(1100px, 85vh)", border: 0, display: "block" }}
+                        >
+                            Loading…
+                        </iframe>
+                    </Box>
+                    <Typography sx={{ color: "#6B7280", textAlign: "center", mt: 2 }}>
+                        Form not loading?{" "}
+                        <a href={FORM_URL} target="_blank" rel="noopener noreferrer" style={{ color: "#2563EB", fontWeight: 600 }}>
+                            Open the application in a new tab
+                        </a>
+                        . Questions? Email{" "}
+                        <a href="mailto:almadenvoices@gmail.com" style={{ color: "#2563EB", fontWeight: 600 }}>
+                            almadenvoices@gmail.com
+                        </a>
+                        .
+                    </Typography>
+                </Container>
+            </Box>
             {/* What is a chapter */}
-            <Box sx={{ py: { xs: 8, md: 10 }, bgcolor: "#FFFFFF" }}>
+            <Box id="learn-more" sx={{ py: { xs: 8, md: 10 }, bgcolor: "#F9FAFB", scrollMarginTop: "90px" }}>
                 <Container maxWidth="md">
                     <SectionTitle>What is a chapter?</SectionTitle>
                     <Typography sx={{ color: "#374151", lineHeight: 1.8, fontSize: "1.05rem", mb: 2 }}>
@@ -144,7 +218,7 @@ export default function ChaptersPage() {
                         }}
                     >
                         {CHAPTER_TYPES.map((type) => (
-                            <Box key={type.title} sx={{ bgcolor: "#F9FAFB", border: "1px solid #E5E7EB", borderRadius: 3, p: 3 }}>
+                            <Box key={type.title} sx={{ bgcolor: "#FFFFFF", border: "1px solid #E5E7EB", borderRadius: 3, p: 3 }}>
                                 {type.icon}
                                 <Typography variant="h6" sx={{ fontWeight: 700, mt: 1, mb: 1, color: "#111827" }}>
                                     {type.title}
@@ -161,7 +235,7 @@ export default function ChaptersPage() {
             </Box>
 
             {/* What you get */}
-            <Box sx={{ py: { xs: 8, md: 10 }, bgcolor: "#F9FAFB" }}>
+            <Box sx={{ py: { xs: 8, md: 10 }, bgcolor: "#FFFFFF" }}>
                 <Container maxWidth="lg">
                     <SectionTitle>What you get</SectionTitle>
                     <Box
@@ -172,44 +246,13 @@ export default function ChaptersPage() {
                         }}
                     >
                         {WHAT_YOU_GET.map(([title, body]) => (
-                            <Box key={title} sx={{ bgcolor: "#FFFFFF", border: "1px solid #E5E7EB", borderRadius: 3, p: 3 }}>
+                            <Box key={title} sx={{ bgcolor: "#F9FAFB", border: "1px solid #E5E7EB", borderRadius: 3, p: 3 }}>
                                 <CheckCircleIcon sx={{ color: "#10B981", mb: 1 }} />
                                 <Typography sx={{ fontWeight: 700, mb: 1, color: "#111827" }}>{title}</Typography>
                                 <Typography sx={{ color: "#4B5563", lineHeight: 1.7, fontSize: "0.95rem" }}>{body}</Typography>
                             </Box>
                         ))}
                     </Box>
-                </Container>
-            </Box>
-
-            {/* How to apply */}
-            <Box sx={{ py: { xs: 8, md: 10 }, bgcolor: "#FFFFFF" }}>
-                <Container maxWidth="md">
-                    <SectionTitle>How to apply</SectionTitle>
-                    {STEPS.map(([title, body], index) => (
-                        <Box key={title} sx={{ display: "flex", gap: 2.5, mb: 3, alignItems: "flex-start" }}>
-                            <Box
-                                sx={{
-                                    flexShrink: 0,
-                                    width: 40,
-                                    height: 40,
-                                    borderRadius: "50%",
-                                    bgcolor: "#2563EB",
-                                    color: "#FFFFFF",
-                                    fontWeight: 800,
-                                    display: "flex",
-                                    alignItems: "center",
-                                    justifyContent: "center",
-                                }}
-                            >
-                                {index + 1}
-                            </Box>
-                            <Box>
-                                <Typography sx={{ fontWeight: 700, color: "#111827" }}>{title}</Typography>
-                                <Typography sx={{ color: "#4B5563", lineHeight: 1.7 }}>{body}</Typography>
-                            </Box>
-                        </Box>
-                    ))}
                 </Container>
             </Box>
 
@@ -245,39 +288,6 @@ export default function ChaptersPage() {
                 </Container>
             </Box>
 
-            {/* Application form */}
-            <Box id="apply" sx={{ py: { xs: 8, md: 10 }, bgcolor: "#FFFFFF", scrollMarginTop: "90px" }}>
-                <Container maxWidth="md">
-                    <SectionTitle>Apply to start a chapter</SectionTitle>
-                    <Box
-                        sx={{
-                            borderRadius: 3,
-                            overflow: "hidden",
-                            border: "1px solid #E5E7EB",
-                            bgcolor: "#FFFFFF",
-                        }}
-                    >
-                        <iframe
-                            src={FORM_EMBED_URL}
-                            title="Almaden Voices chapter application"
-                            style={{ width: "100%", height: 1500, border: 0, display: "block" }}
-                        >
-                            Loading…
-                        </iframe>
-                    </Box>
-                    <Typography sx={{ color: "#6B7280", textAlign: "center", mt: 2 }}>
-                        Form not loading?{" "}
-                        <a href={FORM_URL} target="_blank" rel="noopener noreferrer" style={{ color: "#2563EB", fontWeight: 600 }}>
-                            Open the application in a new tab
-                        </a>
-                        . Questions? Email{" "}
-                        <a href="mailto:almadenvoices@gmail.com" style={{ color: "#2563EB", fontWeight: 600 }}>
-                            almadenvoices@gmail.com
-                        </a>
-                        .
-                    </Typography>
-                </Container>
-            </Box>
         </Box>
     );
 }
