@@ -332,6 +332,54 @@ export default function HomePage(){
 
     return (
         <>
+            {/* Chapter applications banner — sits above everything else on the
+                page. Remove this block when applications close. */}
+            <Box
+                component="a"
+                href="/chapters"
+                onClick={(e) => { e.preventDefault(); navigate('/chapters'); }}
+                sx={{
+                    display: 'block',
+                    textDecoration: 'none',
+                    background: 'linear-gradient(135deg, #1e3a8a 0%, #2563EB 55%, #3b82f6 100%)',
+                    color: '#FFFFFF',
+                    py: { xs: 4, md: 5 },
+                    px: 2,
+                    textAlign: 'center',
+                    '&:hover .chapter-cta': { bgcolor: '#F59E0B' },
+                }}
+            >
+                <Typography
+                    sx={{
+                        fontWeight: 900,
+                        fontSize: { xs: '1.9rem', sm: '2.4rem', md: '3rem' },
+                        lineHeight: 1.15,
+                        letterSpacing: '.01em',
+                    }}
+                >
+                    Chapter Applications Open Now!
+                </Typography>
+                <Box
+                    className="chapter-cta"
+                    sx={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: 1,
+                        mt: 2.5,
+                        px: 4,
+                        py: 1.5,
+                        borderRadius: 999,
+                        bgcolor: '#FBBF24',
+                        color: '#111827',
+                        fontWeight: 800,
+                        fontSize: { xs: '1rem', md: '1.15rem' },
+                        transition: 'background-color .2s',
+                    }}
+                >
+                    Click here to get started <ArrowForwardIcon />
+                </Box>
+            </Box>
+
             <HeroVideo config={heroConfig} />
             <Box id="more-section" ref={moreRef} />
 

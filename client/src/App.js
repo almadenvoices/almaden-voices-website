@@ -12,6 +12,7 @@ import RegisterPage from './Pages/Register/RegisterPage';
 import ImpactPage from './Pages/Impact/ImpactPage';
 import EventsPage from './Pages/Events/EventsPage';
 import VolunteerPage from './Pages/Volunteer/VolunteerPage';
+import ChaptersPage from './Pages/Chapters/ChaptersPage';
 
 export default function App() {
     return (
@@ -30,6 +31,7 @@ export default function App() {
                         <Route path="/register" element={<RegisterPage />} />
                         <Route path="/events" element={<EventsPage />} />
                         <Route path="/volunteer" element={<VolunteerPage />} />
+                        <Route path="/chapters" element={<ChaptersPage />} />
                         <Route path="*" element={<Navigate to="/home" replace />} />
                     </Route>
                 </Routes>
