@@ -25,6 +25,7 @@ const LINKS = [
     { label: "FAQ", to: "/faq" },
     { label: "Contact", to: "/contact" },
     { label: "Volunteer", to: "/volunteer" },
+    { label: "Chapters", to: "/chapters" },
     { label: "Register", to: "/register" }
 ];
 
@@ -194,7 +195,7 @@ function DesktopLinkWithDropdown({ link, active, underline }) {
 function DesktopLinksBig({ underline=true }) {
     const location = useLocation();
     return (
-        <Stack direction="row" spacing={3} alignItems="center" sx={{ display: { xs: 'none', md: 'flex' } }}>
+        <Stack direction="row" spacing={{ md: 1.5, lg: 3 }} alignItems="center" sx={{ display: { xs: 'none', md: 'flex' } }}>
             {LINKS.map((l) => {
                 const active = location.pathname === l.to;
                 if (l.submenu) {
