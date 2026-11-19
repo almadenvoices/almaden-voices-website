@@ -1,0 +1,126 @@
+.chooser {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding: 4px 4px 12px;
+    margin: 0 -4px 32px;
+    scrollbar-width: thin;
+}
+
+.choice {
+    flex: 0 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+    padding: 12px 16px;
+    background: #FFFFFF;
+    border: 1px solid #CED8E5;
+    border-radius: 4px;
+    font: inherit;
+    cursor: pointer;
+    text-align: left;
+    color: var(--ink);
+}
+
+.choice:hover {
+    border-color: var(--navy);
+}
+
+.choiceOn {
+    background: var(--navy);
+    border-color: var(--navy);
+    color: #FFFFFF;
+}
+
+.choiceWhen {
+    font-weight: 700;
+    font-size: 0.98rem;
+    white-space: nowrap;
+}
+
+.choiceKind {
+    font-size: 0.85rem;
+    opacity: 0.85;
+    white-space: nowrap;
+}
+
+.panelHead {
+    max-width: 66ch;
+    margin-bottom: 28px;
+}
+
+.sessionTitle {
+    margin: 0 0 6px;
+    font-size: clamp(1.5rem, 2.6vw, 2rem);
+    line-height: 1.2;
+    color: var(--navy-ink);
+}
+
+.sessionMeta {
+    margin: 0 0 14px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--ink-soft);
+}
+
+.sessionText {
+    margin: 0;
+    font-size: 1.06rem;
+    line-height: 1.75;
+    color: var(--ink);
+}
+
+/* Photos keep their own shape: nothing is cropped. */
+.gallery {
+    columns: 1;
+    column-gap: 24px;
+}
+
+.photo {
+    break-inside: avoid;
+    margin: 0 0 28px;
+}
+
+.photo img {
+    width: 100%;
+    height: auto;
+}
+
+.more {
+    margin: 16px 0 0;
+    font-size: 1.04rem;
+    color: var(--ink-soft);
+}
+
+.videos {
+    display: grid;
+    gap: 32px;
+}
+
+.videoFigure {
+    margin: 0;
+}
+
+.video {
+    width: 100%;
+    aspect-ratio: 9 / 10;
+    background: #000;
+    object-fit: contain;
+    display: block;
+}
+
+.videoName {
+    margin-top: 10px;
+    font-weight: 700;
+    color: var(--navy-ink);
+}
+
+@media (min-width: 640px) {
+    .gallery {
+        columns: 2;
+    }
+    .videos {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}

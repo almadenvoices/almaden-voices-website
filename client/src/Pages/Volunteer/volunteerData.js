@@ -65,7 +65,7 @@ export const POSITIONS = [
         ],
         looking: [
             "Genuinely enjoys research and doesn't mind reading eligibility fine print",
-            "Detail-oriented— small details matter when we're evaluating grant opportunities",
+            "Detail-oriented: small details matter when we're evaluating grant opportunities",
             "Comfortable in Google Sheets",
             "Clear writer",
         ],
@@ -79,7 +79,7 @@ export const POSITIONS = [
             "Write and send handwritten thank-you cards to past families, donors, and volunteers",
             "Call families who've been through a workshop and ask whether they'd support the next one",
             "Keep a shared record of who was contacted, what they said, and who asked not to be contacted again",
-            "Send the follow-up — a card after a call, a thank-you after a donation",
+            "Send the follow-up: a card after a call, a thank-you after a donation",
             "Flag anyone worth asking again later, or who offered something other than money",
         ],
         looking: [
@@ -115,12 +115,12 @@ export const POSITIONS = [
         intro: "Getting into schools is our single biggest goal this year. This role builds and holds those relationships, starting with San José Unified.",
         doing: [
             "Build and maintain our relationship with SJUSD and other districts",
-            "Identify the right people — principals, after-school coordinators, expanded learning offices",
+            "Identify the right people: principals, after-school coordinators, expanded learning offices",
             "Send follow-up emails and schedule workshops on campuses",
             "Keep a clear record of every school, contact, and conversation",
         ],
         looking: [
-            "Professional and patient — school partnerships often take time to develop",
+            "Professional and patient: school partnerships often take time to develop",
             "Good written communication",
             "Comfortable following up thoughtfully and staying persistent when conversations take time",
             "Some familiarity with how schools work is a plus",
@@ -140,7 +140,7 @@ export const POSITIONS = [
         looking: [
             "Genuinely comfortable and patient with kids",
             "Public speaking, debate, theater, or teaching/tutoring experience",
-            "Reliable — students and families are counting on you to show up",
+            "Reliable: students and families are counting on you to show up",
             "Spanish is a strong plus",
             "For in-person sessions, must be able to get to session locations around San José",
         ],
@@ -150,7 +150,7 @@ export const POSITIONS = [
         id: "newsletter",
         title: "Newsletter Writer",
         summary: "Families sign up to hear from us. This role is what actually lands in their inbox.",
-        intro: "Families, volunteers, and donors sign up to hear from us. This role is what actually lands in their inbox — the stories from our workshops, what's coming up, and where we need help.",
+        intro: "Families, volunteers, and donors sign up to hear from us. This role is what actually lands in their inbox: the stories from our workshops, what's coming up, and where we need help.",
         doing: [
             "Write and send our newsletter to families, volunteers, and donors",
             "Talk to students, instructors, and parents for short pieces about what's happening in our workshops",
@@ -158,7 +158,7 @@ export const POSITIONS = [
             "Pull together photos and session details from the team into something people want to read",
         ],
         looking: [
-            "Clear, warm writer — this reads like a person, not a press release",
+            "Clear, warm writer: this reads like a person, not a press release",
             "Reliable about deadlines, so families and supporters can hear from us consistently",
             "Comfortable asking people for quotes and details",
             "Good-to-have: any experience with a school paper, blog, or email tool",
@@ -168,10 +168,10 @@ export const POSITIONS = [
         id: "social-media",
         title: "Social Media Manager",
         summary: "We do work worth seeing, and almost nobody sees it. This role is how families find us.",
-        intro: "Almaden Voices has very little presence on social media, which means families who would love our workshops never hear they exist. This role builds that presence from close to nothing — so there's a lot of room to shape it.",
+        intro: "Almaden Voices has very little presence on social media, which means families who would love our workshops never hear they exist. This role builds that presence from close to nothing: so there's a lot of room to shape it.",
         doing: [
             "Plan and post regularly, starting with Instagram and wherever else local families actually are",
-            "Turn workshop moments into posts worth sharing — a first speech, a showcase, a warm-up circle",
+            "Turn workshop moments into posts worth sharing: a first speech, a showcase, a warm-up circle",
             "Write short captions that sound like a person, in Spanish too wherever you can",
             "Reply to comments and messages, and pass anything that needs us straight to us",
             "Keep a simple posting calendar, so it doesn't stall the first busy week",
@@ -180,7 +180,7 @@ export const POSITIONS = [
             "Knows how these platforms actually work, not just how to scroll them",
             "Can take and edit a decent photo or short video on a phone",
             "Writes short and warm rather than formal",
-            "Reliable — an account that posts twice and goes quiet looks worse than no account at all",
+            "Reliable: an account that posts twice and goes quiet looks worse than no account at all",
             "Good-to-have: Spanish, or having run an account for a club, team or school group",
         ],
         note: "Students appear online only when their family has given photo and video permission, which we record for every child and which you'll be able to check before anything goes out. First names only, never a surname.",
@@ -191,7 +191,7 @@ export const POSITIONS = [
         summary: "Almost everyone who finds us finds us through almadenvoices.org. This role keeps it working and makes it better.",
         intro: "Almost everyone who finds us finds us through the website. It's where families register for workshops, where volunteers apply, and where coaching gets booked and paid for. This role keeps it running and makes it better.",
         doing: [
-            "Keep the site current — new workshops and dates, new photos, new volunteer roles",
+            "Keep the site current: new workshops and dates, new photos, new volunteer roles",
             "Fix what breaks, and check that registration and payment still work after every change",
             "Improve how the site reads on a phone, which is how most families open it",
             "Help keep pages fast, accessible, and clearly worded in both English and Spanish",
@@ -199,7 +199,7 @@ export const POSITIONS = [
         ],
         looking: [
             "Comfortable with HTML, CSS and JavaScript. React is a real plus, since the site is built in it",
-            "Willing to learn the parts you haven't met yet — the site also uses Node and Google Cloud",
+            "Willing to learn the parts you haven't met yet: the site also uses Node and Google Cloud",
             "Careful and unhurried around registration and payments, since these systems are used by real families",
             "Able to explain a change in plain language to someone non-technical",
             "Good-to-have: any experience with Git, or with making a site work properly on a phone",

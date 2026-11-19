@@ -4,22 +4,26 @@ import ColorModeProvider from './Theme/ColorModeContext';
 import AppLayout from './Layout/AppLayout';
 import HomePage from "./Pages/Home/HomePage";
 import AboutPage from "./Pages/About/AboutPage";
-import CoursesPage1 from "./Pages/Courses/CoursesPage1";
 import ContactPage from "./Pages/Contact/ContactPage";
 import FAQPage from "./Pages/FAQ/FAQPage";
 import DonatePage from './Pages/Donate/DonatePage';
 import RegisterPage from './Pages/Register/RegisterPage';
-import ImpactPage from './Pages/Impact/ImpactPage';
-import EventsPage from './Pages/Events/EventsPage';
-import VolunteerPage from './Pages/Volunteer/VolunteerPage';
-import ChaptersPage from './Pages/Chapters/ChaptersPage';
+import ProgramsPage from './Pages/Programs/ProgramsPage';
+import GetInvolvedPage from './Pages/GetInvolved/GetInvolvedPage';
+import StoriesPage from './Pages/Stories/StoriesPage';
 import { OLD_URL_REDIRECTS, HASH_REDIRECTS } from './data/redirects';
 
-/** Sends an old URL to its new home, keeping ?query and #anchor. */
+/**
+ * Sends an old URL to its new home, keeping ?query. An old #anchor that moved
+ * somewhere specific goes there; otherwise the new address's own #anchor
+ * wins, and failing that the old one is kept.
+ */
 function OldUrlRedirect({ to }) {
     const { pathname, search, hash } = useLocation();
     const moved = HASH_REDIRECTS[`${pathname}${hash}`];
-    return <Navigate to={moved || `${to}${search}${hash}`} replace />;
+    const [toPath, toHash] = to.split('#');
+    const target = `${toPath}${search}${toHash ? `#${toHash}` : hash}`;
+    return <Navigate to={moved || target} replace />;
 }
 
 export default function App() {
@@ -33,15 +37,13 @@ export default function App() {
                             <Route key={from} path={from} element={<OldUrlRedirect to={to} />} />
                         ))}
                         <Route path="/about" element={<AboutPage />} />
-                        <Route path="/contact" element={<ContactPage />} />
-                        <Route path="/courses1" element={<CoursesPage1 />} />
+                        <Route path="/programs" element={<ProgramsPage />} />
+                        <Route path="/get-involved" element={<GetInvolvedPage />} />
+                        <Route path="/stories" element={<StoriesPage />} />
+                        <Route path="/register" element={<RegisterPage />} />
                         <Route path="/donate" element={<DonatePage />} />
                         <Route path="/faq" element={<FAQPage />} />
-                        <Route path="/impact" element={<ImpactPage />} />
-                        <Route path="/register" element={<RegisterPage />} />
-                        <Route path="/events" element={<EventsPage />} />
-                        <Route path="/volunteer" element={<VolunteerPage />} />
-                        <Route path="/chapters" element={<ChaptersPage />} />
+                        <Route path="/contact" element={<ContactPage />} />
                         <Route path="*" element={<Navigate to="/" replace />} />
                     </Route>
                 </Routes>

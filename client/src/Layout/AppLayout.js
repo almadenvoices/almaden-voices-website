@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
-import { Outlet, useLocation, useNavigationType } from 'react-router-dom';
+import { Outlet, useLocation, useNavigate, useNavigationType } from 'react-router-dom';
+import { HASH_REDIRECTS } from '../data/redirects';
 import { MotionConfig } from 'framer-motion';
 import Navbar from '../components/Navbar/Navbar';
 import Footer from '../components/Footer/Footer';
@@ -17,12 +18,20 @@ const prefersReducedMotion = () =>
  *   second before giving up.
  * - a new page without an anchor starts at the top.
  * - Back/Forward without an anchor is left to the browser.
+ * - an old anchor that has moved (/about#team) is swapped for its new one
+ *   first (see HASH_REDIRECTS).
  */
 function ScrollManager() {
     const { pathname, hash, key } = useLocation();
     const navType = useNavigationType();
+    const navigate = useNavigate();
 
     useEffect(() => {
+        const moved = hash && HASH_REDIRECTS[`${pathname}${hash}`];
+        if (moved) {
+            navigate(moved, { replace: true });
+            return undefined;
+        }
         if (!hash) {
             if (navType !== 'POP') window.scrollTo(0, 0);
             return undefined;
@@ -45,7 +54,7 @@ function ScrollManager() {
         };
         frame = requestAnimationFrame(attempt);
         return () => cancelAnimationFrame(frame);
-    }, [pathname, hash, key, navType]);
+    }, [pathname, hash, key, navType, navigate]);
 
     return null;
 }

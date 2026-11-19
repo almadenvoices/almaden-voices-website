@@ -2,7 +2,7 @@
     position: relative;
     z-index: 1200;
     background: #FFFFFF;
-    border-bottom: 1px solid #E4E1D8;
+    border-bottom: 1px solid #DCE4EF;
 }
 
 .bar {
@@ -57,7 +57,7 @@
 .topLink:hover {
     text-decoration: none;
     color: var(--navy);
-    border-bottom-color: #C9D2DF;
+    border-bottom-color: #B8C3D3;
 }
 
 .topLinkCurrent {
@@ -101,7 +101,7 @@
     padding: 6px 0;
     list-style: none;
     background: #FFFFFF;
-    border: 1px solid #D9D5CA;
+    border: 1px solid #CED8E5;
     border-top: 3px solid var(--navy);
     box-shadow: 0 10px 24px rgba(16, 32, 58, 0.12);
 }
@@ -129,7 +129,7 @@
 }
 
 .menuLink:hover {
-    background: var(--sand);
+    background: var(--wash);
     color: var(--navy);
     text-decoration: none;
 }
@@ -155,7 +155,7 @@
     align-items: center;
     gap: 8px;
     background: none;
-    border: 1px solid #C9C4B8;
+    border: 1px solid #B8C3D3;
     border-radius: 6px;
     padding: 8px 12px;
     font: inherit;
@@ -179,7 +179,7 @@
 }
 
 .mobilePanel {
-    border-top: 1px solid #E4E1D8;
+    border-top: 1px solid #DCE4EF;
     background: #FFFFFF;
     max-height: calc(100vh - 77px);
     overflow-y: auto;
@@ -196,7 +196,7 @@
 }
 
 .mobileGroup {
-    border-bottom: 1px solid #EEEBE3;
+    border-bottom: 1px solid #E8EEF6;
 }
 
 .mobileGroupBtn,
@@ -247,7 +247,7 @@
 .mobileSectionLink:hover {
     color: var(--navy);
     text-decoration: none;
-    background: var(--sand);
+    background: var(--wash);
 }
 
 @media (max-width: 420px) {

@@ -1,0 +1,116 @@
+.skills {
+    columns: 2;
+    column-gap: 32px;
+    margin-bottom: 8px;
+    max-width: 28rem;
+}
+
+.after {
+    margin: 0 0 32px;
+    color: var(--ink-soft);
+    font-size: 1.02rem;
+}
+
+.quote {
+    margin: 8px 0 24px;
+    padding-left: 18px;
+    border-left: 3px solid var(--amber);
+    font-family: var(--font-heading);
+    font-size: 1.2rem;
+    line-height: 1.5;
+    color: var(--ink);
+    max-width: 50ch;
+}
+
+.quote footer {
+    margin-top: 8px;
+    font-family: var(--font-body);
+    font-size: 0.92rem;
+    color: var(--ink-soft);
+}
+
+.interviewTitle {
+    margin: 0 0 40px;
+    font-size: clamp(2.6rem, 7vw, 5rem);
+    line-height: 1;
+    letter-spacing: -0.03em;
+    color: #FFFFFF;
+    max-width: 12ch;
+}
+
+.interviewGrid {
+    display: grid;
+    gap: 40px;
+}
+
+.interviewLead {
+    font-family: var(--font-heading);
+    font-size: clamp(1.3rem, 2.2vw, 1.6rem) !important;
+    line-height: 1.5 !important;
+    color: #FFFFFF !important;
+}
+
+.topics {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    max-width: 40ch;
+}
+
+.topics li {
+    padding: 12px 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.16);
+    font-size: 1.06rem;
+    line-height: 1.5;
+    color: #E6ECF4;
+}
+
+.topics li:last-child {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.16);
+}
+
+.interested {
+    margin: 48px 0 0;
+    max-width: 62ch;
+    font-size: 1.1rem;
+    line-height: 1.7;
+    color: #FFFFFF;
+}
+
+.interested a {
+    color: var(--amber);
+    font-weight: 700;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
+.testimonial {
+    margin: 56px 0 0;
+    padding-top: 32px;
+    border-top: 1px solid rgba(255, 255, 255, 0.16);
+    max-width: 60ch;
+}
+
+.testimonial blockquote {
+    margin: 0;
+    font-family: var(--font-heading);
+    font-size: clamp(1.3rem, 2.2vw, 1.6rem);
+    line-height: 1.5;
+    color: #FFFFFF;
+}
+
+.testimonial figcaption {
+    margin-top: 12px;
+    color: #C3CCDA;
+}
+
+@media (min-width: 900px) {
+    .stickyPhoto {
+        position: sticky;
+        top: 96px;
+    }
+    .interviewGrid {
+        grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+        gap: 72px;
+    }
+}

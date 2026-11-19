@@ -446,7 +446,7 @@ export default function RegisterPage() {
                             <div className={s.field}>
                                 <label><Bi entry={T.whichSession} lang={lang} block /> <span className={s.req}>*</span></label>
                                 <p style={{ fontSize: "0.85rem", color: "#6B7280", margin: "0 0 8px" }}>
-                                    <Bi entry={T.notSurePrefix} lang={lang} /> <a href="/courses1" style={{ color: "#2563EB", fontWeight: 600, textDecoration: "none" }}>{t(T.browseSessions, lang)}</a> {t(T.notSureSuffix, lang)}
+                                    <Bi entry={T.notSurePrefix} lang={lang} /> <a href="/programs" style={{ color: "#1E3A5F", fontWeight: 600, textDecoration: "none" }}>{t(T.browseSessions, lang)}</a> {t(T.notSureSuffix, lang)}
                                 </p>
                                 <select
                                     name="sessionType"
@@ -497,16 +497,16 @@ export default function RegisterPage() {
                                 </p>
                                 <div style={{ display: "flex", flexWrap: "wrap", gap: "12px 24px", fontSize: "0.85rem", color: "#374151" }}>
                                     <span style={{ display: "flex", alignItems: "center", gap: "4px" }}>
-                                        <CalendarMonthIcon style={{ fontSize: 16, color: "#2563EB" }} /> <Bi entry={bi(selectedSession.date, selectedSession.dateEs)} lang={lang} />
+                                        <CalendarMonthIcon style={{ fontSize: 16, color: "#1E3A5F" }} /> <Bi entry={bi(selectedSession.date, selectedSession.dateEs)} lang={lang} />
                                     </span>
                                     <span style={{ display: "flex", alignItems: "center", gap: "4px" }}>
-                                        <AccessTimeIcon style={{ fontSize: 16, color: "#2563EB" }} /> <Bi entry={bi(selectedSession.time, selectedSession.timeEs)} lang={lang} />
+                                        <AccessTimeIcon style={{ fontSize: 16, color: "#1E3A5F" }} /> <Bi entry={bi(selectedSession.time, selectedSession.timeEs)} lang={lang} />
                                     </span>
                                     <span style={{ display: "flex", alignItems: "center", gap: "4px" }}>
-                                        <PlaceIcon style={{ fontSize: 16, color: "#2563EB" }} /> <Bi entry={bi(selectedSession.location, selectedSession.locationEs)} lang={lang} />
+                                        <PlaceIcon style={{ fontSize: 16, color: "#1E3A5F" }} /> <Bi entry={bi(selectedSession.location, selectedSession.locationEs)} lang={lang} />
                                     </span>
                                     <span style={{ display: "flex", alignItems: "center", gap: "4px" }}>
-                                        <GroupsIcon style={{ fontSize: 16, color: "#2563EB" }} /> <Bi entry={bi(selectedSession.grades, selectedSession.gradesEs)} lang={lang} />
+                                        <GroupsIcon style={{ fontSize: 16, color: "#1E3A5F" }} /> <Bi entry={bi(selectedSession.grades, selectedSession.gradesEs)} lang={lang} />
                                     </span>
                                 </div>
                                 {selectedSession.shareNote && (

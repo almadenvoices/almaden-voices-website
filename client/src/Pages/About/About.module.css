@@ -1,0 +1,276 @@
+/* ---------- Where we've worked ---------- */
+
+.feature {
+    margin: 40px 0 56px;
+    background: var(--navy-deep);
+    color: #FFFFFF;
+    display: grid;
+}
+
+.featureText {
+    padding: clamp(28px, 5vw, 56px);
+}
+
+.featureTitle {
+    margin: 0 0 14px;
+    font-size: clamp(1.7rem, 3vw, 2.4rem);
+    line-height: 1.15;
+    color: #FFFFFF;
+}
+
+.featureBody {
+    margin: 0 0 28px;
+    max-width: 56ch;
+    color: #E6ECF4;
+    font-size: 1.06rem;
+    line-height: 1.7;
+}
+
+.featureStats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px 40px;
+    margin: 0;
+}
+
+.featureStats > div {
+    display: flex;
+    flex-direction: column;
+}
+
+.featureStats dt {
+    color: #C3CCDA;
+    font-size: 0.95rem;
+}
+
+.featureStats dd {
+    order: -1;
+    margin: 0 0 4px;
+    font-family: var(--font-heading);
+    font-size: 1.9rem;
+    font-weight: 700;
+    color: #FFFFFF;
+}
+
+.featureNumber {
+    margin: 0;
+    padding: clamp(28px, 5vw, 56px);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
+    font-size: 1.2rem;
+    color: #E6ECF4;
+}
+
+.featureNumber span {
+    font-family: var(--font-heading);
+    font-size: clamp(5rem, 12vw, 8.5rem);
+    font-weight: 700;
+    line-height: 0.9;
+    color: var(--amber);
+    margin-bottom: 8px;
+}
+
+.featurePhoto {
+    width: 100%;
+    height: auto;
+}
+
+.workMeta {
+    margin: 0 0 8px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--ink-soft);
+}
+
+.feature .workMeta {
+    color: var(--amber);
+}
+
+.workList {
+    display: grid;
+    gap: clamp(48px, 7vw, 88px);
+}
+
+.work {
+    margin: 0;
+}
+
+.workText {
+    max-width: 60ch;
+}
+
+.workBody {
+    margin: 0;
+    font-size: 1.05rem;
+    line-height: 1.7;
+    color: var(--ink);
+}
+
+.gallery {
+    margin-top: 24px;
+    display: grid;
+    gap: 20px;
+    align-items: start;
+}
+
+.photoBox {
+    margin: 0;
+}
+
+/* Photos of people are shown whole, at their own shape, never cropped. */
+.photoFrame img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+/* ---------- Team ---------- */
+
+.founder {
+    margin: 32px 0 72px;
+    align-items: start;
+}
+
+.founderPhoto {
+    width: 100%;
+    max-width: 520px;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    object-position: center top;
+}
+
+.personName {
+    margin: 0;
+    font-size: 1.35rem;
+    color: var(--navy-ink);
+}
+
+.personRole {
+    margin: 2px 0 12px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--navy);
+}
+
+.groupTitle {
+    margin: 0 0 28px;
+    padding-top: 40px;
+    border-top: 1px solid #DCE4EF;
+    font-size: clamp(1.5rem, 2.4vw, 1.9rem);
+    color: var(--navy-ink);
+}
+
+.board {
+    display: grid;
+    gap: 36px;
+    margin-bottom: 72px;
+}
+
+.boardMember {
+    display: grid;
+    grid-template-columns: 96px minmax(0, 1fr);
+    gap: 20px;
+    align-items: start;
+}
+
+.boardPhoto {
+    width: 96px;
+    height: 96px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.bio {
+    margin: 0;
+    font-size: 0.98rem;
+    line-height: 1.7;
+    color: var(--ink-soft);
+    max-width: 60ch;
+}
+
+/* Volunteer portraits: same hard-cornered 3:4 frame for everyone (the
+   user's call, 2026-09-27). Check no one's head gets trimmed. */
+.volunteers {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 40px 32px;
+}
+
+.volunteerPhoto {
+    width: 100%;
+    aspect-ratio: 3 / 4;
+    object-fit: cover;
+    object-position: center;
+    display: block;
+}
+
+.volunteerName {
+    margin: 14px 0 0;
+    font-family: var(--font-body);
+    font-size: 1.08rem;
+    font-weight: 700;
+    color: var(--navy-ink);
+}
+
+.volunteer .bio {
+    font-size: 0.93rem;
+}
+
+.initials {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--wash);
+    color: var(--navy);
+    font-family: var(--font-heading);
+    font-size: 2.4rem;
+    font-weight: 700;
+}
+
+.joinLine {
+    margin: 56px 0 0;
+    font-size: 1.05rem;
+}
+
+.pressList {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.pressList li {
+    padding: 14px 0;
+    border-top: 1px solid #DCE4EF;
+}
+
+@media (min-width: 700px) {
+    .gallery {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+@media (min-width: 900px) {
+    .feature {
+        grid-template-columns: minmax(0, 7fr) minmax(0, 4fr);
+    }
+    .featureNumber {
+        border-top: 0;
+        border-left: 1px solid rgba(255, 255, 255, 0.12);
+    }
+    .founder {
+        grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    }
+    .board {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 40px;
+    }
+    .boardMember {
+        grid-template-columns: 1fr;
+    }
+    .boardPhoto {
+        width: 120px;
+        height: 120px;
+    }
+}

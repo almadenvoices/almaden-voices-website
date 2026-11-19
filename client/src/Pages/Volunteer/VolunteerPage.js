@@ -296,7 +296,8 @@ export default function VolunteerPage() {
             {/* ---------- Header ---------- */}
             <section className={s.hero}>
                 <div className="container">
-                    <h1 className={s.heroTitle}>Join the Almaden Voices Team</h1>
+                    {/* h2: this now sits inside the Get involved page, which has the h1. */}
+                    <h2 className={s.heroTitle}>Volunteer with us</h2>
                     <p className={s.heroSub}>
                         Almaden Voices is a San José 501(c)(3) that has taught free public speaking to 350
                         students since April 2025. We&apos;re growing, and we&apos;re looking for volunteers
@@ -426,8 +427,8 @@ export default function VolunteerPage() {
                         <li>Any email you send on behalf of Almaden Voices must cc almadenvoices@gmail.com</li>
                         <li>
                             During your first month, please send drafts to us for a quick review before sending.
-                            This helps you get familiar with the Almaden Voices voice and approach. Once you’re
-                            comfortable, you’ll be able to send outreach independently.
+                            This helps you get familiar with the Almaden Voices voice and approach. Once you're
+                            comfortable, you'll be able to send outreach independently.
                         </li>
                         <li>
                             We&apos;ll provide templates, talking points, and the context you need to feel confident
@@ -640,7 +641,7 @@ export default function VolunteerPage() {
                                 <label htmlFor="resume">Resume (optional)</label>
                                 <p className={s.hint}>
                                     PDF, Word, RTF, or text, up to 4&nbsp;MB. No resume is completely
-                                    fine — plenty of our volunteers are students and don&apos;t have one.
+                                    fine. Plenty of our volunteers are students and don&apos;t have one.
                                 </p>
                                 <input
                                     id="resume"
@@ -759,7 +760,7 @@ export default function VolunteerPage() {
 
                                     <p style={{ fontSize: "0.82rem", color: "#6B7280", margin: "12px 0 0", lineHeight: 1.6 }}>
                                         If there isn&apos;t a second parent or guardian we can contact, email{" "}
-                                        <a href="mailto:almadenvoices@gmail.com" style={{ color: "#2563EB" }}>almadenvoices@gmail.com</a>{" "}
+                                        <a href="mailto:almadenvoices@gmail.com" style={{ color: "#1E3A5F" }}>almadenvoices@gmail.com</a>{" "}
                                         and we&apos;ll take your sign-up that way instead.
                                     </p>
                                 </div>
@@ -814,7 +815,7 @@ export default function VolunteerPage() {
                                 <label htmlFor="availability">
                                     This role typically takes about 2–3 hours per week, and we generally ask
                                     for a commitment of at least 3 months. If you&apos;re not sure you can commit
-                                    to that timeline, no worries at all — please still sign up! We&apos;re happy to
+                                    to that timeline, no worries at all. Please still sign up! We&apos;re happy to
                                     talk through your availability and see what might work. <strong>What days
                                     and times are you generally available? Please include as much detail as
                                     possible (for example, Mondays from 5–7 PM or Saturdays from 2–4 PM).</strong> <span className={s.req}>*</span>

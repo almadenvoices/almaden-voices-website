@@ -367,7 +367,7 @@ export default function DonatePage() {
                                     <ol style={{ margin: 0, paddingLeft: 20 }}>
                                         <li>Make your check payable to: <strong>Almaden Voices</strong></li>
                                         {displayAmount > 0 && <li>Amount: <strong>${displayAmount.toFixed(2)}</strong></li>}
-                                        <li>Email <a href="mailto:almadenvoices@gmail.com" style={{ color: '#2563EB', fontWeight: 600 }}>almadenvoices@gmail.com</a> and we&apos;ll send you the mailing address</li>
+                                        <li>Email <a href="mailto:almadenvoices@gmail.com" style={{ color: '#1E3A5F', fontWeight: 600 }}>almadenvoices@gmail.com</a> and we&apos;ll send you the mailing address</li>
                                     </ol>
                                     <p style={{ marginTop: 8, fontSize: 13, color: '#6B7280' }}>
                                         Include your email if you'd like a digital receipt. Thank you for your support!

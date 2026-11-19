@@ -1,6 +1,6 @@
 .footer {
-    background: var(--sand);
-    border-top: 1px solid #E4E1D8;
+    background: var(--wash);
+    border-top: 1px solid #DCE4EF;
     color: var(--ink);
 }
 
@@ -14,7 +14,7 @@
     display: grid;
     gap: 40px;
     padding-bottom: 40px;
-    border-bottom: 1px solid #DDD8CC;
+    border-bottom: 1px solid #D3DCE8;
 }
 
 .logo {
@@ -57,7 +57,7 @@
     min-width: 0;
     padding: 12px 14px;
     font: inherit;
-    border: 1px solid #B9B3A6;
+    border: 1px solid #A9B5C6;
     border-radius: 4px;
     background: #FFFFFF;
     color: var(--ink);
@@ -137,7 +137,7 @@
 }
 
 .bottom {
-    border-top: 1px solid #DDD8CC;
+    border-top: 1px solid #D3DCE8;
     padding-top: 20px;
     display: flex;
     flex-wrap: wrap;

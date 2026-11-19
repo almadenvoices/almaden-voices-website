@@ -15,7 +15,7 @@
     --navy-ink: #10203A;
     --amber: #FBBF24;
     --amber-soft: #FEF3C7;
-    --sand: #F6F3EC;
+    --wash: #EDF4FF;
     --ink: #1A1F2B;
     --ink-soft: #404756;
 
@@ -58,7 +58,7 @@ a:hover{ text-decoration: underline }
 }
 
 /* Visible keyboard focus everywhere. A navy ring with a white gap reads on
-   white, sand and photos; navy sections switch to amber via .onDark. */
+   white, the pale blue wash and photos; navy sections switch to amber via .onDark. */
 :focus-visible{
     outline: 3px solid var(--navy);
     outline-offset: 3px;
