@@ -1,730 +1,282 @@
-import React, { useRef, useState } from 'react';
-import {Box, Typography, Container, Button} from '@mui/material';
-import { motion } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
-import PlayArrowIcon from '@mui/icons-material/PlayArrow';
-import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
-import StarIcon from '@mui/icons-material/Star';
+import React, { useRef, useState } from "react";
+import { Link } from "react-router-dom";
 import HeroVideo from "../../components/HeroVideo/HeroVideo";
-import VisionMission from "../../components/Sections/VisionMission";
-import TestimonialsGridSlider from '../../components/Testimonial/TestimonialsGridSlider';
-import { headlineStats } from '../../data/ourWork';
-// const images = [
-//     "https://source.unsplash.com/1600x900/?speech,debate,stage",
-//     "https://source.unsplash.com/1600x900/?students,speaking",
-//     "https://source.unsplash.com/1600x900/?audience,lecture"
-// ];
+import StatCounter from "../../components/StatCounter";
+import usePageMeta from "../../hooks/usePageMeta";
+import { headlineStats } from "../../data/ourWork";
+import { FEATURED_REVIEWS, REVIEW_COUNT, AVERAGE_RATING, sessionLabel } from "../../data/parentReviews";
+import s from "./Home.module.css";
+
 const heroConfig = {
-    title: 'Find your voice. Inspire others.',
+    title: "Find your voice. Inspire others.",
     subtitle:
-        'Almaden Voices is a 501(c)(3) nonprofit helping students build confidence, clarity, and leadership through speech & debate.',
+        "Almaden Voices is a nonprofit in San José that teaches kids and teens to speak in front of an audience. Our workshops are free.",
     ctas: [
-        { label: 'Our Impact', href: '/impact', variant: 'contained', color: 'primary', standout: true },
-        { label: 'Our Courses', href: '/courses1', color: 'secondary' },
+        {
+            label: "Register for a workshop",
+            href: "/register",
+            variant: "contained",
+            color: "secondary",
+        },
+        {
+            label: "See our programs",
+            href: "/courses1",
+            variant: "outlined",
+            color: "inherit",
+            sx: { color: "#FFFFFF", borderColor: "rgba(255,255,255,0.75)", "&:hover": { borderColor: "#FFFFFF", bgcolor: "rgba(255,255,255,0.1)" } },
+        },
     ],
     images: [
-        '/images/s3-final-showcase-crowd.jpg',
-        '/images/looking at paper.JPG',
-        '/images/s3-group-picture.jpg',
+        {
+            src: "/images/s3-final-showcase-crowd.jpg",
+            alt: "Parents and younger kids crowd a garage for the last day of our July 2025 session, watching two speakers at the front of the room.",
+        },
+        {
+            src: "/images/looking at paper.JPG",
+            alt: "Students sit in small groups on a tarp working on their speeches while an instructor points something out on the far wall.",
+        },
+        {
+            src: "/images/s3-group-picture.jpg",
+            alt: "About twenty students and two instructors grin for a group photo under a slide that reads Awards, on the last day of the July 2025 session.",
+        },
     ],
-    autoplayInterval: 5000,
-    overlay: { gradient: false, tint: 'rgba(0,0,0,0.5)' },
-    height: { xs: '60vh', md: '70vh' },
-    align: 'center',
-    scrollCta: { targetRefId: 'more-section' } // for the down-arrow CTA
+    autoplayInterval: 6000,
+    overlay: { gradient: false, tint: "rgba(10, 22, 40, 0.55)" },
+    align: "start",
+    scrollCta: null,
 };
 
-const testimonials = [
-    // August-September 2025 (Advanced)
-    {
-        name: 'Nirali Doshi',
-        sessionType: 'Advanced Session',
-        title: "Gained confidence in public speaking",
-        review: "Appreciated the efforts put by Anjika in this program. Helped my daughter in gaining confidence in public speaking.",
-        rating: 5
-    },
-    {
-        name: 'Shalini Sridhar',
-        sessionType: 'Advanced Session',
-        title: "Greater clarity and expression",
-        review: "Since joining the speech and debate class, I've seen my daughter grow in confidence on stage. She now speaks with greater clarity, expression, and purpose — it's been wonderful to watch her progress!",
-        rating: 5
-    },
-    {
-        name: 'Huamin Zhou',
-        sessionType: 'Advanced Session',
-        title: "Life-changing program",
-        review: "The program is an awesome program for speech and debate. It can help with public speaking skills and many others. The people in the program and the teachers are great and very helpful. After this course it can change your life.",
-        rating: 5
-    },
-    {
-        name: 'Ujwala Hingarh',
-        sessionType: 'Advanced Session',
-        title: "Increased confidence level",
-        review: "My child continues to grow her speaking skills. This program has increased her confidence level. Thank you!",
-        rating: 5
-    },
-    // April-May 2025 (Beginner)
-    {
-        name: 'Priya Desai',
-        sessionType: 'Beginner Session',
-        title: "Impressive and passionate teacher",
-        review: "Five stars! Anjika is obviously an impressive communicator but she also mastered how to impart her knowledge with young children with a wide range of skills! She is a wonderful enthusiastic teacher who clearly is passionate about her craft!",
-        rating: 5
-    },
-    {
-        name: 'Shahrzad Raisi',
-        sessionType: 'Beginner Session',
-        title: "Helped my shy child present",
-        review: "My child is a very shy person around new faces. He doesn't like to be the center of everyone's attention and have all eyes staring at him. So for him to present his speech in front of other parents was a big deal. Thank you Anjika for sharing your knowledge and experience with him and the other kids!",
-        rating: 5
-    },
-    {
-        name: 'Rupa Sundaram',
-        sessionType: 'Beginner Session',
-        title: "Professional and engaging",
-        review: "Anjika and her brother were amazing. I loved their confidence and the way they both engaged kids like a professional. I will definitely recommend their session to kids who are interested to learn about public speaking skills.",
-        rating: 5
-    },
-    {
-        name: 'Alice Yang',
-        sessionType: 'Beginner Session',
-        title: "Remarkable improvement",
-        review: "My child absolutely loves the public speaking program! The class was designed to build confidence gradually, starting with enjoyable and engaging ice-breakers and gradually transitioning to more structured speeches. The instructor fostered a warm and supportive environment that encouraged every student to participate and discover their voice. I was astounded by my child's remarkable improvement—not only in speaking clearly and confidently, but also in organizing thoughts, using gestures, and connecting with the audience. This program didn't merely impart public speaking skills; it empowered my child to believe in herself.",
-        rating: 5
-    },
-    // June 2025 Session (Beginner)
-    {
-        name: 'Deepthi',
-        sessionType: 'Beginner Session',
-        title: "Great summer program",
-        review: "This is a great summer program for kids! They get to introduced to public speaking! I strongly say it's a good start!!",
-        rating: 4
-    },
-    {
-        name: 'Jeeyoon Choi',
-        sessionType: 'Beginner Session',
-        title: "Passionate guidance",
-        review: "Anjika's passion to guiding kids for public speaking program was awesome. My kid really enjoyed the whole session!",
-        rating: 5
-    },
-    {
-        name: 'Danya',
-        sessionType: 'Beginner Session',
-        title: "Confidence increased",
-        review: "I can definitely see my kid's confidence level has increased. His final speech was awesome and beyond what I had expected.",
-        rating: 4
-    },
-    {
-        name: 'Zubera Syeda',
-        sessionType: 'Beginner Session',
-        title: "Wonderful team",
-        review: "A truly beneficial program for kids to grow his or her public speaking skills and confidence. Anjika and Parth make a wonderful team.",
-        rating: 4
-    },
-    {
-        name: 'Rekha Holt',
-        sessionType: 'Beginner Session',
-        title: "Good foundation",
-        review: "It's a good foundation for young children prepping them to public speaking. It helped them with eye contact and moving their body while addressing the public.",
-        rating: 4
-    },
-    {
-        name: 'Saumya Bhadauria',
-        sessionType: 'Beginner Session',
-        title: "Amazing sessions",
-        review: "We loved seeing our child grow and become better speaker in a matter of weeks. Thank you for your amazing sessions!",
-        rating: 5
-    },
-    {
-        name: 'Shikha Dhartterwal',
-        sessionType: 'Beginner Session',
-        title: "More confident to speak",
-        review: "Amayra is feeling more confident to speak in front of group. She enjoyed learning from Anjika and Parth. The sessions were well organized and fun.",
-        rating: 5
-    },
-    {
-        name: 'Anita Hothur',
-        sessionType: 'Beginner Session',
-        title: "Great for practicing speech",
-        review: "The program was great for practicing speech over the summer. I do notice an improvement in his confidence. Thanks for all your guidance and patience with the kids.",
-        rating: 5
-    },
-    {
-        name: 'Brijal Patel',
-        sessionType: 'Beginner Session',
-        title: "Built his confidence",
-        review: "Really appreciate all the effort Anjika and Parth put into kids. My son really enjoyed their group discussion and rehearsal sessions. Last showcase session really built his confidence.",
-        rating: 4
-    },
-    {
-        name: 'Shaila Karim',
-        sessionType: 'Beginner Session',
-        title: "Great initiative",
-        review: "Great initiative and lots of growth! Speaking is a skill that is needed in every aspect of life. This programs gives kids a good start! This program improved my child's confidence in public speaking!",
-        rating: 4
-    },
-    // July 2025 Session (Beginner)
-    {
-        name: 'Puneet Dhingra',
-        sessionType: 'Beginner Session',
-        title: "Helps kids thrive",
-        review: "Absolutely love the program! This will help kids thrive in their lives and express themselves.",
-        rating: 5
-    },
-    {
-        name: 'Vivek Krishnan',
-        sessionType: 'Beginner Session',
-        title: "Loved the structure",
-        review: "Loved the program and its structure. We enjoyed our daughter's journey and are grateful for what she learnt.",
-        rating: 5
-    },
-    {
-        name: 'Nidhi Mahajan',
-        sessionType: 'Beginner Session',
-        title: "Great platform for kids",
-        review: "Arjun really enjoyed the program. It's a great platform for kids to start building their confidence in public speaking at a young age.",
-        rating: 5
-    },
-    {
-        name: 'Dipti Arora',
-        sessionType: 'Beginner Session',
-        title: "Much more confident",
-        review: "Anjika was great with the kids! Our son was much more confident about being in front of an audience after the session.",
-        rating: 5
-    },
-    {
-        name: 'Charlotte Huh',
-        sessionType: 'Beginner Session',
-        title: "High-quality class",
-        review: "It was such a high-quality class that it's almost a shame it was free. I feel like he has gained more confidence and learned a lot.",
-        rating: 5
-    },
-    {
-        name: 'Akshatha Chandrashekar',
-        sessionType: 'Beginner Session',
-        title: "Builds confidence",
-        review: "It's a great program initiated by high schoolers. It helps build confidence and practicing skills.",
-        rating: 5
-    },
-    {
-        name: 'Shalini Sridhar',
-        sessionType: 'Beginner Session',
-        title: "Overcame stage fear",
-        review: "This is an awesome program. Great effort by Anjika and Parth, they helped all the kids to break out of their shell and overcome their stage fear. My daughter really enjoyed the experience and came out more confident.",
-        rating: 5
-    },
-    {
-        name: 'Pranay Pogde',
-        sessionType: 'Beginner Session',
-        title: "Brought out the best",
-        review: "True to its motto, Almaden Voices brought the best out of the Almaden's kids - helping them build tremendous confidence in their voices.",
-        rating: 5
-    },
-    {
-        name: 'Soyoung Hwang',
-        sessionType: 'Beginner Session',
-        title: "Excellent foundation",
-        review: "This program teaches one of the most important elements of public speaking, making it an excellent foundation for beginners. It's a great way to build confidence and strengthen your core communication skills.",
-        rating: 5
-    },
-    {
-        name: 'Mohan Boddeda',
-        sessionType: 'Beginner Session',
-        title: "Impactful speech skills",
-        review: "Anvi learnt great technique structuring and delivering impactful speech. She wrote her speech and with critical inputs, practice with Anjika it developed into impactful presence.",
-        rating: 5
-    },
-    {
-        name: 'Saurabh Shandilya',
-        sessionType: 'Beginner Session',
-        title: "Clarity and consistency",
-        review: "Atharv really enjoyed the program and had only good things to say. He learnt to focus on things which he didn't care about much earlier. Having a clarity and consistency about key points really helped him develop.",
-        rating: 5
-    },
-    {
-        name: 'Shan Chen',
-        sessionType: 'Beginner Session',
-        title: "Responsible and helpful",
-        review: "You are so responsible for the class, give them feedback and help them get more confidence. Thank you so much!",
-        rating: 5
-    },
-    {
-        name: 'Supriya Sheshu',
-        sessionType: 'Beginner Session',
-        title: "Excited for every session",
-        review: "Very good program for our budding Almaden kids. My daughter was always excited to come for the session and wants to continue through the year!!",
-        rating: 5
-    },
-    {
-        name: 'Girish Thombare',
-        sessionType: 'Beginner Session',
-        title: "Makes a real difference",
-        review: "Awesome!! Really makes difference to children's ability to speak in public.",
-        rating: 5
-    },
-    {
-        name: 'Ujwala Hingarh',
-        sessionType: 'Beginner Session',
-        title: "Boosted public speaking confidence",
-        review: "Almaden Voices has boosted my child's public speaking confidence. It has taught my child the elements of public speaking. It made my child pick a topic independently and give a short speech. Thank you so much Anjika for providing this opportunity for kids and making them a better speaker!",
-        rating: 5
-    },
-    {
-        name: 'Ramya Kudithipudi',
-        sessionType: 'Beginner Session',
-        title: "Well structured program",
-        review: "The program is well structured and executed providing the best environment for kids to learn. It tremendously boosted my child's confidence during public speaking. Her posture, gestures, confidence have all improved in a very short time.",
-        rating: 5
-    },
-    // Winter Debate Booster 2025
-    {
-        name: 'Anil Babbar',
-        sessionType: 'Debate Booster',
-        title: "Focused on researching",
-        review: "I enjoyed seeing my son really focused on researching the topic and learning how to communicate.",
-        rating: 5
-    },
-    {
-        name: 'Ramya Gandamaneni',
-        sessionType: 'Debate Booster',
-        title: "Great with small kids",
-        review: "It was great how you adapt to small kids and make them understand the concept of debate and its structure and I saw all the kids attended all the sessions without dropping.",
-        rating: 5
-    },
-    {
-        name: 'Ram Neelakandan',
-        sessionType: 'Debate Booster',
-        title: "Good early exposure",
-        review: "Good concept for the kids to get exposed to at an early stage. This program helped my daughter get an idea on what is a debate.",
-        rating: 4
-    },
-    {
-        name: 'Shaila Karim',
-        sessionType: 'Debate Booster',
-        title: "Supportive environment",
-        review: "This program encourages kids to build their debate skills using evidence and provides a supportive environment to build their skills.",
-        rating: 5
-    },
-    {
-        name: 'Huamin Zhou',
-        sessionType: 'Debate Booster',
-        title: "Truly an awesome teacher",
-        review: "This program was great! Anjika is such a great teacher at both speech and debate. She truly is a pro and has mastered both speech and debate. She has taught my son so much and tremendous growth has been seen. My son has built his confidence in speech, knowing how to do gestures and when to do them, and many other skills along the way of this program, both the speech and the debate sessions. Anjika is truly an awesome teacher.",
-        rating: 5
-    }
-];
-
-
-export default function HomePage(){
-    const moreRef = useRef(null);
-    const videoRef = useRef(null);
-    const [videoPlaying, setVideoPlaying] = useState(false);
-    const missionVideoRef = useRef(null);
-    const [missionVideoPlaying, setMissionVideoPlaying] = useState(false);
-    const [missionVideoError, setMissionVideoError] = useState(false);
-    const navigate = useNavigate();
-
-    const reviewCount = testimonials.length;
-    const averageRating = (
-        testimonials.reduce((sum, t) => sum + t.rating, 0) / reviewCount
-    ).toFixed(1);
-
+function PlayOverlay({ label, onPlay }) {
     return (
-        <>
-            {/* Chapter applications banner — sits above everything else on the
-                page. Remove this block when applications close. */}
-            <Box
-                component="a"
-                href="/chapters"
-                onClick={(e) => { e.preventDefault(); navigate('/chapters'); }}
-                sx={{
-                    display: 'block',
-                    textDecoration: 'none',
-                    background: 'linear-gradient(135deg, #1e3a8a 0%, #2563EB 55%, #3b82f6 100%)',
-                    color: '#FFFFFF',
-                    py: { xs: 4, md: 5 },
-                    px: 2,
-                    textAlign: 'center',
-                    '&:hover .chapter-cta': { bgcolor: '#F59E0B' },
-                }}
-            >
-                <Typography
-                    sx={{
-                        fontWeight: 900,
-                        fontSize: { xs: '1.9rem', sm: '2.4rem', md: '3rem' },
-                        lineHeight: 1.15,
-                        letterSpacing: '.01em',
-                    }}
-                >
-                    Chapter Applications Open Now!
-                </Typography>
-                <Box
-                    className="chapter-cta"
-                    sx={{
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: 1,
-                        mt: 2.5,
-                        px: 4,
-                        py: 1.5,
-                        borderRadius: 999,
-                        bgcolor: '#FBBF24',
-                        color: '#111827',
-                        fontWeight: 800,
-                        fontSize: { xs: '1rem', md: '1.15rem' },
-                        transition: 'background-color .2s',
-                    }}
-                >
-                    Click here to get started <ArrowForwardIcon />
-                </Box>
-            </Box>
-
-            <HeroVideo config={heroConfig} />
-            <Box id="more-section" ref={moreRef} />
-
-            {/* Proof band — the headline numbers, straight under the hero.
-                Figures come from src/data/ourWork.js so this and the Impact
-                page can't fall out of step. */}
-            <Box sx={{ py: { xs: 6, md: 8 }, bgcolor: "#111827" }}>
-                <Container maxWidth="lg">
-                    <Box
-                        sx={{
-                            display: "flex",
-                            flexWrap: "wrap",
-                            justifyContent: "center",
-                            gap: { xs: 3, md: 4 },
-                        }}
-                    >
-                        {headlineStats.map((stat, index) => (
-                            <motion.div
-                                key={stat.label}
-                                initial={{ opacity: 0, y: 20 }}
-                                whileInView={{ opacity: 1, y: 0 }}
-                                viewport={{ once: true }}
-                                transition={{ duration: 0.4, delay: index * 0.08 }}
-                                style={{ flex: "1 1 200px", maxWidth: 280 }}
-                            >
-                                <Box sx={{ textAlign: "center" }}>
-                                    <Typography
-                                        sx={{
-                                            fontSize: { xs: "1.9rem", md: "2.2rem" },
-                                            fontWeight: "bold",
-                                            color: "#FBBF24",
-                                            lineHeight: 1.1,
-                                        }}
-                                    >
-                                        {stat.number}
-                                    </Typography>
-                                    <Typography sx={{ fontWeight: 700, color: "#FFFFFF", mt: 1.25, fontSize: "1.05rem", lineHeight: 1.45 }}>
-                                        {stat.label}
-                                    </Typography>
-                                    <Typography sx={{ fontSize: "0.95rem", color: "#CBD5E1", mt: 0.75, lineHeight: 1.6 }}>
-                                        {stat.note}
-                                    </Typography>
-                                </Box>
-                            </motion.div>
-                        ))}
-                    </Box>
-
-                    <Box sx={{ textAlign: "center", mt: 5 }}>
-                        <Button
-                            variant="outlined"
-                            endIcon={<ArrowForwardIcon />}
-                            onClick={() => navigate("/impact")}
-                            sx={{
-                                color: "#FFFFFF",
-                                borderColor: "rgba(255,255,255,0.4)",
-                                borderRadius: 999,
-                                px: 3.5,
-                                py: 1.2,
-                                fontWeight: 700,
-                                textTransform: "none",
-                                "&:hover": { borderColor: "#FFFFFF", bgcolor: "rgba(255,255,255,0.08)" },
-                            }}
-                        >
-                            See where we've worked
-                        </Button>
-                    </Box>
-                </Container>
-            </Box>
-
-            <VisionMission />
-
-            {/* Who We Are — the students and Anjika saying it in their own voices.
-                Sits right under the written mission so you hear it after reading it.
-                Click to play: the whole point is the sound, so it can't autoplay. */}
-            <Box sx={{ py: 10, bgcolor: "#F9FAFB" }}>
-                <Container maxWidth="md">
-                    <motion.div
-                        initial={{ opacity: 0, y: 30 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 0.5 }}
-                    >
-                        <Typography
-                            variant="h3"
-                            align="center"
-                            sx={{ fontWeight: "bold", mb: 2, color: "#111827" }}
-                        >
-                            Who We Are
-                        </Typography>
-                        <Box
-                            sx={{
-                                width: 80,
-                                height: 4,
-                                bgcolor: "#2563EB",
-                                borderRadius: 2,
-                                mx: "auto",
-                                mb: 2,
-                            }}
-                        />
-                        <Typography
-                            variant="body1"
-                            align="center"
-                            sx={{ color: "#6B7280", mb: 5, lineHeight: 1.8 }}
-                        >
-                            Our students say it better than we can. Turn your sound on.
-                        </Typography>
-
-                        <Box
-                            sx={{
-                                position: "relative",
-                                width: "100%",
-                                aspectRatio: "16/9",
-                                borderRadius: 3,
-                                overflow: "hidden",
-                                boxShadow: "0 8px 30px rgba(0,0,0,0.12)",
-                                bgcolor: "#000",
-                            }}
-                        >
-                            <Box
-                                component="video"
-                                ref={missionVideoRef}
-                                src="/who-are-we.mp4"
-                                poster="/images/who-are-we-poster.jpg"
-                                controls={missionVideoPlaying}
-                                preload="metadata"
-                                playsInline
-                                onError={() => setMissionVideoError(true)}
-                                sx={{
-                                    width: "100%",
-                                    height: "100%",
-                                    objectFit: "cover",
-                                    display: "block",
-                                }}
-                            />
-                            {!missionVideoPlaying && (
-                                <Box
-                                    onClick={() => {
-                                        // Controls stay on from here: the clip is only a few
-                                        // seconds, so without them there'd be no way to replay it.
-                                        setMissionVideoPlaying(true);
-                                        const played = missionVideoRef.current?.play();
-                                        if (played?.catch) played.catch(() => setMissionVideoError(true));
-                                    }}
-                                    sx={{
-                                        position: "absolute",
-                                        inset: 0,
-                                        display: "flex",
-                                        alignItems: "center",
-                                        justifyContent: "center",
-                                        bgcolor: "rgba(0,0,0,0.3)",
-                                        transition: "background-color 0.2s",
-                                        cursor: "pointer",
-                                        "&:hover": { bgcolor: "rgba(0,0,0,0.15)" },
-                                    }}
-                                >
-                                    <Box
-                                        sx={{
-                                            width: 72,
-                                            height: 72,
-                                            borderRadius: "50%",
-                                            bgcolor: "rgba(255,255,255,0.9)",
-                                            display: "flex",
-                                            alignItems: "center",
-                                            justifyContent: "center",
-                                        }}
-                                    >
-                                        <PlayArrowIcon sx={{ fontSize: 40, color: "#2563EB" }} />
-                                    </Box>
-                                </Box>
-                            )}
-                        </Box>
-
-                        <Typography
-                            align="center"
-                            sx={{ color: "#6B7280", fontSize: "0.9rem", mt: 2 }}
-                        >
-                            {missionVideoError
-                                ? "This video won't play in your browser right now. Please let us know."
-                                : "A few seconds, with sound."}
-                        </Typography>
-                    </motion.div>
-                </Container>
-            </Box>
-
-            {/* Average rating summary */}
-            <Box sx={{ pt: 8, pb: 2, bgcolor: "#FFFFFF", textAlign: "center" }}>
-                <Typography
-                    variant="h2"
-                    sx={{ fontWeight: "bold", color: "#111827", lineHeight: 1 }}
-                >
-                    {averageRating}
-                </Typography>
-                <Box
-                    sx={{
-                        display: "flex",
-                        justifyContent: "center",
-                        gap: 0.5,
-                        mt: 1,
-                        mb: 1,
-                    }}
-                >
-                    {[1, 2, 3, 4, 5].map((star) => (
-                        <StarIcon
-                            key={star}
-                            sx={{
-                                fontSize: 32,
-                                color: star <= Math.round(averageRating) ? "#FBBF24" : "#E5E7EB",
-                            }}
-                        />
-                    ))}
-                </Box>
-                <Typography variant="body1" sx={{ color: "#6B7280", fontWeight: 500 }}>
-                    Average rating from {reviewCount} parent reviews
-                </Typography>
-            </Box>
-
-            <TestimonialsGridSlider
-                title="Hear From Our Student's Parents"
-                subTitle=""
-                items={testimonials}
-                autoplay={true}
-                intervalMs={5000}
-                variant="compact"
-            />
-
-            {/* See Our Students in Action — teaser video */}
-            <Box sx={{ py: 10, bgcolor: "#FFFFFF" }}>
-                <Container maxWidth="md">
-                    <motion.div
-                        initial={{ opacity: 0, y: 30 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.5 }}
-                    >
-                        <Typography
-                            variant="h3"
-                            align="center"
-                            sx={{ fontWeight: "bold", mb: 2, color: "#111827" }}
-                        >
-                            See Student Testimonials
-                        </Typography>
-                        <Box
-                            sx={{
-                                width: 80,
-                                height: 4,
-                                bgcolor: "#2563EB",
-                                borderRadius: 2,
-                                mx: "auto",
-                                mb: 2,
-                            }}
-                        />
-                        <Typography
-                            variant="body1"
-                            align="center"
-                            sx={{ color: "#6B7280", mb: 5, lineHeight: 1.8 }}
-                        >
-                            Watch how Almaden Voices is helping students find their confidence.
-                        </Typography>
-
-                        {/* Featured teaser video */}
-                        <Box
-                            sx={{
-                                position: "relative",
-                                width: "100%",
-                                aspectRatio: "16/9",
-                                borderRadius: 3,
-                                overflow: "hidden",
-                                boxShadow: "0 8px 30px rgba(0,0,0,0.12)",
-                                bgcolor: "#000",
-                            }}
-                        >
-                            <Box
-                                component="video"
-                                ref={videoRef}
-                                src="/images/noah-testimonial.mov"
-                                controls={videoPlaying}
-                                preload="metadata"
-                                playsInline
-                                sx={{
-                                    width: "100%",
-                                    height: "100%",
-                                    objectFit: "cover",
-                                    display: "block",
-                                }}
-                            />
-                            {/* Play button overlay */}
-                            {!videoPlaying && (
-                                <Box
-                                    onClick={() => {
-                                        setVideoPlaying(true);
-                                        videoRef.current?.play();
-                                    }}
-                                    sx={{
-                                        position: "absolute",
-                                        inset: 0,
-                                        display: "flex",
-                                        alignItems: "center",
-                                        justifyContent: "center",
-                                        bgcolor: "rgba(0,0,0,0.3)",
-                                        transition: "background-color 0.2s",
-                                        cursor: "pointer",
-                                        "&:hover": { bgcolor: "rgba(0,0,0,0.15)" },
-                                    }}
-                                >
-                                    <Box
-                                        sx={{
-                                            width: 72,
-                                            height: 72,
-                                            borderRadius: "50%",
-                                            bgcolor: "rgba(255,255,255,0.9)",
-                                            display: "flex",
-                                            alignItems: "center",
-                                            justifyContent: "center",
-                                        }}
-                                    >
-                                        <PlayArrowIcon sx={{ fontSize: 40, color: "#2563EB" }} />
-                                    </Box>
-                                </Box>
-                            )}
-                        </Box>
-
-                        {/* View More button */}
-                        <Box sx={{ textAlign: "center", mt: 4 }}>
-                            <Button
-                                variant="contained"
-                                size="large"
-                                endIcon={<ArrowForwardIcon />}
-                                onClick={() => navigate("/impact#testimonials")}
-                                sx={{
-                                    bgcolor: "#2563EB",
-                                    borderRadius: "999px",
-                                    fontWeight: 700,
-                                    px: 4,
-                                    py: 1.5,
-                                    textTransform: "none",
-                                    fontSize: "1rem",
-                                    "&:hover": { bgcolor: "#1d4ed8" },
-                                }}
-                            >
-                                View More Student Stories
-                            </Button>
-                        </Box>
-                    </motion.div>
-                </Container>
-            </Box>
-        </>
+        <button type="button" className={s.playOverlay} onClick={onPlay} aria-label={label}>
+            <span className={s.playCircle} aria-hidden="true">
+                <svg width="30" height="30" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" fill="currentColor" /></svg>
+            </span>
+        </button>
     );
 }
 
+function Stars({ rating }) {
+    const filled = Math.round(Number(rating));
+    return (
+        <span className={s.stars} aria-hidden="true">
+            {[1, 2, 3, 4, 5].map((n) => (
+                <svg key={n} width="22" height="22" viewBox="0 0 24 24">
+                    <path
+                        d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.3 1.3-6.6-4.9-4.6 6.6-.8z"
+                        fill={n <= filled ? "var(--amber)" : "#E4E1D8"}
+                    />
+                </svg>
+            ))}
+        </span>
+    );
+}
+
+export default function HomePage() {
+    usePageMeta(
+        null,
+        "Almaden Voices is a San José nonprofit teaching kids and teens public speaking and debate. 350 students in 15 sessions across five countries, and the workshops are free."
+    );
+
+    const missionVideoRef = useRef(null);
+    const [missionPlaying, setMissionPlaying] = useState(false);
+    const [missionError, setMissionError] = useState(false);
+    const noahRef = useRef(null);
+    const [noahPlaying, setNoahPlaying] = useState(false);
+
+    return (
+        <>
+            {/* Chapter applications notice. Delete this block when they close. */}
+            <div className={s.notice}>
+                <p className={s.noticeText}>
+                    Chapter applications are open. If you'd like to run free speaking workshops at
+                    your school or in your town, <Link to="/chapters">read how chapters work</Link>.
+                </p>
+            </div>
+
+            <HeroVideo config={heroConfig} />
+
+            {/* The stat band. The counters are this page's one animation. */}
+            <section className={`${s.band} onDark`} aria-labelledby="band-title">
+                <div className={s.bandInner}>
+                    <h2 id="band-title" className={s.visuallyHidden}>Our work in numbers</h2>
+                    <dl className={s.stats}>
+                        {headlineStats.map((stat) => (
+                            <div key={stat.label} className={s.stat}>
+                                <dt className={s.statLabel}>{stat.label}</dt>
+                                <dd className={s.statValue}>
+                                    <StatCounter value={stat.value} />
+                                </dd>
+                                <dd className={s.statNote}>{stat.note}</dd>
+                            </div>
+                        ))}
+                    </dl>
+                    <p className={s.bandLink}>
+                        <Link to="/impact#our-work">See where we've worked</Link>
+                    </p>
+                </div>
+            </section>
+
+            {/* Why we exist: prose beside one large photograph. */}
+            <section className={s.story} aria-labelledby="story-title">
+                <figure className={s.storyFigure}>
+                    <img
+                        src="/images/s6-sophia-presenting.jpg"
+                        alt="A young girl in a pink shirt stands at the front of a library community room, speaking to six students sitting on the carpet while an instructor watches from the side."
+                        className={s.storyImg}
+                        width="1600"
+                        height="902"
+                        loading="lazy"
+                    />
+                    <figcaption className={s.caption}>
+                        Sophia during the eye-contact exercise at our March 2026 workshop at the Almaden library.
+                    </figcaption>
+                </figure>
+                <div className={s.storyText}>
+                    <h2 id="story-title" className={s.storyTitle}>
+                        Most kids would rather do anything than stand up and talk. We start there.
+                    </h2>
+                    <p>
+                        Almaden Voices began in April 2025 with one free eight-week class for beginners
+                        in Almaden Valley. Anjika Bansal, who competes for Leland Speech and Debate,
+                        started it so younger kids could build the confidence she'd grown up with.
+                    </p>
+                    <p>
+                        Every session ends the same way. Each student gives a speech to a room of
+                        parents and family, and for most of them it's the first speech they've ever
+                        given. Parents often tell us the final speech is where they saw the change,
+                        and plenty of the kids sign up for the next session.
+                    </p>
+                    <p>
+                        Since then we've taught 350 students across 15 sessions. Most of them live here
+                        in San José. Others joined online from Canada, India, Singapore and Kenya.
+                    </p>
+                    <p>
+                        Our workshops are free. One-on-one coaching costs $25 online or $30 in person,
+                        and that money goes back into the workshops.
+                    </p>
+                </div>
+            </section>
+
+            {/* The students saying it themselves. Click to play: the point is the
+                sound, so it can't autoplay. */}
+            <section className={s.voices} aria-labelledby="voices-title">
+                <div className={s.narrow}>
+                    <h2 id="voices-title" className={s.h2}>Hear it from our students</h2>
+                    <p className={s.lede}>
+                        A few of our students and Anjika, in their own words. It's only a few seconds
+                        long, so turn your sound on.
+                    </p>
+                    <div className={s.videoFrame}>
+                        <video
+                            ref={missionVideoRef}
+                            src="/who-are-we.mp4"
+                            poster="/images/who-are-we-poster.jpg"
+                            controls={missionPlaying}
+                            preload="metadata"
+                            playsInline
+                            onError={() => setMissionError(true)}
+                            className={s.video}
+                        />
+                        {!missionPlaying && (
+                            <PlayOverlay
+                                label="Play the video of our students introducing Almaden Voices"
+                                onPlay={() => {
+                                    // Controls stay on from here: the clip is short, so
+                                    // without them there'd be no way to replay it.
+                                    setMissionPlaying(true);
+                                    const played = missionVideoRef.current?.play();
+                                    if (played?.catch) played.catch(() => setMissionError(true));
+                                }}
+                            />
+                        )}
+                    </div>
+                    {missionError && (
+                        <p className={s.videoNote} role="status">
+                            This video won't play in your browser right now. Please let us know at
+                            almadenvoices@gmail.com.
+                        </p>
+                    )}
+                </div>
+            </section>
+
+            {/* Four parent reviews, picked for range, beside the overall rating. */}
+            <section className={s.reviews} aria-labelledby="reviews-title">
+                <div className={s.reviewsInner}>
+                    <div className={s.rating}>
+                        <p className={s.ratingNumber}>{AVERAGE_RATING}</p>
+                        <Stars rating={AVERAGE_RATING} />
+                        <p className={s.ratingText}>
+                            Average rating from {REVIEW_COUNT} parent reviews
+                        </p>
+                        <Link to="/impact#parent-reviews" className={s.textLink}>
+                            Read all {REVIEW_COUNT} reviews
+                        </Link>
+                    </div>
+                    <div>
+                        <h2 id="reviews-title" className={s.h2}>What parents tell us</h2>
+                        <ul className={s.quotes}>
+                            {FEATURED_REVIEWS.map((r) => (
+                                <li key={`${r.name}-${r.sessionType}`} className={s.quoteItem}>
+                                    <blockquote className={s.quote}>{r.review}</blockquote>
+                                    <p className={s.quoteWho}>
+                                        {r.name}, parent, {sessionLabel(r)}
+                                    </p>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            {/* One student video, text left and video right. */}
+            <section className={s.noah} aria-labelledby="noah-title">
+                <div className={s.noahInner}>
+                    <div className={s.noahText}>
+                        <h2 id="noah-title" className={s.h2}>Noah, in his own words</h2>
+                        <p>
+                            Noah is one of our students. He agreed to tell the camera what he thought of
+                            his class. There are more student videos on our stories page.
+                        </p>
+                        <Link to="/impact#testimonials" className={s.textLink}>
+                            Watch more student videos
+                        </Link>
+                    </div>
+                    <div className={s.noahVideo}>
+                        <div className={s.videoFrame}>
+                            <video
+                                ref={noahRef}
+                                src="/images/noah-testimonial.mov"
+                                controls={noahPlaying}
+                                preload="metadata"
+                                playsInline
+                                className={s.video}
+                            />
+                            {!noahPlaying && (
+                                <PlayOverlay
+                                    label="Play Noah's video about his class"
+                                    onPlay={() => {
+                                        setNoahPlaying(true);
+                                        noahRef.current?.play();
+                                    }}
+                                />
+                            )}
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            {/* A plain closing line. */}
+            <section className={s.closing} aria-labelledby="closing-title">
+                <div className={s.narrow}>
+                    <h2 id="closing-title" className={s.closingTitle}>Want your kid in the next one?</h2>
+                    <p className={s.lede}>
+                        Sign-ups happen on our registration page. If nothing is open right now, leave
+                        your email there and we'll tell you when the next workshop opens.
+                    </p>
+                    <Link to="/register" className={s.button}>Go to registration</Link>
+                </div>
+            </section>
+        </>
+    );
+}

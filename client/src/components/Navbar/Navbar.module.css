@@ -1,0 +1,280 @@
+.header {
+    position: relative;
+    z-index: 1200;
+    background: #FFFFFF;
+    border-bottom: 1px solid #E4E1D8;
+}
+
+.bar {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 10px 24px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.brand {
+    display: inline-flex;
+    flex-shrink: 0;
+    margin-right: auto;
+}
+
+.logo {
+    height: 56px;
+    width: auto;
+}
+
+/* ---------- Desktop ---------- */
+
+.desktopNav {
+    display: none;
+}
+
+.groups {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    gap: 22px;
+}
+
+.group {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.topLink {
+    font-weight: 600;
+    font-size: 1rem;
+    color: var(--ink);
+    padding: 8px 2px;
+    border-bottom: 2px solid transparent;
+}
+
+.topLink:hover {
+    text-decoration: none;
+    color: var(--navy);
+    border-bottom-color: #C9D2DF;
+}
+
+.topLinkCurrent {
+    color: var(--navy);
+    border-bottom-color: var(--amber);
+}
+
+.registerLink {
+    margin-left: 6px;
+}
+
+.chevBtn {
+    background: none;
+    border: 0;
+    padding: 8px 4px;
+    margin-left: 1px;
+    color: var(--ink-soft);
+    cursor: pointer;
+    display: inline-flex;
+    border-radius: 3px;
+}
+
+.chevBtn:hover {
+    color: var(--navy);
+}
+
+.chevron {
+    transition: transform 0.15s ease;
+}
+
+.chevronOpen {
+    transform: rotate(180deg);
+}
+
+.menu {
+    position: absolute;
+    top: 100%;
+    left: -14px;
+    min-width: 220px;
+    margin: 6px 0 0;
+    padding: 6px 0;
+    list-style: none;
+    background: #FFFFFF;
+    border: 1px solid #D9D5CA;
+    border-top: 3px solid var(--navy);
+    box-shadow: 0 10px 24px rgba(16, 32, 58, 0.12);
+}
+
+/* Bridges the gap between the link and the menu so moving the mouse down
+   doesn't close it. */
+.menu::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: -12px;
+    height: 12px;
+}
+
+.menu[hidden] {
+    display: none;
+}
+
+.menuLink {
+    display: block;
+    padding: 9px 16px;
+    color: var(--ink);
+    font-size: 0.95rem;
+}
+
+.menuLink:hover {
+    background: var(--sand);
+    color: var(--navy);
+    text-decoration: none;
+}
+
+.donate {
+    flex-shrink: 0;
+    background: var(--amber);
+    color: var(--navy-ink);
+    font-weight: 700;
+    padding: 9px 18px;
+    border-radius: 6px;
+}
+
+.donate:hover {
+    background: #F5AE0B;
+    text-decoration: none;
+}
+
+/* ---------- Mobile ---------- */
+
+.menuBtn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: none;
+    border: 1px solid #C9C4B8;
+    border-radius: 6px;
+    padding: 8px 12px;
+    font: inherit;
+    font-weight: 600;
+    color: var(--ink);
+    cursor: pointer;
+    min-height: 44px;
+}
+
+.menuIcon {
+    display: inline-flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.menuIcon span {
+    display: block;
+    width: 16px;
+    height: 2px;
+    background: currentColor;
+}
+
+.mobilePanel {
+    border-top: 1px solid #E4E1D8;
+    background: #FFFFFF;
+    max-height: calc(100vh - 77px);
+    overflow-y: auto;
+}
+
+.mobilePanel[hidden] {
+    display: none;
+}
+
+.mobileList {
+    list-style: none;
+    margin: 0;
+    padding: 4px 0 12px;
+}
+
+.mobileGroup {
+    border-bottom: 1px solid #EEEBE3;
+}
+
+.mobileGroupBtn,
+.mobilePlainLink {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: none;
+    border: 0;
+    padding: 14px 20px;
+    font: inherit;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--ink);
+    cursor: pointer;
+    text-align: left;
+    min-height: 52px;
+}
+
+.mobilePlainLink:hover {
+    text-decoration: none;
+}
+
+.mobileGroupCurrent {
+    color: var(--navy);
+    box-shadow: inset 4px 0 0 var(--amber);
+}
+
+.mobileSections {
+    list-style: none;
+    margin: 0;
+    padding: 0 0 10px;
+}
+
+.mobileSections[hidden] {
+    display: none;
+}
+
+.mobileSectionLink {
+    display: block;
+    padding: 11px 20px 11px 36px;
+    color: var(--ink-soft);
+    font-size: 1rem;
+    min-height: 44px;
+}
+
+.mobileSectionLink:hover {
+    color: var(--navy);
+    text-decoration: none;
+    background: var(--sand);
+}
+
+@media (max-width: 420px) {
+    .bar {
+        padding: 8px 16px;
+        gap: 10px;
+    }
+    .logo {
+        height: 48px;
+    }
+    .donate {
+        padding: 9px 14px;
+    }
+}
+
+@media (min-width: 1040px) {
+    .desktopNav {
+        display: block;
+    }
+    .menuBtn,
+    .mobilePanel {
+        display: none !important;
+    }
+    .brand {
+        margin-right: 8px;
+    }
+    .desktopNav {
+        margin-left: auto;
+    }
+}

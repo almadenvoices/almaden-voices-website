@@ -2014,6 +2014,24 @@ app.post("/api/paypal/orders/:orderID/capture", async (req, res) => {
     }
 });
 
+// ---------- old URL redirects ----------
+
+// Pages that moved in the 2026 restructure. Links to the old addresses live on
+// in emails, flyers and grant applications, so each one gets a permanent (301)
+// redirect. Browsers carry any #anchor across a redirect on their own, and the
+// query string is kept here. Keep this list in step with OLD_URL_REDIRECTS in
+// client/src/data/redirects.js.
+const OLD_URL_REDIRECTS = {
+    "/home": "/",
+};
+
+Object.entries(OLD_URL_REDIRECTS).forEach(([from, to]) => {
+    app.get([from, `${from}/`], (req, res) => {
+        const query = req.originalUrl.includes("?") ? req.originalUrl.slice(req.originalUrl.indexOf("?")) : "";
+        res.redirect(301, to + query);
+    });
+});
+
 // ---------- static React build ----------
 
 // Path to React build

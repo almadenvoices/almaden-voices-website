@@ -14,12 +14,14 @@
  * Copy is deliberately short — the numbers carry the weight.
  */
 
-// Headline numbers for the homepage band.
+// Headline numbers for the homepage band. `value` is what the counter counts
+// up to; keep it a plain number. These are the site-wide figures: if one
+// changes, also check the Impact page metrics and the Volunteer page intro.
 export const headlineStats = [
-    { number: "300", label: "Audience Our Students MC'd For", note: "A two-hour show in East San José" },
-    { number: "150", label: "Students Taught", note: "Beginner through advanced" },
-    { number: "5", label: "Countries Reached", note: "US, Canada, India, Singapore, Kenya" },
-    { number: "52", label: "Students This Summer", note: "Across two camp sessions" },
+    { value: 350, label: "students taught", note: "Since our first class in April 2025" },
+    { value: 15, label: "sessions run", note: "Workshops, camps and debate classes" },
+    { value: 5, label: "countries", note: "US, Canada, India, Singapore and Kenya" },
+    { value: 300, label: "people in one audience", note: "When our summer camp students MC'd a two-hour show" },
 ];
 
 // The lead story — rendered large, with its numbers pulled out.
@@ -27,7 +29,7 @@ export const featuredWork = {
     id: "mexican-heritage-plaza-2026",
     kicker: "Summer 2026 · East San José",
     title: "Mexican Heritage Plaza Summer Camps",
-    body: "We brought a free public speaking program to the June and July summer camp sessions — the first ever offered at these camps. At the end of the summer, the students MC'd a two-hour performance.",
+    body: "We brought a free public speaking program to the June and July summer camp sessions, the first ever offered at these camps. At the end of the summer, the students MC'd a two-hour performance.",
     bigNumber: "300",
     bigNumberLabel: "people in the audience",
     stats: [
@@ -48,7 +50,7 @@ export const ourWork = [
         date: "August 2026",
         place: "San José, CA",
         title: "National Night Out",
-        body: "Our first community table — meeting neighbourhood families and talking with parents in English and Spanish.",
+        body: "Our first community table, meeting neighbourhood families and talking with parents in English and Spanish.",
         // Factual captions. Being photographed with someone is not an
         // endorsement, and we don't print titles we can't verify.
         photos: [
@@ -92,7 +94,7 @@ export const ourWork = [
         date: "July 2026",
         place: "Online · Singapore & India",
         title: "Singapore & India Workshop",
-        body: "A free two-day workshop run across time zones for about 15 students — our first program taught outside North America.",
+        body: "A free two-day workshop run across time zones for about 15 students. It was our first workshop taught outside North America.",
         photos: [
             {
                 src: "/images/singapore-india-workshop.jpg",
@@ -108,12 +110,12 @@ export const ourWork = [
         date: "2026",
         place: "Remote · Kenya",
         title: "One-on-One Interview Coaching",
-        body: "One-on-one sessions with a college student preparing for job interviews — remote, free, and on their schedule.",
+        body: "One-on-one sessions with a university graduate in Kenya preparing for her first interview. Remote, free, and on her schedule.",
         photos: [
             {
                 src: "/images/dorcas-and-anjika.jpg",
                 alt: "Anjika Bansal and Dorcas side by side on a video call during a one-on-one coaching session",
-                caption: "A session with Dorcas, who joins from Kenya. These are free one-on-one video sessions built around interview practice — run on their schedule, across time zones.",
+                caption: "A session with Dorcas, who joins from Kenya. These are free one-on-one video sessions built around interview practice, run on her schedule across time zones.",
             },
         ],
     },
