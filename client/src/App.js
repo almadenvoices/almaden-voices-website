@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import ColorModeProvider from './Theme/ColorModeContext';
 import AppLayout from './Layout/AppLayout';
 import HomePage from "./Pages/Home/HomePage";
@@ -13,6 +13,14 @@ import ImpactPage from './Pages/Impact/ImpactPage';
 import EventsPage from './Pages/Events/EventsPage';
 import VolunteerPage from './Pages/Volunteer/VolunteerPage';
 import ChaptersPage from './Pages/Chapters/ChaptersPage';
+import { OLD_URL_REDIRECTS, HASH_REDIRECTS } from './data/redirects';
+
+/** Sends an old URL to its new home, keeping ?query and #anchor. */
+function OldUrlRedirect({ to }) {
+    const { pathname, search, hash } = useLocation();
+    const moved = HASH_REDIRECTS[`${pathname}${hash}`];
+    return <Navigate to={moved || `${to}${search}${hash}`} replace />;
+}
 
 export default function App() {
     return (
@@ -20,8 +28,10 @@ export default function App() {
             <BrowserRouter>
                 <Routes>
                     <Route element={<AppLayout />}>
-                        <Route index element={<Navigate to="/home" replace />} />
-                        <Route path="/home" element={<HomePage />} />
+                        <Route index element={<HomePage />} />
+                        {Object.entries(OLD_URL_REDIRECTS).map(([from, to]) => (
+                            <Route key={from} path={from} element={<OldUrlRedirect to={to} />} />
+                        ))}
                         <Route path="/about" element={<AboutPage />} />
                         <Route path="/contact" element={<ContactPage />} />
                         <Route path="/courses1" element={<CoursesPage1 />} />
@@ -32,7 +42,7 @@ export default function App() {
                         <Route path="/events" element={<EventsPage />} />
                         <Route path="/volunteer" element={<VolunteerPage />} />
                         <Route path="/chapters" element={<ChaptersPage />} />
-                        <Route path="*" element={<Navigate to="/home" replace />} />
+                        <Route path="*" element={<Navigate to="/" replace />} />
                     </Route>
                 </Routes>
             </BrowserRouter>

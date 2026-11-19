@@ -8,32 +8,37 @@
     --font-heading: 'Playfair Display', Georgia, 'Times New Roman', serif;
     --font-body: 'DM Sans', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
 
-    /* Color scheme */
+    /* Palette: navy and amber. Amber is for backgrounds, rules and numbers on
+       navy. It's too light to use as text on white. */
+    --navy: #1E3A5F;
+    --navy-deep: #14253F;
+    --navy-ink: #10203A;
+    --amber: #FBBF24;
+    --amber-soft: #FEF3C7;
+    --sand: #F6F3EC;
+    --ink: #1A1F2B;
+    --ink-soft: #404756;
+
+    /* Older names, still used by pages that haven't been rebuilt. They point
+       at the new palette so nothing on the site is the old bright blue. */
     --bg: #FFFFFF;
     --section: #F9FAFB;
     --text: #111827;
-    --muted: #6B7280;
-    --accent: #2563EB;
+    --muted: #5B6372;
+    --accent: var(--navy);
     --icon: #9CA3AF;
-
-    /* Derived colors */
     --card: #FFFFFF;
     --line: #E5E7EB;
-    --blue: #2563EB;
-    --brand: #2563EB;
-}
+    --blue: var(--navy);
+    --brand: var(--navy);
 
-@media (prefers-color-scheme: dark){
-    :root{
-        --text:#f4f4f5; --muted:#a1a1aa; --card:#1f2330; --line:#2b2f3c; --bg:#171826;
-    }
+    /* How far an #anchor lands below the top of the window, so the sticky
+       sub-nav doesn't cover the heading. */
+    --anchor-offset: 84px;
 }
 
 *{ box-sizing:border-box }
 html,body,#root{ height:100% }
-html[data-color-mode="dark"]{
-    --text:#f4f4f5; --muted:#a1a1aa; --card:#1f2330; --line:#2b2f3c; --bg:#171826;
-}
 body{ margin:0; color:var(--text); background:var(--bg);
     font: 16px/1.55 var(--font-body);
 }
@@ -41,8 +46,50 @@ h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-heading);
 }
 img{ display:block; max-width:100% }
-a{ color: var(--blue); text-decoration: none }
+a{ color: var(--navy); text-decoration: none }
 a:hover{ text-decoration: underline }
+
+[id]{ scroll-margin-top: var(--anchor-offset); }
+
+/* Smooth scrolling for #anchor jumps, unless the visitor has asked for less
+   motion. */
+@media (prefers-reduced-motion: no-preference){
+    html{ scroll-behavior: smooth; }
+}
+
+/* Visible keyboard focus everywhere. A navy ring with a white gap reads on
+   white, sand and photos; navy sections switch to amber via .onDark. */
+:focus-visible{
+    outline: 3px solid var(--navy);
+    outline-offset: 3px;
+}
+.onDark :focus-visible{
+    outline-color: var(--amber);
+}
+
+/* No entrance animation or transition of any kind for visitors who've asked
+   for reduced motion. */
+@media (prefers-reduced-motion: reduce){
+    *, *::before, *::after{
+        animation-duration: 0.001ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.001ms !important;
+        scroll-behavior: auto !important;
+    }
+}
+
+.skipLink{
+    position: absolute;
+    left: 12px;
+    top: -60px;
+    z-index: 2000;
+    background: var(--navy);
+    color: #fff;
+    padding: 10px 16px;
+    border-radius: 4px;
+    font-weight: 700;
+}
+.skipLink:focus{ top: 12px; }
 
 .container{ max-width: var(--container); margin: 0 auto; padding: 0 var(--pad); }
 .section{ padding: clamp(40px, 6vw, 96px) 0; }
@@ -53,7 +100,11 @@ a:hover{ text-decoration: underline }
 .card{ background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); }
 
 .btn{ display:inline-flex; align-items:center; gap:10px; border:0; border-radius:999px; padding:12px 20px; font-weight:900; cursor:pointer }
-.btnPrimary{ background:var(--accent); color:#fff; box-shadow:0 4px 12px rgba(37,99,235,.25) }
-.btnPrimary:hover{ background:#1d4ed8 }
+.btnPrimary{ background:var(--accent); color:#fff; }
+.btnPrimary:hover{ background:var(--navy-deep) }
 
 .section{ background: var(--section); }
+
+@media (max-width: 480px){
+    :root{ --pad: 16px; }
+}

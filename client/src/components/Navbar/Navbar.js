@@ -1,280 +1,236 @@
-import React from "react";
-import {
-    AppBar, Toolbar, IconButton, Button, Box, Container, Stack, Typography,
-    Drawer, List, ListItemButton, ListItemText, Divider, Link as MLink,
-    Popper, Paper, Grow, ClickAwayListener, Collapse
-} from "@mui/material";
-import MenuIcon from "@mui/icons-material/Menu";
-import CloseIcon from "@mui/icons-material/Close";
-import VolunteerActivismIcon from "@mui/icons-material/VolunteerActivism";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import ExpandLessIcon from "@mui/icons-material/ExpandLess";
-import { Link as RouterLink, useLocation, useNavigate } from "react-router-dom";
+import React, { useEffect, useRef, useState } from "react";
+import { Link, NavLink, useLocation } from "react-router-dom";
+import { MAIN_PAGES, sectionHref, visibleSections, pageForPath } from "../../data/siteNav";
+import s from "./Navbar.module.css";
 
-const ABOUT_SUBMENU = [
-    { label: "About Us", to: "/about" },
-    { label: "Our Team", to: "/about#team" },
-];
-
-const LINKS = [
-    { label: "Home", to: "/home" },
-    { label: "About", to: "/about", submenu: ABOUT_SUBMENU },
-    { label: "Impact", to: "/impact" },
-    { label: "Courses", to: "/courses1" },
-    { label: "Events", to: "/events" },
-    { label: "FAQ", to: "/faq" },
-    { label: "Contact", to: "/contact" },
-    { label: "Volunteer", to: "/volunteer" },
-    { label: "Chapters", to: "/chapters" },
-    { label: "Register", to: "/register" }
-];
-
-function MobileDrawer({ open, onClose }) {
-    const location = useLocation();
-    const [aboutOpen, setAboutOpen] = React.useState(false);
+function Chevron({ open }) {
     return (
-        <Drawer anchor="left" open={open} onClose={onClose}>
-            <Box sx={{ width: 280, p: 2 }} role="presentation">
-                <Stack direction="row" alignItems="center" justifyContent="space-between">
-                    <RouterLink to="/home" onClick={onClose} style={{ display: 'inline-flex', alignItems: 'center' }}>
-                        <Box
-                            component="img"
-                            src="/almaden_voices_logo_transparent.png"
-                            alt="Almaden Voices"
-                            sx={{ height: 56, width: 'auto' }}
-                        />
-                    </RouterLink>
-                    <IconButton onClick={onClose}><CloseIcon /></IconButton>
-                </Stack>
-                <Divider sx={{ my: 1 }} />
-                <List>
-                    {LINKS.map((l) => {
-                        if (l.submenu) {
-                            return (
-                                <React.Fragment key={l.to}>
-                                    <ListItemButton onClick={() => setAboutOpen(!aboutOpen)} selected={location.pathname === l.to}>
-                                        <ListItemText primary={l.label} />
-                                        {aboutOpen ? <ExpandLessIcon /> : <ExpandMoreIcon />}
-                                    </ListItemButton>
-                                    <Collapse in={aboutOpen}>
-                                        <List disablePadding>
-                                            {l.submenu.map((sub) => (
-                                                <ListItemButton
-                                                    key={sub.to}
-                                                    component={RouterLink}
-                                                    to={sub.to}
-                                                    onClick={onClose}
-                                                    sx={{ pl: 4 }}
-                                                >
-                                                    <ListItemText primary={sub.label} />
-                                                </ListItemButton>
-                                            ))}
-                                        </List>
-                                    </Collapse>
-                                </React.Fragment>
-                            );
-                        }
-                        return (
-                            <ListItemButton key={l.to} component={RouterLink} to={l.to} selected={location.pathname===l.to} onClick={onClose}>
-                                <ListItemText primary={l.label} />
-                            </ListItemButton>
-                        );
-                    })}
-                </List>
-                <Button fullWidth variant="contained" color="secondary" startIcon={<VolunteerActivismIcon />} component={RouterLink} to="/donate" onClick={onClose}>
-                    Donate
-                </Button>
-            </Box>
-        </Drawer>
+        <svg className={`${s.chevron} ${open ? s.chevronOpen : ""}`} width="12" height="12" viewBox="0 0 12 12" aria-hidden="true">
+            <path d="M2 4.5 6 8.5 10 4.5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
     );
 }
 
-// ---- Desktop link with dropdown support ----
-function DesktopLinkWithDropdown({ link, active, underline }) {
-    const anchorRef = React.useRef(null);
-    const [open, setOpen] = React.useState(false);
-    const timeoutRef = React.useRef(null);
-    const navigate = useNavigate();
+/**
+ * One top-level page with its section dropdown (desktop).
+ *
+ * The page name is a real link, so clicking "About" goes to About. The menu
+ * opens on hover, and on the chevron button for keyboard and touch-screen
+ * laptops. Escape closes it and puts focus back on the chevron.
+ */
+function DesktopGroup({ page, current, openKey, setOpenKey }) {
+    const open = openKey === page.key;
+    const groupRef = useRef(null);
+    const toggleRef = useRef(null);
+    const closeTimer = useRef(null);
+    const sections = visibleSections(page);
+    const menuId = `nav-menu-${page.key}`;
 
-    const handleEnter = () => {
-        clearTimeout(timeoutRef.current);
-        setOpen(true);
+    const show = () => {
+        clearTimeout(closeTimer.current);
+        setOpenKey(page.key);
     };
-
-    const handleLeave = () => {
-        timeoutRef.current = setTimeout(() => setOpen(false), 150);
+    const hideSoon = () => {
+        clearTimeout(closeTimer.current);
+        closeTimer.current = setTimeout(() => setOpenKey((k) => (k === page.key ? null : k)), 140);
     };
+    useEffect(() => () => clearTimeout(closeTimer.current), []);
 
-    const handleSubClick = (to) => {
-        setOpen(false);
-        if (to.includes('#')) {
-            const [path, hash] = to.split('#');
-            navigate(path);
-            setTimeout(() => {
-                const el = document.getElementById(hash);
-                if (el) el.scrollIntoView({ behavior: 'smooth' });
-            }, 100);
-        } else {
-            navigate(to);
+    const onKeyDown = (e) => {
+        if (e.key === "Escape" && open) {
+            setOpenKey(null);
+            toggleRef.current?.focus();
+        }
+    };
+    // Close when focus leaves the whole group (tabbing past the last item).
+    const onBlur = (e) => {
+        if (!groupRef.current?.contains(e.relatedTarget)) {
+            setOpenKey((k) => (k === page.key ? null : k));
         }
     };
 
     return (
-        <Box
-            ref={anchorRef}
-            onMouseEnter={handleEnter}
-            onMouseLeave={handleLeave}
-            sx={{ position: 'relative', display: 'inline-flex', alignItems: 'center' }}
+        <li
+            ref={groupRef}
+            className={s.group}
+            onMouseEnter={show}
+            onMouseLeave={hideSoon}
+            onKeyDown={onKeyDown}
+            onBlur={onBlur}
         >
-            <MLink
-                component={RouterLink}
-                to={link.to}
-                underline="none"
-                sx={{
-                    fontWeight: 800,
-                    fontSize: 16,
-                    letterSpacing: '.02em',
-                    color: active ? 'secondary.main' : 'text.primary',
-                    position: 'relative',
-                    px: 0.5,
-                    '&:hover': { color: 'secondary.main' },
-                    ...(underline ? {
-                        '&::after': {
-                            content: '""', position: 'absolute', left: 0, right: 0, bottom: -8,
-                            height: 3, borderRadius: 2,
-                            bgcolor: active ? 'secondary.main' : 'transparent',
-                            transition: 'background-color .2s'
-                        }
-                    } : {})
-                }}
-            >{link.label}</MLink>
-            <Popper
-                open={open}
-                anchorEl={anchorRef.current}
-                placement="bottom-start"
-                transition
-                disablePortal
-                sx={{ zIndex: 1300 }}
+            <Link
+                to={page.path}
+                className={`${s.topLink} ${current ? s.topLinkCurrent : ""}`}
+                aria-current={current ? "page" : undefined}
             >
-                {({ TransitionProps }) => (
-                    <Grow {...TransitionProps} style={{ transformOrigin: 'top left' }}>
-                        <Paper
-                            elevation={4}
-                            sx={{ mt: 1, borderRadius: 2, overflow: 'hidden', minWidth: 160 }}
-                            onMouseEnter={handleEnter}
-                            onMouseLeave={handleLeave}
+                {page.label}
+            </Link>
+            <button
+                ref={toggleRef}
+                type="button"
+                className={s.chevBtn}
+                aria-expanded={open}
+                aria-controls={menuId}
+                aria-label={`${page.label} sections`}
+                onClick={() => setOpenKey(open ? null : page.key)}
+            >
+                <Chevron open={open} />
+            </button>
+            <ul id={menuId} className={s.menu} hidden={!open}>
+                {sections.map((section) => (
+                    <li key={section.id}>
+                        <Link
+                            to={sectionHref(page, section)}
+                            className={s.menuLink}
+                            onClick={() => setOpenKey(null)}
                         >
-                            <ClickAwayListener onClickAway={() => setOpen(false)}>
-                                <List disablePadding>
-                                    {link.submenu.map((sub) => (
-                                        <ListItemButton
-                                            key={sub.to}
-                                            onClick={() => handleSubClick(sub.to)}
-                                            sx={{
-                                                py: 1, px: 2.5,
-                                                '&:hover': { bgcolor: 'action.hover' }
-                                            }}
-                                        >
-                                            <ListItemText
-                                                primary={sub.label}
-                                                primaryTypographyProps={{ fontWeight: 600, fontSize: 14 }}
-                                            />
-                                        </ListItemButton>
-                                    ))}
-                                </List>
-                            </ClickAwayListener>
-                        </Paper>
-                    </Grow>
-                )}
-            </Popper>
-        </Box>
+                            {section.label}
+                        </Link>
+                    </li>
+                ))}
+            </ul>
+        </li>
     );
 }
 
-// ---- Active link with bold styling & indicator ----
-function DesktopLinksBig({ underline=true }) {
-    const location = useLocation();
+/**
+ * The phone and small-tablet menu. The menu button opens a panel; tapping a
+ * page name opens its sections; tapping a section jumps there and closes the
+ * whole menu.
+ */
+function MobileMenu({ open, onClose, currentKey }) {
+    const [expanded, setExpanded] = useState(currentKey || null);
+
+    useEffect(() => {
+        if (open) setExpanded(currentKey || null);
+    }, [open, currentKey]);
+
     return (
-        <Stack direction="row" spacing={{ md: 1.5, lg: 3 }} alignItems="center" sx={{ display: { xs: 'none', md: 'flex' } }}>
-            {LINKS.map((l) => {
-                const active = location.pathname === l.to;
-                if (l.submenu) {
-                    return <DesktopLinkWithDropdown key={l.to} link={l} active={active} underline={underline} />;
-                }
-                return (
-                    <MLink
-                        key={l.to}
-                        component={RouterLink}
-                        to={l.to}
-                        underline="none"
-                        sx={{
-                            fontWeight: 800,
-                            fontSize: 16,
-                            letterSpacing: '.02em',
-                            color: active ? 'secondary.main' : 'text.primary',
-                            position: 'relative',
-                            px: 0.5,
-                            '&:hover': { color: 'secondary.main' },
-                            ...(underline ? {
-                                '&::after': {
-                                    content: '""', position: 'absolute', left: 0, right: 0, bottom: -8,
-                                    height: 3, borderRadius: 2,
-                                    bgcolor: active ? 'secondary.main' : 'transparent',
-                                    transition: 'background-color .2s'
-                                }
-                            } : {})
-                        }}
-                    >{l.label}</MLink>
-                );
-            })}
-        </Stack>
+        <div id="mobile-menu" className={s.mobilePanel} hidden={!open}>
+            <ul className={s.mobileList}>
+                {MAIN_PAGES.map((page) => {
+                    const isOpen = expanded === page.key;
+                    const listId = `mobile-sections-${page.key}`;
+                    return (
+                        <li key={page.key} className={s.mobileGroup}>
+                            <button
+                                type="button"
+                                className={`${s.mobileGroupBtn} ${currentKey === page.key ? s.mobileGroupCurrent : ""}`}
+                                aria-expanded={isOpen}
+                                aria-controls={listId}
+                                onClick={() => setExpanded(isOpen ? null : page.key)}
+                            >
+                                {page.label}
+                                <Chevron open={isOpen} />
+                            </button>
+                            <ul id={listId} className={s.mobileSections} hidden={!isOpen}>
+                                {visibleSections(page).map((section) => (
+                                    <li key={section.id}>
+                                        <Link to={sectionHref(page, section)} className={s.mobileSectionLink} onClick={onClose}>
+                                            {section.label}
+                                        </Link>
+                                    </li>
+                                ))}
+                            </ul>
+                        </li>
+                    );
+                })}
+                <li className={s.mobileGroup}>
+                    <NavLink to="/register" className={s.mobilePlainLink} onClick={onClose}>
+                        Register
+                    </NavLink>
+                </li>
+            </ul>
+        </div>
     );
 }
 
 export default function Navbar() {
-    const [open, setOpen] = React.useState(false);
+    const location = useLocation();
+    const [openKey, setOpenKey] = useState(null);
+    const [mobileOpen, setMobileOpen] = useState(false);
+    const headerRef = useRef(null);
+    const menuBtnRef = useRef(null);
+    const currentPage = pageForPath(location.pathname);
+
+    // Any navigation closes every menu.
+    useEffect(() => {
+        setOpenKey(null);
+        setMobileOpen(false);
+    }, [location.pathname, location.hash, location.key]);
+
+    // Escape closes the mobile panel; a tap outside the header closes either.
+    useEffect(() => {
+        if (!mobileOpen && !openKey) return undefined;
+        const onKey = (e) => {
+            if (e.key === "Escape" && mobileOpen) {
+                setMobileOpen(false);
+                menuBtnRef.current?.focus();
+            }
+        };
+        const onPointer = (e) => {
+            if (!headerRef.current?.contains(e.target)) {
+                setMobileOpen(false);
+                setOpenKey(null);
+            }
+        };
+        document.addEventListener("keydown", onKey);
+        document.addEventListener("pointerdown", onPointer);
+        return () => {
+            document.removeEventListener("keydown", onKey);
+            document.removeEventListener("pointerdown", onPointer);
+        };
+    }, [mobileOpen, openKey]);
+
     return (
-        <Box sx={{ my: 2 }}>
-                <AppBar position="sticky" color="transparent" elevation={0} sx={{ backdropFilter: 'saturate(180%) blur(10px)', borderBottom: 1, borderColor: 'divider' }}>
-                    <Container maxWidth="xl">
-                        <Toolbar disableGutters sx={{ py: 1.5, gap: 3 }}>
-                            {/* Mobile */}
-                            <IconButton sx={{ display: { md: 'none' }, mr: 1 }} onClick={()=>setOpen(true)}><MenuIcon /></IconButton>
-                            <MobileDrawer open={open} onClose={()=>setOpen(false)} />
+        <header ref={headerRef} className={s.header}>
+            <div className={s.bar}>
+                <Link to="/" className={s.brand} aria-label="Almaden Voices home">
+                    <img src="/almaden_voices_logo_transparent.png" alt="" className={s.logo} />
+                </Link>
 
-                            {/* Brand */}
-                            <RouterLink to="/home" style={{ display: 'inline-flex', alignItems: 'center', marginRight: 24 }}>
-                                <Box
-                                    component="img"
-                                    src="/almaden_voices_logo_transparent.png"
-                                    alt="Almaden Voices"
-                                    sx={{ height: { xs: 48, md: 60 }, width: 'auto', display: 'block' }}
-                                />
-                            </RouterLink>
+                <nav aria-label="Main" className={s.desktopNav}>
+                    <ul className={s.groups}>
+                        {MAIN_PAGES.map((page) => (
+                            <DesktopGroup
+                                key={page.key}
+                                page={page}
+                                current={currentPage?.key === page.key}
+                                openKey={openKey}
+                                setOpenKey={setOpenKey}
+                            />
+                        ))}
+                        <li>
+                            <NavLink
+                                to="/register"
+                                className={({ isActive }) => `${s.topLink} ${s.registerLink} ${isActive ? s.topLinkCurrent : ""}`}
+                            >
+                                Register
+                            </NavLink>
+                        </li>
+                    </ul>
+                </nav>
 
-                            {/* Links + Donate */}
-                            <Stack direction="row" spacing={2.25} alignItems="center" sx={{ ml: 'auto' }}>
-                                <DesktopLinksBig underline />
-                                <Button
-                                    variant="contained"
-                                    color="secondary"
-                                    component={RouterLink}
-                                    to="/donate"
-                                    startIcon={<VolunteerActivismIcon />}
-                                    sx={{
-                                        fontWeight: 900,
-                                        borderRadius: 99,
-                                        px: 2.25,
-                                        py: 1,
-                                        boxShadow: (t)=>t.shadows[4]
-                                    }}
-                                >
-                                    Donate
-                                </Button>
-                            </Stack>
-                        </Toolbar>
-                    </Container>
-                </AppBar>
-        </Box>
+                <Link to="/donate" className={s.donate}>
+                    Donate
+                </Link>
+
+                <button
+                    ref={menuBtnRef}
+                    type="button"
+                    className={s.menuBtn}
+                    aria-expanded={mobileOpen}
+                    aria-controls="mobile-menu"
+                    onClick={() => setMobileOpen((o) => !o)}
+                >
+                    <span className={s.menuIcon} aria-hidden="true">
+                        <span /><span /><span />
+                    </span>
+                    {mobileOpen ? "Close" : "Menu"}
+                </button>
+            </div>
+
+            <MobileMenu open={mobileOpen} onClose={() => setMobileOpen(false)} currentKey={currentPage?.key} />
+        </header>
     );
 }

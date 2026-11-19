@@ -3,6 +3,7 @@ import { Box, Typography, Container, Select, MenuItem, FormControl } from "@mui/
 import { motion, AnimatePresence } from "framer-motion";
 import { ourWork, featuredWork } from "../../data/ourWork";
 import SessionOutcomes from "./SessionOutcomes";
+import ParentReviewList from "../../components/ParentReviewList";
 
 
 const studentVideos = [
@@ -18,8 +19,8 @@ const studentVideos = [
 
 const metrics = [
     { number: "300", label: "Audience Reached", description: "Our students MC'd a two-hour show" },
-    { number: "12", label: "Sessions Completed", description: "Beginner through advanced" },
-    { number: "150", label: "Students Served", description: "Across multiple levels" },
+    { number: "15", label: "Sessions Completed", description: "Beginner through advanced" },
+    { number: "350", label: "Students Served", description: "Across multiple levels" },
     { number: "K–9", label: "Grades Served", description: "Kindergarten through 9th grade" },
     { number: "$1,710", label: "Raised", description: "In community donations" },
     { number: "3x", label: "Class Sizes", description: "Tripled through targeted outreach & marketing" },
@@ -294,7 +295,7 @@ export default function ImpactPage() {
                             mb: 2,
                         }}
                     >
-                        From a summer camp in East San José to classrooms in four countries.
+                        From a summer camp in East San José to classrooms in five countries.
                     </Typography>
 
                     {/* Lead story */}
@@ -567,6 +568,9 @@ export default function ImpactPage() {
                 <SessionOutcomes />
             </Box>
 
+            {/* The parent reviews that moved off the homepage. */}
+            <ParentReviewList />
+
             {/* Student Video Testimonials Section */}
             <Box id="testimonials" sx={{ pt: { xs: 5, md: 7 }, pb: 10, bgcolor: "#FFFFFF" }}>
                 <Container maxWidth="lg">
@@ -698,7 +702,7 @@ export default function ImpactPage() {
 
                     {/* Dropdown (centered) + Compact All-Sessions Nav (centered) */}
                     <Box sx={{ mb: 5, display: "flex", flexDirection: "column", alignItems: "center" }}>
-                        <FormControl sx={{ minWidth: { xs: "100%", sm: 320 }, mb: 3 }}>
+                        <FormControl sx={{ width: { xs: "100%", sm: "auto" }, minWidth: { sm: 320 }, maxWidth: "100%", mb: 3 }}>
                             <Select
                                 value={selectedIndex}
                                 onChange={(e) => setSelectedIndex(e.target.value)}
@@ -706,6 +710,7 @@ export default function ImpactPage() {
                                 sx={{
                                     bgcolor: "#FFFFFF",
                                     borderRadius: 2,
+                                    "& .MuiSelect-select": { whiteSpace: "normal" },
                                     "& .MuiOutlinedInput-notchedOutline": {
                                         borderColor: "#E5E7EB",
                                     },

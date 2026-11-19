@@ -1,617 +1,155 @@
-// import React from 'react';
-// import { Box, Typography, Grid, Link, IconButton } from '@mui/material';
-// import FacebookIcon from '@mui/icons-material/Facebook';
-// import TwitterIcon from '@mui/icons-material/Twitter';
-// import InstagramIcon from '@mui/icons-material/Instagram';
-// import EmailIcon from '@mui/icons-material/Email';
+import React, { useState } from "react";
+import { Link } from "react-router-dom";
+import { MAIN_PAGES, sectionHref, visibleSections } from "../../data/siteNav";
+import s from "./Footer.module.css";
 
-// export default function Footer() {
-//     return (
-//         <Box
-//             component="footer"
-//             sx={{
-//                 backgroundColor: '#1976d2',
-//                 color: '#fff',
-//                 p: 4,
-//                 mt: 8
-//             }}
-//         >
-//             <Grid container spacing={4}>
-//                 {/* About Section */}
-//                 <Grid item xs={12} md={4}>
-//                     <Typography variant="h6" gutterBottom>
-//                         About Us
-//                     </Typography>
-//                     <Typography>
-//                         We provide high-quality courses and sessions for learners of all ages.
-//                     </Typography>
-//                 </Grid>
-//
-//                 {/* Links Section */}
-//                 <Grid item xs={12} md={4}>
-//                     <Typography variant="h6" gutterBottom>
-//                         Quick Links
-//                     </Typography>
-//                     <Link href="/" color="inherit" display="block">Home</Link>
-//                     <Link href="/about" color="inherit" display="block">About</Link>
-//                     <Link href="/courses" color="inherit" display="block">Courses</Link>
-//                     <Link href="/sessions" color="inherit" display="block">Sessions</Link>
-//                     <Link href="/donate" color="inherit" display="block">Donate</Link>
-//                     <Link href="/contact" color="inherit" display="block">Contact</Link>
-//                 </Grid>
-//
-//                 {/* Social Section */}
-//                 <Grid item xs={12} md={4}>
-//                     <Typography variant="h6" gutterBottom>
-//                         Connect With Us
-//                     </Typography>
-//                     <Box>
-//                         <IconButton href="https://facebook.com" color="inherit">
-//                             <FacebookIcon />
-//                         </IconButton>
-//                         <IconButton href="https://twitter.com" color="inherit">
-//                             <TwitterIcon />
-//                         </IconButton>
-//                         <IconButton href="https://instagram.com" color="inherit">
-//                             <InstagramIcon />
-//                         </IconButton>
-//                         <IconButton href="mailto:info@example.com" color="inherit">
-//                             <EmailIcon />
-//                         </IconButton>
-//                     </Box>
-//                 </Grid>
-//             </Grid>
-//
-//             <Typography variant="body2" align="center" sx={{ mt: 4 }}>
-//                 &copy; {new Date().getFullYear()} Your Website Name. All rights reserved.
-//             </Typography>
-//         </Box>
-//     );
-// }
+const HELP_LINKS = [
+    { label: "FAQ", to: "/faq" },
+    { label: "Contact us", to: "/contact" },
+    { label: "Register", to: "/register" },
+    { label: "Donate", to: "/donate" },
+];
 
+const DOCUMENTS = [
+    { label: "IRS 501(c)(3) determination letter", href: "/docs/irs-letter-947-confirmation-of-501c3-status.pdf" },
+    { label: "Articles of incorporation", href: "/docs/articles-of-incorporation.pdf" },
+    { label: "Terms of service", href: "/docs/terms-of-service.html" },
+    { label: "Privacy policy", href: "/docs/privacy-policy.html" },
+];
 
-import React, { useState } from 'react';
-import OpenInNewIcon from '@mui/icons-material/OpenInNew';
+function NewsletterSignup() {
+    const [email, setEmail] = useState("");
+    const [status, setStatus] = useState("idle"); // idle | sending | done | error
+    const [message, setMessage] = useState("");
 
-const Footer = () => {
-    const [email, setEmail] = useState('');
-    const [subscribed, setSubscribed] = useState(false);
-    const [loading, setLoading] = useState(false);
-    const [message, setMessage] = useState('');
-    const [error, setError] = useState('');
-
-    const handleSubscribe = async () => {
-        // Validate email
-        if (!email || !email.includes('@')) {
-            setError('Please enter a valid email address');
-            setTimeout(() => setError(''), 3000);
+    async function onSubmit(e) {
+        e.preventDefault();
+        if (!email || !email.includes("@")) {
+            setStatus("error");
+            setMessage("Please enter a valid email address.");
             return;
         }
-
-        setLoading(true);
-        setError('');
-        setMessage('');
-
+        setStatus("sending");
+        setMessage("");
         try {
-            const response = await fetch('/api/subscribe', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
+            const response = await fetch("/api/subscribe", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ email }),
             });
-
-            const data = await response.json();
-
+            const data = await response.json().catch(() => ({}));
             if (response.ok) {
-                setSubscribed(true);
-                setMessage(data.message || 'Thank you for subscribing!');
-                setEmail('');
-                setTimeout(() => {
-                    setSubscribed(false);
-                    setMessage('');
-                }, 5000);
+                setStatus("done");
+                setMessage(data.message || "Thanks. You're on the list.");
+                setEmail("");
             } else {
-                setError(data.error || 'Failed to subscribe. Please try again.');
-                setTimeout(() => setError(''), 3000);
+                setStatus("error");
+                setMessage(data.error || "That didn't go through. Please try again.");
             }
         } catch (err) {
-            console.error('Subscribe error:', err);
-            setError('Network error. Please try again.');
-            setTimeout(() => setError(''), 3000);
-        } finally {
-            setLoading(false);
+            console.error("Subscribe error:", err);
+            setStatus("error");
+            setMessage("Network error. Please try again.");
         }
-    };
-    const rightColumnLinks = {
-        about: [
-            { label: 'Our Mission', href: '/about#mission' },
-            { label: 'Our Team', href: '/about#team' },
-            { label: 'Success Stories', href: '/impact#testimonials' },
-            { label: 'Board of Directors', href: '/about#board' }
-        ],
-        programs: [
-            { label: 'Upcoming Events', href: '/events' },
-            { label: 'Free Workshop Sign-Up', href: '/register#workshop-signup' },
-            { label: 'Past Sessions', href: '/impact#past-sessions' }
-        ],
-        getInvolved: [
-            { label: 'Donate', href: '/donate' },
-            { label: 'Partner With Us', href: '/events#host' },
-            { label: 'Become a Sponsor', href: '/events#host' },
-            { label: 'Corporate Partnerships', href: '/events#host' },
-            { label: 'Fundraising Events', href: '/events' }
-        ],
-        legal: [
-            { label: 'IRS 501(c)(3) Determination Letter', href: '/docs/irs-letter-947-confirmation-of-501c3-status.pdf', target: '_blank' },
-            { label: 'Articles of Incorporation', href: '/docs/articles-of-incorporation.pdf', target: '_blank' }
-        ]
-    };
+    }
 
     return (
-        <div style={{ backgroundColor: '#FFFFFF', color: '#111827' }}>
-            {/* Main Footer Content */}
-            <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '60px 20px' }}>
-
-                {/* Newsletter Subscription Section */}
-                <div style={{backgroundColor: '#F9FAFB', padding: '40px 20px', borderRadius: '12px', borderBottom: '1px solid #E5E7EB', marginBottom: '50px'}}>
-                    <div style={{
-                        maxWidth: '1200px',
-                        margin: '0 auto',
-                        textAlign: 'center'
-                    }}>
-                        <h3 style={{
-                            fontSize: '1.8rem',
-                            fontWeight: 700,
-                            marginBottom: '12px',
-                            color: '#111827'
-                        }}>
-                            Stay Connected
-                        </h3>
-                        <p style={{
-                            fontSize: '1.1rem',
-                            color: '#6B7280',
-                            marginBottom: '25px',
-                            lineHeight: 1.6,
-                        }}>
-                            Subscribe to receive updates on upcoming sessions, success stories, and speech tips!
-                        </p>
-
-                        <div style={{display: 'flex', gap: '12px', maxWidth: '600px', margin: '0 auto', flexWrap: 'wrap', justifyContent: 'center'}}>
-                            <input
-                                type="email"
-                                placeholder="Enter your email address"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                onKeyPress={(e) => e.key === 'Enter' && !loading && handleSubscribe()}
-                                disabled={loading}
-                                style={{
-                                    flex: '1',
-                                    minWidth: '280px',
-                                    padding: '14px 20px',
-                                    border: '2px solid #E5E7EB',
-                                    borderRadius: '8px',
-                                    fontSize: '1rem',
-                                    backgroundColor: '#FFFFFF',
-                                    color: '#111827',
-                                    outline: 'none',
-                                    transition: 'all 0.3s ease',
-                                    opacity: loading ? 0.6 : 1
-                                }}
-                                onFocus={(e) => e.currentTarget.style.borderColor = '#2563EB'}
-                                onBlur={(e) => e.currentTarget.style.borderColor = '#E5E7EB'}
-                            />
-                            <button
-                                onClick={handleSubscribe}
-                                disabled={loading}
-                                style={{
-                                    padding: '14px 32px',
-                                    backgroundColor: subscribed ? '#4caf50' : '#2563EB',
-                                    color: 'white',
-                                    border: 'none',
-                                    borderRadius: '8px',
-                                    fontSize: '1rem',
-                                    fontWeight: 600,
-                                    cursor: loading ? 'not-allowed' : 'pointer',
-                                    transition: 'all 0.3s ease',
-                                    whiteSpace: 'nowrap',
-                                    opacity: loading ? 0.6 : 1
-                                }}
-                                onMouseEnter={(e) => {
-                                    if (!subscribed && !loading) e.currentTarget.style.backgroundColor = '#1d4ed8';
-                                }}
-                                onMouseLeave={(e) => {
-                                    if (!subscribed && !loading) e.currentTarget.style.backgroundColor = '#2563EB';
-                                }}
-                            >
-                                {loading ? 'Subscribing...' : subscribed ? '✓ Subscribed!' : 'Subscribe'}
-                            </button>
-                        </div>
-
-                        {/* Success/Error Messages */}
-                        {(message || error) && (
-                            <div style={{
-                                marginTop: '15px',
-                                padding: '12px 20px',
-                                borderRadius: '8px',
-                                backgroundColor: error ? '#ff5252' : '#4caf50',
-                                color: 'white',
-                                textAlign: 'center',
-                                fontSize: '0.95rem',
-                                fontWeight: 500
-                            }}>
-                                {message || error}
-                            </div>
-                        )}
-                    </div>
-                </div>
-
-                {/* Main Footer - Two Column Layout */}
-                <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '60px'}}>
-
-                    {/* LEFT COLUMN - About & Action Buttons */}
-                    <div>
-                        <div style={{
-                            marginBottom: '30px'
-                        }}>
-                        <div style={{ textAlign: 'center', marginBottom: '20px' }}>
-                            <a href="/home" style={{ display: 'inline-block' }}>
-                                <img
-                                    src="/almaden_voices_logo_transparent.png"
-                                    alt="Almaden Voices"
-                                    style={{ height: '120px', width: 'auto' }}
-                                />
-                            </a>
-                        </div>
-
-                        <p style={{
-                            fontSize: '1rem',
-                            lineHeight: 1.8,
-                            color: '#6B7280',
-                            marginBottom: '20px'
-                        }}>
-                            A registered 501(c)(3) nonprofit organization (EIN: 39-4978818) dedicated to empowering
-                            young voices through free speech and debate programs for children in our community.
-                            All donations are tax-deductible to the fullest extent allowed by law.
-                        </p>
-
-                        {/* Contact Info */}
-                        <div style={{
-                            marginBottom: '40px',
-                            padding: '20px',
-                            backgroundColor: '#F9FAFB',
-                            borderRadius: '12px'
-                        }}>
-                            <div>
-                                <h4 style={{
-                                    color: '#2563EB',
-                                    marginBottom: '12px',
-                                    fontSize: '1rem',
-                                    fontWeight: 600,
-                                    textTransform: 'uppercase',
-                                    letterSpacing: '1px'
-                                }}>
-                                    📞 Contact
-                                </h4>
-                                <p style={{ color: '#6B7280', fontSize: '0.95rem', lineHeight: 1.6, margin: 0 }}>
-                                    Email: almadenvoices@gmail.com
-                                </p>
-                            </div>
-                        </div>
-
-                        {/*<div style={{*/}
-                        {/*    backgroundColor: '#2d2d44',*/}
-                        {/*    padding: '20px',*/}
-                        {/*    borderRadius: '10px',*/}
-                        {/*    marginBottom: '25px'*/}
-                        {/*}}>*/}
-                        {/*    <p style={{ fontSize: '0.9rem', color: '#6B7280', marginBottom: '8px' }}>*/}
-                        {/*        <strong style={{ color: '#9c27b0' }}>Tax ID:</strong> XX-XXXXXXX*/}
-                        {/*    </p>*/}
-                        {/*    <p style={{ fontSize: '0.9rem', color: '#6B7280', marginBottom: '8px' }}>*/}
-                        {/*        <strong style={{ color: '#9c27b0' }}>License:</strong> CA-XXXX-XXXX*/}
-                        {/*    </p>*/}
-                        {/*    <p style={{ fontSize: '0.9rem', color: '#6B7280', marginBottom: 0 }}>*/}
-                        {/*        <strong style={{ color: '#9c27b0' }}>Status:</strong> Active Non-Profit*/}
-                        {/*    </p>*/}
-                        {/*</div>*/}
-
-                        {/* Action Buttons */}
-                        <div style={{ marginBottom: '30px', textAlign: 'center' }}>
-                            <a
-                                href="/donate"
-                                style={{
-                                    display: 'inline-block',
-                                    padding: '16px 24px',
-                                    backgroundColor: 'transparent',
-                                    color: '#2563EB',
-                                    border: '2px solid #2563EB',
-                                    borderRadius: '10px',
-                                    fontSize: '1.1rem',
-                                    fontFamily: "'DM Sans', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif",
-                                    fontWeight: 900,
-                                    cursor: 'pointer',
-                                    transition: 'all 0.3s ease',
-                                    marginBottom: '12px',
-                                    textDecoration: 'none'
-                                }}
-                                onMouseEnter={(e) => {
-                                    e.currentTarget.style.backgroundColor = '#2563EB';
-                                    e.currentTarget.style.color = 'white';
-                                    e.currentTarget.style.transform = 'translateY(-2px)';
-                                    e.currentTarget.style.boxShadow = '0 6px 20px rgba(37, 99, 235, 0.4)';
-                                }}
-                                onMouseLeave={(e) => {
-                                    e.currentTarget.style.backgroundColor = 'transparent';
-                                    e.currentTarget.style.color = '#2563EB';
-                                    e.currentTarget.style.transform = 'translateY(0)';
-                                    e.currentTarget.style.boxShadow = 'none';
-                                }}
-                            >
-                                Donate Now
-                            </a>
-
-                            <a
-                                href="/volunteer"
-                                style={{
-                                    display: 'inline-block',
-                                    padding: '16px 24px',
-                                    backgroundColor: 'transparent',
-                                    color: '#2563EB',
-                                    border: '2px solid #2563EB',
-                                    borderRadius: '10px',
-                                    fontSize: '1.1rem',
-                                    fontFamily: "'DM Sans', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif",
-                                    fontWeight: 900,
-                                    cursor: 'pointer',
-                                    transition: 'all 0.3s ease',
-                                    textDecoration: 'none',
-                                    marginLeft: '12px'
-                                }}
-                                onMouseEnter={(e) => {
-                                    e.currentTarget.style.backgroundColor = '#2563EB';
-                                    e.currentTarget.style.color = 'white';
-                                    e.currentTarget.style.transform = 'translateY(-2px)';
-                                    e.currentTarget.style.boxShadow = '0 6px 20px rgba(37, 99, 235, 0.4)';
-                                }}
-                                onMouseLeave={(e) => {
-                                    e.currentTarget.style.backgroundColor = 'transparent';
-                                    e.currentTarget.style.color = '#2563EB';
-                                    e.currentTarget.style.transform = 'translateY(0)';
-                                    e.currentTarget.style.boxShadow = 'none';
-                                }}
-                            >
-                                Volunteer With Us
-                            </a>
-                        </div>
-                        </div>
-                    </div>
-
-                    {/* RIGHT COLUMN - Links */}
-                    <div>
-                        {/* Links Grid */}
-                        <div style={{
-                            display: 'grid',
-                            gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
-                            gap: '40px',
-                            marginBottom: '30px'
-                        }}>
-                            {/* About */}
-                            <div>
-                                <h4 style={{
-                                    fontSize: '1rem',
-                                    fontWeight: 600,
-                                    marginBottom: '16px',
-                                    color: '#111827',
-                                    textTransform: 'uppercase',
-                                    letterSpacing: '1px'
-                                }}>
-                                    About
-                                </h4>
-                                <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-                                    {rightColumnLinks.about.map((link, index) => (
-                                        <li key={index} style={{ marginBottom: '10px' }}>
-                                            <a
-                                                href={link.href}
-                                                style={{
-                                                    color: '#6B7280',
-                                                    textDecoration: 'none',
-                                                    fontSize: '0.9rem',
-                                                    transition: 'all 0.3s ease',
-                                                    display: 'inline-block'
-                                                }}
-                                                onMouseEnter={(e) => {
-                                                    e.currentTarget.style.color = '#2563EB';
-                                                    e.currentTarget.style.paddingLeft = '5px';
-                                                }}
-                                                onMouseLeave={(e) => {
-                                                    e.currentTarget.style.color = '#6B7280';
-                                                    e.currentTarget.style.paddingLeft = '0';
-                                                }}
-                                            >
-                                                {link.label}
-                                            </a>
-                                        </li>
-                                    ))}
-                                </ul>
-                            </div>
-
-                            {/* Programs */}
-                            <div>
-                                <h4 style={{
-                                    fontSize: '1rem',
-                                    fontWeight: 600,
-                                    marginBottom: '16px',
-                                    color: '#111827',
-                                    textTransform: 'uppercase',
-                                    letterSpacing: '1px'
-                                }}>
-                                    Programs & Events
-                                </h4>
-                                <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-                                    {rightColumnLinks.programs.map((link, index) => (
-                                        <li key={index} style={{ marginBottom: '10px' }}>
-                                            <a
-                                                href={link.href}
-                                                style={{
-                                                    color: '#6B7280',
-                                                    textDecoration: 'none',
-                                                    fontSize: '0.9rem',
-                                                    transition: 'all 0.3s ease',
-                                                    display: 'inline-block'
-                                                }}
-                                                onMouseEnter={(e) => {
-                                                    e.currentTarget.style.color = '#2563EB';
-                                                    e.currentTarget.style.paddingLeft = '5px';
-                                                }}
-                                                onMouseLeave={(e) => {
-                                                    e.currentTarget.style.color = '#6B7280';
-                                                    e.currentTarget.style.paddingLeft = '0';
-                                                }}
-                                            >
-                                                {link.label}
-                                            </a>
-                                        </li>
-                                    ))}
-                                </ul>
-                            </div>
-
-                            {/* get Involved */}
-                            <div>
-                                <h4 style={{
-                                    fontSize: '1rem',
-                                    fontWeight: 600,
-                                    marginBottom: '16px',
-                                    color: '#111827',
-                                    textTransform: 'uppercase',
-                                    letterSpacing: '1px'
-                                }}>
-                                    Get Involved
-                                </h4>
-                                <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-                                    {rightColumnLinks.getInvolved.map((link, index) => (
-                                        <li key={index} style={{ marginBottom: '10px' }}>
-                                            <a
-                                                href={link.href}
-                                                style={{
-                                                    color: '#6B7280',
-                                                    textDecoration: 'none',
-                                                    fontSize: '0.9rem',
-                                                    transition: 'all 0.3s ease',
-                                                    display: 'inline-block'
-                                                }}
-                                                onMouseEnter={(e) => {
-                                                    e.currentTarget.style.color = '#2563EB';
-                                                    e.currentTarget.style.paddingLeft = '5px';
-                                                }}
-                                                onMouseLeave={(e) => {
-                                                    e.currentTarget.style.color = '#6B7280';
-                                                    e.currentTarget.style.paddingLeft = '0';
-                                                }}
-                                            >
-                                                {link.label}
-                                            </a>
-                                        </li>
-                                    ))}
-                                </ul>
-                            </div>
-                            {/* Legal */}
-                            <div>
-                                <h4 style={{
-                                    fontSize: '1rem',
-                                    fontWeight: 600,
-                                    marginBottom: '16px',
-                                    color: '#111827',
-                                    textTransform: 'uppercase',
-                                    letterSpacing: '1px'
-                                }}>
-                                    Legal & Financial
-                                </h4>
-                                <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-                                    {rightColumnLinks.legal.map((link, index) => (
-                                        <li key={index} style={{ marginBottom: '10px' }}>
-                                            <a
-                                                href={link.href}
-                                                style={{
-                                                    color: '#6B7280',
-                                                    textDecoration: 'none',
-                                                    fontSize: '0.9rem',
-                                                    transition: 'all 0.3s ease',
-                                                    display: 'inline-block'
-                                                }}
-                                                onMouseEnter={(e) => {
-                                                    e.currentTarget.style.color = '#2563EB';
-                                                    e.currentTarget.style.paddingLeft = '5px';
-                                                }}
-                                                onMouseLeave={(e) => {
-                                                    e.currentTarget.style.color = '#6B7280';
-                                                    e.currentTarget.style.paddingLeft = '0';
-                                                }}
-                                            >
-                                                {link.label}
-                                            </a>
-                                        </li>
-                                    ))}
-                                </ul>
-                            </div>
-                        </div>
-
-                    </div>
-                </div>
+        <form className={s.signup} onSubmit={onSubmit} noValidate>
+            <h2 className={s.signupTitle}>Hear about the next workshop</h2>
+            <p className={s.signupText}>
+                One email a month, with new sessions and what our students have been up to.
+            </p>
+            <div className={s.signupRow}>
+                <label htmlFor="footer-email" className={s.visuallyHidden}>Email address</label>
+                <input
+                    id="footer-email"
+                    type="email"
+                    autoComplete="email"
+                    placeholder="you@example.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    disabled={status === "sending"}
+                    className={s.input}
+                    aria-describedby={message ? "footer-email-status" : undefined}
+                />
+                <button type="submit" className={s.submit} disabled={status === "sending"}>
+                    {status === "sending" ? "Subscribing..." : "Subscribe"}
+                </button>
             </div>
-
-            {/* Bottom Copyright Bar */}
-            <div style={{borderTop: '1px solid #E5E7EB', backgroundColor: '#F9FAFB', padding: '25px 20px',}}>
-                <div style={{
-                    maxWidth: '1400px',
-                    margin: '0 auto',
-                    padding: '10px 20px',
-                    display: 'flex',
-                    flexWrap: 'wrap',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    gap: '20px'
-                }}>
-                    <div style={{ fontSize: '1rem', color: '#6B7280', margin: 0 }}>
-                        © {new Date().getFullYear()} Almaden Voices. All rights reserved. &nbsp;|&nbsp; Registered 501(c)(3) Nonprofit &nbsp;|&nbsp; EIN: 39-4978818
-                    </div>
-
-                    <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap' }}>
-                        <a
-                            href="/docs/terms-of-service.html"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            style={{
-                                color: '#6B7280',
-                                textDecoration: 'none',
-                                fontSize: '1rem',
-                                transition: 'color 0.3s ease'
-                            }}
-                            onMouseEnter={(e) => e.currentTarget.style.color = '#2563EB'}
-                            onMouseLeave={(e) => e.currentTarget.style.color = '#6B7280'}
-                        >
-                            Terms of Service <OpenInNewIcon sx={{ fontSize: 14, verticalAlign: 'middle', ml: 0.5 }} />
-                        </a>
-                        <a
-                            href="/docs/privacy-policy.html"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            style={{
-                                color: '#6B7280',
-                                textDecoration: 'none',
-                                fontSize: '1rem',
-                                transition: 'color 0.3s ease'
-                            }}
-                            onMouseEnter={(e) => e.currentTarget.style.color = '#2563EB'}
-                            onMouseLeave={(e) => e.currentTarget.style.color = '#6B7280'}
-                        >
-                            Privacy Policy <OpenInNewIcon sx={{ fontSize: 14, verticalAlign: 'middle', ml: 0.5 }} />
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
+            <p
+                id="footer-email-status"
+                role="status"
+                className={`${s.status} ${status === "error" ? s.statusError : ""}`}
+            >
+                {message}
+            </p>
+        </form>
     );
-};
+}
 
-export default Footer;
+export default function Footer() {
+    return (
+        <footer className={s.footer}>
+            <div className={s.inner}>
+                <div className={s.top}>
+                    <div className={s.about}>
+                        <Link to="/" aria-label="Almaden Voices home">
+                            <img src="/almaden_voices_logo_transparent.png" alt="" className={s.logo} />
+                        </Link>
+                        <p className={s.aboutText}>
+                            Almaden Voices is a registered 501(c)(3) nonprofit in San José, California.
+                            Donations are tax-deductible to the fullest extent allowed by law.
+                        </p>
+                        <p className={s.aboutText}>
+                            <a href="mailto:almadenvoices@gmail.com">almadenvoices@gmail.com</a>
+                        </p>
+                    </div>
+                    <NewsletterSignup />
+                </div>
+
+                <nav aria-label="Footer" className={s.columns}>
+                    {MAIN_PAGES.map((page) => (
+                        <div key={page.key}>
+                            <h2 className={s.colTitle}>
+                                <Link to={page.path}>{page.label}</Link>
+                            </h2>
+                            <ul className={s.list}>
+                                {visibleSections(page).map((section) => (
+                                    <li key={section.id}>
+                                        <Link to={sectionHref(page, section)}>{section.label}</Link>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    ))}
+                    <div>
+                        <h2 className={s.colTitle}>Help</h2>
+                        <ul className={s.list}>
+                            {HELP_LINKS.map((link) => (
+                                <li key={link.to}>
+                                    <Link to={link.to}>{link.label}</Link>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                </nav>
+
+                <div className={s.bottom}>
+                    <p className={s.legal}>
+                        © {new Date().getFullYear()} Almaden Voices. EIN 39-4978818.
+                    </p>
+                    <ul className={s.docs}>
+                        {DOCUMENTS.map((doc) => (
+                            <li key={doc.href}>
+                                <a href={doc.href} target="_blank" rel="noopener noreferrer">
+                                    {doc.label}
+                                    <span className={s.visuallyHidden}> (opens in a new tab)</span>
+                                </a>
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+            </div>
+        </footer>
+    );
+}

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { Link as RouterLink } from 'react-router-dom';
 import {
     Box, Container, Stack, Typography, Button, IconButton, useMediaQuery
 } from '@mui/material';
@@ -11,14 +12,17 @@ import s from './HeroVideo.module.css';
 
 // Positioning for the slideshow arrows lives here (via sx) so it always wins
 // over MUI's own IconButton styles — a CSS-module class was being overridden.
+// On phones the arrows drop to the bottom corners, beside the dots, so they
+// never sit on top of the headline.
 const navBtnSx = (side) => ({
     position: 'absolute',
-    top: '50%',
-    transform: 'translateY(-50%)',
-    [side]: { xs: 8, md: 20 },
+    top: { xs: 'auto', md: '50%' },
+    bottom: { xs: 10, md: 'auto' },
+    transform: { xs: 'none', md: 'translateY(-50%)' },
+    [side]: { xs: 12, md: 20 },
     zIndex: 3,
-    width: 52,
-    height: 52,
+    width: { xs: 44, md: 52 },
+    height: { xs: 44, md: 52 },
     color: '#FFFFFF',
     bgcolor: 'rgba(0,0,0,.45)',
     border: '2px solid rgba(255,255,255,.85)',
@@ -26,7 +30,6 @@ const navBtnSx = (side) => ({
     transition: 'background .2s, transform .2s',
     '&:hover': {
         bgcolor: 'rgba(0,0,0,.7)',
-        transform: 'translateY(-50%) scale(1.08)',
     },
 });
 
@@ -63,8 +66,11 @@ export default function HeroVideo({ config = {} }) {
         }
     }, [hasImages, images.length]);
 
+    // The slideshow doesn't advance on its own for visitors who've asked for
+    // reduced motion. The arrows and dots still work.
     useEffect(() => {
         if (!hasImages || images.length <= 1) return;
+        if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return;
         const timer = setInterval(nextSlide, autoplayInterval);
         return () => clearInterval(timer);
     }, [hasImages, images.length, autoplayInterval, nextSlide]);
@@ -90,19 +96,21 @@ export default function HeroVideo({ config = {} }) {
             component="section"
             className={s.root}
             style={{ paddingTop: topOffset }}
-            aria-label="Hero"
+            aria-label="Photos from our sessions"
             data-height-xs={height.xs}
             data-height-md={height.md}
         >
 
-            {/* Background */}
-            <Box className={s.mediaWrap} aria-hidden>
+            {/* Background. Slides can be a plain path or { src, alt }; only
+                the slide on screen is exposed to screen readers. */}
+            <Box className={s.mediaWrap}>
                 {hasImages ? (
                     images.map((img, index) => (
                         <img
                             key={index}
-                            src={img}
-                            alt=""
+                            src={typeof img === 'string' ? img : img.src}
+                            alt={typeof img === 'string' ? '' : img.alt}
+                            aria-hidden={index === currentSlide ? undefined : true}
                             className={s.slideImage}
                             style={{
                                 opacity: index === currentSlide ? 1 : 0,
@@ -115,7 +123,7 @@ export default function HeroVideo({ config = {} }) {
                         {(video.sources || []).map((src) => <source key={src.src} src={src.src} type={src.type} />)}
                     </video>
                 )}
-                <Box className={s.overlay} style={{ background: overlayBg }} />
+                <Box className={s.overlay} style={{ background: overlayBg }} aria-hidden />
             </Box>
 
             {/* Slideshow nav buttons (outside mediaWrap so they're above content) */}
@@ -141,6 +149,7 @@ export default function HeroVideo({ config = {} }) {
                                 key={index}
                                 className={`${s.dot} ${index === currentSlide ? s.activeDot : ''}`}
                                 onClick={() => setCurrentSlide(index)}
+                                aria-current={index === currentSlide ? 'true' : undefined}
                                 aria-label={`Go to slide ${index + 1}`}
                             />
                         ))}
@@ -169,20 +178,14 @@ export default function HeroVideo({ config = {} }) {
                             {(ctas || []).map((b, i) => (
                                 <Button
                                     key={(b.label || 'cta') + i}
-                                    href={b.href || '#'}
+                                    {...(b.href && b.href.startsWith('/')
+                                        ? { component: RouterLink, to: b.href }
+                                        : { href: b.href || '#' })}
                                     variant={b.variant || 'contained'}
                                     color={b.color || 'secondary'}
                                     size={isMobile ? 'medium' : 'large'}
                                     className={s.ctaBtn}
-                                    sx={b.standout ? {
-                                        backgroundColor: '#FACC15',
-                                        color: '#111827',
-                                        fontWeight: 900,
-                                        '&:hover': {
-                                            backgroundColor: '#EAB308',
-                                        },
-                                        boxShadow: '0 4px 14px rgba(250, 204, 21, 0.4)',
-                                    } : {}}
+                                    sx={b.sx || {}}
                                     startIcon={
                                         b.icon === 'donate' ? <VolunteerActivismIcon /> :
                                             b.icon === 'play' ? <PlayArrowIcon /> : undefined
@@ -194,9 +197,11 @@ export default function HeroVideo({ config = {} }) {
                         </Stack>
 
                         {/* Scroll down CTA */}
-                        <IconButton onClick={onScrollDown} aria-label="Scroll for more" className={s.scrollBtn}>
-                            <KeyboardArrowDownIcon />
-                        </IconButton>
+                        {scrollCta && (
+                            <IconButton onClick={onScrollDown} aria-label="Scroll for more" className={s.scrollBtn}>
+                                <KeyboardArrowDownIcon />
+                            </IconButton>
+                        )}
                     </Stack>
                 </div>
             </Container>

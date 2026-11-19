@@ -229,7 +229,7 @@ const CoursesPage = () => {
                     </div>
 
                     {/* Debate Session - Right */}
-                    <div style={{ flex: '1 1 480px' }}>
+                    <div id="debate-booster" style={{ flex: '1 1 480px' }}>
                         <h2 style={{ fontSize: 'clamp(1.25rem, 2.5vw, 1.5rem)', fontWeight: 700, color: '#111827', textAlign: 'center', marginBottom: '24px' }}>
                             In our debate session, we teach…
                         </h2>

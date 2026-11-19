@@ -298,8 +298,8 @@ export default function VolunteerPage() {
                 <div className="container">
                     <h1 className={s.heroTitle}>Join the Almaden Voices Team</h1>
                     <p className={s.heroSub}>
-                        Almaden Voices is a San José 501(c)(3) that has taught free public speaking to more than
-                        140 students since March 2025. We&apos;re growing, and we&apos;re looking for volunteers
+                        Almaden Voices is a San José 501(c)(3) that has taught free public speaking to 350
+                        students since April 2025. We&apos;re growing, and we&apos;re looking for volunteers
                         who want to help more kids find their voices.
                     </p>
                     <p className={s.heroNote}>

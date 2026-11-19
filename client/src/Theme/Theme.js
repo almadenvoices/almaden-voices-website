@@ -8,8 +8,10 @@ export const getAppTheme = () =>
         palette: {
             mode: 'light',
             background: { default: '#FFFFFF', paper: '#F9FAFB' },
-            primary: { main: '#2563EB' },
-            secondary: { main: '#2563EB' },
+            // Navy and amber. Amber buttons carry navy text: white on amber
+            // fails contrast.
+            primary: { main: '#1E3A5F', dark: '#14253F', contrastText: '#FFFFFF' },
+            secondary: { main: '#FBBF24', dark: '#F59E0B', contrastText: '#10203A' },
             text: {
                 primary: '#111827',
                 secondary: '#6B7280',
@@ -40,24 +42,17 @@ export const getAppTheme = () =>
                     body: { fontFamily: bodyFont }
                 }
             },
-            // Pill buttons with a little lift, instead of MUI's flat default.
+            // Flat buttons with a small radius. No shadow, no hover lift.
             MuiButton: {
                 defaultProps: { disableElevation: true },
                 styleOverrides: {
                     root: {
-                        borderRadius: 999,
-                        paddingLeft: 26,
-                        paddingRight: 26,
+                        borderRadius: 6,
+                        paddingLeft: 22,
+                        paddingRight: 22,
                         paddingTop: 10,
                         paddingBottom: 10,
-                        transition: "transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease",
-                    },
-                    containedPrimary: {
-                        boxShadow: "0 4px 14px rgba(37, 99, 235, 0.28)",
-                        "&:hover": {
-                            boxShadow: "0 8px 22px rgba(37, 99, 235, 0.36)",
-                            transform: "translateY(-1px)",
-                        },
+                        transition: "background-color 0.15s ease",
                     },
                 },
             },
