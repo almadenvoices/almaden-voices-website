@@ -166,7 +166,7 @@ export default function HeroVideo({ config = {} }) {
                         justifyContent="center"
                         spacing={2}
                     >
-                        <Typography variant={isMobile ? 'h4' : 'h2'} className={s.title}>
+                        <Typography component="h1" variant={isMobile ? 'h4' : 'h2'} className={s.title}>
                             {title}
                         </Typography>
                         {subtitle && (

@@ -1,7 +1,6 @@
 /**
  * The site's four main pages and the sections on each. The top-nav
- * dropdowns, the mobile menu, the footer and (from the About rebuild on) the
- * sticky sub-nav all read from this list, so a section only has to be added
+ * dropdowns, the mobile menu, the footer and the sticky sub-nav all read from this list, so a section only has to be added
  * once.
  *
  * `id` is the anchor on the finished page, e.g. /programs#interview-prep.
@@ -13,12 +12,6 @@
  *
  * `hidden: true` keeps a section out of every menu until its content exists
  * (press and Voices are waiting on content).
- *
- * WHILE THE RESTRUCTURE IS IN PROGRESS: pages that haven't been rebuilt yet
- * still live at their old URLs, so their entries carry a `to` that points at
- * the old location. When a page is rebuilt, change its `path`, delete the
- * `to` overrides, and add the old URL to the redirect list in server.js and
- * App.js.
  */
 export const MAIN_PAGES = [
     {
@@ -27,53 +20,58 @@ export const MAIN_PAGES = [
         path: "/about",
         matches: ["/about"],
         sections: [
-            { id: "our-story", label: "Our story", to: "/about#mission" },
-            { id: "our-team", label: "Our team", to: "/about#team" },
-            { id: "where-weve-worked", label: "Where we've worked", to: "/impact#our-work" },
+            { id: "our-story", label: "Our story" },
+            { id: "where-weve-worked", label: "Where we've worked" },
+            { id: "our-team", label: "Our team" },
+            // Waiting on content. Turn on in Pages/About/AboutPage.js too.
             { id: "press", label: "Press", hidden: true },
         ],
     },
     {
         key: "programs",
         label: "Programs",
-        path: "/courses1",
-        matches: ["/courses1"],
+        path: "/programs",
+        matches: ["/programs"],
         sections: [
-            { id: "workshops", label: "Workshops", to: "/courses1" },
-            { id: "debate-booster", label: "Debate Booster", to: "/courses1#debate-booster" },
-            { id: "coaching", label: "One-on-one coaching", to: "/register" },
-            // Goes live with the Programs page rebuild.
-            { id: "interview-prep", label: "Interview prep", hidden: true },
+            { id: "workshops", label: "Workshops" },
+            { id: "debate-booster", label: "Debate Booster" },
+            { id: "coaching", label: "One-on-one coaching" },
+            { id: "interview-prep", label: "Interview prep" },
         ],
     },
     {
         key: "get-involved",
         label: "Get involved",
-        path: "/volunteer",
-        matches: ["/volunteer", "/chapters", "/events"],
+        path: "/get-involved",
+        matches: ["/get-involved"],
         sections: [
-            { id: "volunteer", label: "Volunteer", to: "/volunteer" },
-            { id: "start-a-chapter", label: "Start a chapter", to: "/chapters" },
-            { id: "upcoming-events", label: "Upcoming events", to: "/events" },
+            { id: "start-a-chapter", label: "Start a chapter" },
+            { id: "volunteer", label: "Volunteer" },
+            { id: "upcoming-events", label: "Upcoming events" },
         ],
     },
     {
         key: "stories",
         label: "Stories",
-        path: "/impact",
-        matches: ["/impact"],
+        path: "/stories",
+        matches: ["/stories"],
         sections: [
-            { id: "parent-reviews", label: "Parent reviews", to: "/impact#parent-reviews" },
-            { id: "student-videos", label: "Student videos", to: "/impact#testimonials" },
+            { id: "past-sessions", label: "Past sessions" },
+            { id: "june-survey", label: "June camp survey" },
+            { id: "parent-reviews", label: "Parent reviews" },
+            { id: "student-videos", label: "Student videos" },
+            // Waiting on content. Turn on in Pages/Stories/StoriesPage.js too.
             { id: "voices", label: "Voices", hidden: true },
         ],
     },
 ];
 
-/** Where a section link points: its interim override, or path#id. */
-export const sectionHref = (page, section) => section.to || `${page.path}#${section.id}`;
+/** Where a section link points: /programs#interview-prep. */
+export const sectionHref = (page, section) => `${page.path}#${section.id}`;
 
 export const visibleSections = (page) => page.sections.filter((s) => !s.hidden);
+
+export const pageByKey = (key) => MAIN_PAGES.find((page) => page.key === key);
 
 /** Which main page the current URL belongs to, for marking it in the nav. */
 export function pageForPath(pathname) {

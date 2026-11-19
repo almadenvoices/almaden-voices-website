@@ -108,6 +108,11 @@ function MobileMenu({ open, onClose, currentKey }) {
     return (
         <div id="mobile-menu" className={s.mobilePanel} hidden={!open}>
             <ul className={s.mobileList}>
+                <li className={s.mobileGroup}>
+                    <NavLink to="/" end className={({ isActive }) => `${s.mobilePlainLink} ${isActive ? s.mobileGroupCurrent : ""}`} onClick={onClose}>
+                        Home
+                    </NavLink>
+                </li>
                 {MAIN_PAGES.map((page) => {
                     const isOpen = expanded === page.key;
                     const listId = `mobile-sections-${page.key}`;
@@ -136,7 +141,7 @@ function MobileMenu({ open, onClose, currentKey }) {
                     );
                 })}
                 <li className={s.mobileGroup}>
-                    <NavLink to="/register" className={s.mobilePlainLink} onClick={onClose}>
+                    <NavLink to="/register" className={({ isActive }) => `${s.mobilePlainLink} ${isActive ? s.mobileGroupCurrent : ""}`} onClick={onClose}>
                         Register
                     </NavLink>
                 </li>
@@ -191,6 +196,15 @@ export default function Navbar() {
 
                 <nav aria-label="Main" className={s.desktopNav}>
                     <ul className={s.groups}>
+                        <li>
+                            <NavLink
+                                to="/"
+                                end
+                                className={({ isActive }) => `${s.topLink} ${isActive ? s.topLinkCurrent : ""}`}
+                            >
+                                Home
+                            </NavLink>
+                        </li>
                         {MAIN_PAGES.map((page) => (
                             <DesktopGroup
                                 key={page.key}

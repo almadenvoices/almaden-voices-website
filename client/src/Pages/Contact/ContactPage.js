@@ -1,10 +1,12 @@
 import React, { useState } from "react";
+import usePageMeta from "../../hooks/usePageMeta";
 import s from "./Contact.module.css";
 import EmailIcon from "@mui/icons-material/Email";
 import SendIcon from "@mui/icons-material/Send";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 
 export default function ContactPage() {
+    usePageMeta("Contact", "Get in touch with Almaden Voices. Email almadenvoices@gmail.com or send a message, and we reply within 24 to 48 hours.");
     const [agreed, setAgreed] = useState(false);
     const [showToast, setShowToast] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -87,10 +89,9 @@ export default function ContactPage() {
             {/* Header (optional; hide if you want the pure card view) */}
             <section className={s.hero}>
                 <div className="container">
-                    <p className={s.heroEyebrow}>Contact Us</p>
                     <h1 className={s.heroTitle}>Get in touch</h1>
                     <p className={s.heroSub}>
-                        We&apos;d love to hear from you. Our friendly team is always here to chat.
+                        Questions, an idea for a workshop, or anything else. We reply within 24 to 48 hours.
                     </p>
                 </div>
             </section>

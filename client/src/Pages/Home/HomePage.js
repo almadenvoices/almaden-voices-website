@@ -20,7 +20,7 @@ const heroConfig = {
         },
         {
             label: "See our programs",
-            href: "/courses1",
+            href: "/programs",
             variant: "outlined",
             color: "inherit",
             sx: { color: "#FFFFFF", borderColor: "rgba(255,255,255,0.75)", "&:hover": { borderColor: "#FFFFFF", bgcolor: "rgba(255,255,255,0.1)" } },
@@ -86,13 +86,22 @@ export default function HomePage() {
 
     return (
         <>
-            {/* Chapter applications notice. Delete this block when they close. */}
-            <div className={s.notice}>
-                <p className={s.noticeText}>
-                    Chapter applications are open. If you'd like to run free speaking workshops at
-                    your school or in your town, <Link to="/chapters">read how chapters work</Link>.
-                </p>
-            </div>
+            {/* Chapter applications. Delete this block when they close. */}
+            <section className={s.chapters} aria-labelledby="chapters-title">
+                <div className={s.chaptersInner}>
+                    <div>
+                        <h2 id="chapters-title" className={s.chaptersTitle}>Chapter applications are open</h2>
+                        <p className={s.chaptersText}>
+                            Start an Almaden Voices chapter at your school or in your town. We'll give you
+                            the curriculum, the training and a nonprofit to run it under.
+                        </p>
+                    </div>
+                    <div className={s.chaptersActions}>
+                        <Link to="/get-involved#start-a-chapter" className={s.chaptersButton}>Start a chapter</Link>
+                        <Link to="/get-involved#chapter-guide" className={s.chaptersLink}>Read the chapter guide</Link>
+                    </div>
+                </div>
+            </section>
 
             <HeroVideo config={heroConfig} />
 
@@ -112,7 +121,7 @@ export default function HomePage() {
                         ))}
                     </dl>
                     <p className={s.bandLink}>
-                        <Link to="/impact#our-work">See where we've worked</Link>
+                        <Link to="/about#where-weve-worked">See where we've worked</Link>
                     </p>
                 </div>
             </section>
@@ -209,7 +218,7 @@ export default function HomePage() {
                         <p className={s.ratingText}>
                             Average rating from {REVIEW_COUNT} parent reviews
                         </p>
-                        <Link to="/impact#parent-reviews" className={s.textLink}>
+                        <Link to="/stories#parent-reviews" className={s.textLink}>
                             Read all {REVIEW_COUNT} reviews
                         </Link>
                     </div>
@@ -238,7 +247,7 @@ export default function HomePage() {
                             Noah is one of our students. He agreed to tell the camera what he thought of
                             his class. There are more student videos on our stories page.
                         </p>
-                        <Link to="/impact#testimonials" className={s.textLink}>
+                        <Link to="/stories#student-videos" className={s.textLink}>
                             Watch more student videos
                         </Link>
                     </div>

@@ -1,0 +1,169 @@
+.heading {
+    margin: 0 0 16px;
+    font-size: clamp(1.8rem, 3.4vw, 2.6rem);
+    line-height: 1.12;
+    letter-spacing: -0.02em;
+    color: var(--navy-ink);
+    max-width: 22ch;
+}
+
+.intro {
+    margin: 0 0 36px;
+    max-width: 64ch;
+    font-size: 1.06rem;
+    line-height: 1.75;
+    color: var(--ink-soft);
+}
+
+.metrics {
+    display: grid;
+    gap: 24px;
+    margin: 0 0 40px;
+}
+
+.metric {
+    display: flex;
+    flex-direction: column;
+}
+
+.metric dt {
+    font-weight: 700;
+    color: var(--navy-ink);
+    font-size: 1.02rem;
+}
+
+.metricValue {
+    order: -1;
+    margin: 0 0 4px;
+    font-family: var(--font-heading);
+    font-size: clamp(2.6rem, 5vw, 3.4rem);
+    font-weight: 700;
+    line-height: 1;
+    color: var(--navy);
+}
+
+.metricNote {
+    margin: 4px 0 0;
+    font-size: 0.93rem;
+    line-height: 1.55;
+    color: var(--ink-soft);
+    max-width: 34ch;
+}
+
+.panels {
+    display: grid;
+    gap: 24px;
+}
+
+.panel {
+    background: #FFFFFF;
+    border-top: 4px solid;
+    padding: 24px 24px 20px;
+}
+
+.panelTitle {
+    margin: 0;
+    font-size: 1.3rem;
+    color: var(--navy-ink);
+}
+
+.panelSub {
+    margin: 4px 0 24px;
+    font-size: 0.93rem;
+    color: var(--ink-soft);
+}
+
+.row + .row {
+    margin-top: 20px;
+}
+
+.rowHead {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 16px;
+    font-size: 0.97rem;
+    color: var(--ink);
+}
+
+.rowHead strong {
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+}
+
+.bar {
+    display: block;
+    margin-top: 8px;
+}
+
+.panelCaption {
+    margin: 24px 0 0;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    color: var(--ink-soft);
+}
+
+.note {
+    margin: 16px 0 0;
+    max-width: 70ch;
+    font-size: 0.92rem;
+    line-height: 1.65;
+    color: var(--ink-soft);
+}
+
+.quotesTitle {
+    margin: 56px 0 20px;
+    font-size: 1.5rem;
+    color: var(--navy-ink);
+}
+
+.quotes {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    columns: 1;
+    column-gap: 48px;
+}
+
+.quotes li {
+    break-inside: avoid;
+    padding: 14px 0;
+    border-top: 1px solid #CED8E5;
+}
+
+.quotes blockquote {
+    margin: 0;
+    font-size: 1.05rem;
+    line-height: 1.6;
+    color: var(--ink);
+}
+
+.quotes p {
+    margin: 6px 0 0;
+    font-size: 0.92rem;
+    font-weight: 600;
+    color: var(--navy);
+}
+
+.footnote {
+    margin: 40px 0 0;
+    font-size: 0.85rem;
+    line-height: 1.65;
+    color: var(--ink-soft);
+    max-width: 70ch;
+}
+
+@media (min-width: 700px) {
+    .metrics {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+    .quotes {
+        columns: 2;
+    }
+}
+
+@media (min-width: 900px) {
+    .panels {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}

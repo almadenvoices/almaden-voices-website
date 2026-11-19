@@ -2018,11 +2018,17 @@ app.post("/api/paypal/orders/:orderID/capture", async (req, res) => {
 
 // Pages that moved in the 2026 restructure. Links to the old addresses live on
 // in emails, flyers and grant applications, so each one gets a permanent (301)
-// redirect. Browsers carry any #anchor across a redirect on their own, and the
-// query string is kept here. Keep this list in step with OLD_URL_REDIRECTS in
+// redirect. The query string is kept. A browser keeps the old #anchor across
+// the redirect unless the new address has its own, and the client remaps old
+// anchors that moved (HASH_REDIRECTS in client/src/data/redirects.js). Keep this list in step with OLD_URL_REDIRECTS in
 // client/src/data/redirects.js.
 const OLD_URL_REDIRECTS = {
     "/home": "/",
+    "/courses1": "/programs",
+    "/impact": "/stories",
+    "/volunteer": "/get-involved#volunteer",
+    "/chapters": "/get-involved#start-a-chapter",
+    "/events": "/get-involved#upcoming-events",
 };
 
 Object.entries(OLD_URL_REDIRECTS).forEach(([from, to]) => {

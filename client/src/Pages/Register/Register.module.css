@@ -47,7 +47,7 @@
     padding: 8px 20px;
     border-radius: 999px;
     font-size: var(--r-font-sm);
-    color: #2563EB;
+    color: #1E3A5F;
     font-weight: 600;
     margin-bottom: 20px;
 }
@@ -95,7 +95,7 @@
 }
 
 .langBtnActive {
-    background: #2563EB;
+    background: #1E3A5F;
     color: #FFFFFF;
 }
 
@@ -130,14 +130,14 @@
 
 .chooseBtn:hover {
     border-color: #93B4F5;
-    box-shadow: 0 6px 20px rgba(37, 99, 235, 0.12);
+    box-shadow: 0 6px 20px rgba(30, 58, 95, 0.12);
     transform: translateY(-2px);
 }
 
 .chooseBtnActive {
-    border-color: #2563EB;
+    border-color: #1E3A5F;
     background: #F0F6FF;
-    box-shadow: 0 6px 20px rgba(37, 99, 235, 0.15);
+    box-shadow: 0 6px 20px rgba(30, 58, 95, 0.15);
 }
 
 .chooseIcon {
@@ -148,11 +148,11 @@
     display: grid;
     place-items: center;
     background: #EFF6FF;
-    color: #2563EB;
+    color: #1E3A5F;
 }
 
 .chooseBtnActive .chooseIcon {
-    background: #2563EB;
+    background: #1E3A5F;
     color: #FFFFFF;
 }
 
@@ -193,7 +193,7 @@
 
 .chooseBtn:hover .chooseArrow,
 .chooseBtnActive .chooseArrow {
-    color: #2563EB;
+    color: #1E3A5F;
     transform: translateX(3px);
 }
 
@@ -295,7 +295,7 @@
 .iconCircle {
     width: 52px;
     height: 52px;
-    background: #2563EB;
+    background: #1E3A5F;
     color: white;
     border-radius: 14px;
     display: flex;
@@ -343,14 +343,14 @@
     color: #111827;
     margin: 12px 0 0;
     padding-bottom: 10px;
-    border-bottom: 2px solid #2563EB;
+    border-bottom: 2px solid #1E3A5F;
     display: flex;
     align-items: center;
     gap: 8px;
 }
 
 .formTitle svg {
-    color: #2563EB;
+    color: #1E3A5F;
     font-size: 20px;
 }
 
@@ -375,7 +375,7 @@
 }
 
 .req {
-    color: #2563EB;
+    color: #1E3A5F;
     font-weight: 700;
 }
 
@@ -404,8 +404,8 @@
 .field input:focus,
 .field textarea:focus,
 .field select:focus {
-    border-color: #2563EB;
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    border-color: #1E3A5F;
+    box-shadow: 0 0 0 3px rgba(30, 58, 95, 0.1);
 }
 
 .field input:disabled,
@@ -463,7 +463,7 @@
     height: 18px;
     margin-top: 2px;
     flex-shrink: 0;
-    accent-color: #2563EB;
+    accent-color: #1E3A5F;
 }
 
 /* Photo/video permission: the required radio pair plus the optional press
@@ -498,7 +498,7 @@
 }
 
 .link {
-    color: #2563EB;
+    color: #1E3A5F;
     font-weight: 600;
     text-decoration: none;
 }
@@ -514,7 +514,7 @@
     gap: 10px;
     height: clamp(52px, 3.4vw, 56px);
     padding: 0 clamp(20px, 2.5vw, 28px);
-    background: #2563EB;
+    background: #1E3A5F;
     color: white;
     border: 0;
     border-radius: 12px;
@@ -528,7 +528,7 @@
 
 .btn:hover:not(:disabled) {
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(37, 99, 235, 0.35);
+    box-shadow: 0 6px 20px rgba(30, 58, 95, 0.35);
 }
 
 .btn:disabled {
@@ -553,8 +553,8 @@
 }
 
 .counterBtn:hover:not(:disabled) {
-    border-color: #2563EB;
-    color: #2563EB;
+    border-color: #1E3A5F;
+    color: #1E3A5F;
     background: #EFF6FF;
 }
 
@@ -582,7 +582,7 @@
 .studentLabel {
     font-size: 0.95rem;
     font-weight: 700;
-    color: #2563EB;
+    color: #1E3A5F;
 }
 
 .removeBtn {
@@ -608,7 +608,7 @@
     gap: 6px;
     padding: 10px 20px;
     background: #EFF6FF;
-    color: #2563EB;
+    color: #1E3A5F;
     border: 2px dashed #BFDBFE;
     border-radius: 12px;
     font-size: 0.9rem;

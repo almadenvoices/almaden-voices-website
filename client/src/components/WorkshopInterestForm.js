@@ -129,7 +129,7 @@ const WorkshopInterestForm = ({ lang = 'both' }) => {
                     ? <h3 style={{ fontSize: '1.4rem', fontWeight: 700, color: '#111827', margin: '0 0 16px', textAlign: 'center' }}>
                         ¿Le interesa un taller de oratoria gratuito?
                     </h3>
-                    : <p style={{ fontSize: '1.1rem', fontWeight: 600, color: '#2563EB', fontStyle: 'italic', margin: '0 0 16px', textAlign: 'center' }}>
+                    : <p style={{ fontSize: '1.1rem', fontWeight: 600, color: '#1E3A5F', fontStyle: 'italic', margin: '0 0 16px', textAlign: 'center' }}>
                         ¿Le interesa un taller de oratoria gratuito?
                     </p>
             )}
@@ -292,7 +292,7 @@ const WorkshopInterestForm = ({ lang = 'both' }) => {
                         style={{
                             width: '100%',
                             padding: '13px 28px',
-                            backgroundColor: status === 'submitting' ? '#93B4F5' : '#2563EB',
+                            backgroundColor: status === 'submitting' ? '#93B4F5' : '#1E3A5F',
                             color: 'white',
                             border: 'none',
                             borderRadius: '999px',
@@ -301,8 +301,8 @@ const WorkshopInterestForm = ({ lang = 'both' }) => {
                             cursor: status === 'submitting' ? 'not-allowed' : 'pointer',
                             transition: 'background-color 0.3s ease'
                         }}
-                        onMouseEnter={(e) => { if (status !== 'submitting') e.currentTarget.style.backgroundColor = '#1D4ED8'; }}
-                        onMouseLeave={(e) => { if (status !== 'submitting') e.currentTarget.style.backgroundColor = '#2563EB'; }}
+                        onMouseEnter={(e) => { if (status !== 'submitting') e.currentTarget.style.backgroundColor = '#14253F'; }}
+                        onMouseLeave={(e) => { if (status !== 'submitting') e.currentTarget.style.backgroundColor = '#1E3A5F'; }}
                     >
                         {status === 'submitting' ? pick('Sending…', 'Enviando…', lang) : pick('Keep me posted', 'Manténganme informado', lang)}
                     </button>

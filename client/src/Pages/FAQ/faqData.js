@@ -1,72 +1,21 @@
-export const CATEGORIES = [
-    {
-        id: "program",
-        title: "Program Basics",
-        icon: "🎓",
-        blurb: "What the program is, who it’s for, and what students learn.",
-        image:
-            "https://images.unsplash.com/photo-1509062522246-3755977927d7?q=80&w=1200&auto=format&fit=crop"
-    },
-    {
-        id: "enrollment",
-        title: "Enrollment",
-        icon: "🗓️",
-        blurb: "Registration steps, age groups, schedules, and seats.",
-        image:
-            "https://images.unsplash.com/photo-1523580846011-d3a5bc25702b?q=80&w=1200&auto=format&fit=crop"
-    },
-    {
-        id: "fees",
-        title: "Fees & Support",
-        icon: "💳",
-        blurb: "Pricing, discounts, and scholarship information.",
-        image:
-            "https://images.unsplash.com/photo-1454179083322-198bb4daae1b?q=80&w=1200&auto=format&fit=crop"
-    },
-    {
-        id: "logistics",
-        title: "Logistics",
-        icon: "📍",
-        blurb: "Locations, parking, makeup classes, online options.",
-        image:
-            "https://images.unsplash.com/photo-1517632298125-f1ca6f2de6d1?q=80&w=1200&auto=format&fit=crop"
-    },
-    {
-        id: "coaching",
-        title: "Coaching",
-        icon: "🧑‍🏫",
-        blurb: "Who coaches, safety, and how sessions are run.",
-        image:
-            "https://images.unsplash.com/photo-1553877522-43269d4ea984?q=80&w=1200&auto=format&fit=crop"
-    },
-    {
-        id: "policies",
-        title: "Policies",
-        icon: "📝",
-        blurb: "Refunds, attendance, and community standards.",
-        image:
-            "https://images.unsplash.com/photo-1519389950473-47ba0277781c?q=80&w=1200&auto=format&fit=crop"
-    }
+// Questions families ask, grouped. Each `id` is a live anchor
+// (/faq#faq-fees), so don't rename one once it's in use.
+export const GROUPS = [
+    { id: "program", title: "The program" },
+    { id: "signup", title: "Signing up" },
+    { id: "logistics", title: "Where and when" },
 ];
 
 export const FAQS = [
-    { id: "what",   cat: "program",    q: "What is Almaden Voices?", a: "A youth public speaking program that builds confidence through weekly practice, coaching, and a short showcase speech." },
-    { id: "who",    cat: "program",    q: "Who can join?", a: "Grades K–9. Programs vary by grade level, and specific eligibility is listed for each session." },
-    { id: "length", cat: "program",    q: "How long is the program?", a: "Core series runs 4 weeks (75–90 minutes each); we also host seasonal workshops." },
-
-    { id: "enroll", cat: "enrollment", q: "How do I enroll my student?", a: "Complete the registration form; we’ll confirm dates/availability and next steps by email." },
-    { id: "age",    cat: "enrollment", q: "Are levels grouped by age?", a: "Yes—by grade band. We may adjust groupings to balance seat counts and comfort." },
-
-    { id: "fees",   cat: "fees",       q: "What are the fees?", a: "Fees vary by session length. Scholarships are available—please contact us if cost is a barrier." },
-
-    { id: "where",  cat: "logistics",  q: "Where are sessions held?", a: "Primarily in Almaden Valley, San Jose. Occasional online cohorts are offered." },
-    { id: "miss",   cat: "logistics",  q: "What if we miss a class?", a: "We share catch-up notes and optional prompts. If seats allow, we’ll try to fit a makeup." },
-
-    { id: "coach",  cat: "coaching",   q: "Who are the coaches?", a: "Trained student leaders (with adult supervision) using a consistent, supportive curriculum." },
-
-    { id: "final",  cat: "program",    q: "Is there a final speech?", a: "Yes—each student presents a short talk in week 4. Families are welcome to cheer." },
-
-    { id: "refund", cat: "policies",   q: "What is your refund policy?", a: "Full refund up to 7 days before start; partial thereafter if your seat can be filled." },
-    { id: "contact",cat: "policies",   q: "How can I contact the team?", a: "Email almadenvoices@gmail.com or use the Contact page—we reply within 24–48 hours." }
+    { id: "what", group: "program", q: "What is Almaden Voices?", a: "A nonprofit in San José that teaches kids and teens public speaking and debate. Most of what we do is free group workshops that end with each student giving a speech to their family." },
+    { id: "who", group: "program", q: "Who can join?", a: "Workshops are for kindergarten through 9th grade, and each session lists the grades it's for. Interview prep is for teens and young adults." },
+    { id: "length", group: "program", q: "How long is a program?", a: "It depends on the session. Library workshops run two days. Our longer sessions have run four or eight weeks." },
+    { id: "final", group: "program", q: "Is there a final speech?", a: "Yes. On the last day every student gives a speech, and families are welcome to come and watch." },
+    { id: "coach", group: "program", q: "Who teaches?", a: "Trained student volunteers, with adult supervision, using the same curriculum in every session." },
+    { id: "fees", group: "signup", q: "What does it cost?", a: "Workshops, the Debate Booster and interview prep are free. One-on-one coaching costs $25 online or $30 in person, and that money pays for the free workshops." },
+    { id: "enroll", group: "signup", q: "How do I sign up?", a: "Use the registration page. If no session is open, leave your email there and we'll tell you when the next one opens. We confirm the details by email." },
+    { id: "age", group: "signup", q: "Are kids grouped by age?", a: "Yes, by grade. We sometimes adjust groups to balance numbers and help everyone feel comfortable." },
+    { id: "where", group: "logistics", q: "Where are sessions held?", a: "Mostly in San José, at the Almaden library and other community spaces. Some are online." },
+    { id: "miss", group: "logistics", q: "What if we miss a class?", a: "We share catch-up notes, and if there's room we'll try to fit in a makeup." },
+    { id: "contact", group: "logistics", q: "How do I reach you?", a: "Email almadenvoices@gmail.com or use the contact page. We reply within 24 to 48 hours." },
 ];
-
