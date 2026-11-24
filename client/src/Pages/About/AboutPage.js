@@ -18,7 +18,7 @@ const founder = {
     photo: "/images/anjika-bansal.png",
     bio: [
         "Hi! I'm Anjika Bansal, founder of Almaden Voices. I want to help students grow into confident speakers.",
-        "I've spent over 1,500 hours in public speaking through Leland Speech and Debate, ranked #1 in California and #5 in the nation. Across 32 tournaments I've reached elimination rounds at four nationally competitive ones, including Stanford, where I earned a bid to the Tournament of Champions, and I've been recognized with NSDA's Special Distinction Award.",
+        "I've spent over 1,500 hours in public speaking through Leland Speech and Debate, ranked #1 in California and #5 in the nation. Across 32 tournaments I've reached elimination rounds at four nationally competitive ones, including Stanford, where I earned a bid to the Tournament of Champions, and I've been recognized with NSDA's Superior Distinction Award.",
         "But none of that matters as much as the smile on a student's face when they give their very first speech.",
         "Growing up, I was lucky to feel confident speaking in front of others. I started Almaden Voices so every student could build that same confidence, discover their voice, and feel proud to use it.",
     ],
