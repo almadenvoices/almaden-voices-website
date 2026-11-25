@@ -1528,50 +1528,6 @@ app.get("/unsubscribe", async (req, res) => {
     }
 });
 
-// Get enrollment counts per session from registrations.csv
-app.get("/api/sessions/enrollment", (req, res) => {
-    try {
-        const registrationsFile = path.join(__dirname, 'registrations.csv');
-
-        if (!fs.existsSync(registrationsFile)) {
-            return res.json({});
-        }
-
-        const fileContent = fs.readFileSync(registrationsFile, 'utf-8');
-        const lines = fileContent.split('\n').filter(line => line.trim());
-
-        if (lines.length < 2) {
-            return res.json({});
-        }
-
-        // Detect session type column from header
-        const headerFields = parseCSVLine(lines[0]);
-        const sessionColIndex = headerFields.findIndex(h => h.trim().toLowerCase() === 'session type');
-
-        if (sessionColIndex === -1) {
-            return res.json({});
-        }
-
-        // Skip header row
-        const dataLines = lines.slice(1);
-
-        // Count registrations per session
-        const counts = {};
-        for (const line of dataLines) {
-            const fields = parseCSVLine(line);
-            const sessionId = (fields[sessionColIndex] || '').trim();
-            if (sessionId) {
-                counts[sessionId] = (counts[sessionId] || 0) + 1;
-            }
-        }
-
-        res.json(counts);
-    } catch (err) {
-        console.error("Enrollment count error:", err);
-        res.status(500).json({ error: "Error fetching enrollment data" });
-    }
-});
-
 // ---------- 1-on-1 coaching ----------
 
 // The slot list plus which ones are already taken. Prices come from the server

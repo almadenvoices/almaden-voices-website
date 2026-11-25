@@ -31,7 +31,7 @@ const BCC_EMAIL = ADMIN_EMAIL;
 // Bump this whenever this file changes, then check it shows up at the web app
 // URL after redeploying. If the URL still reports the old version, the new
 // code is pasted but not deployed.
-const SCRIPT_VERSION = "2026-09-08";
+const SCRIPT_VERSION = "2026-11-25";
 
 // Desired column order for the Registrations sheet. New columns are appended
 // automatically to existing sheets, so this is safe to extend over time.
@@ -267,6 +267,33 @@ function doPost(e) {
     const students = data.students || [];
     const workshop = WORKSHOPS[data.sessionType];
 
+    // Only one registration is checked and written at a time, so two families
+    // pressing Register at the same moment can't both take the last seat.
+    const lock = LockService.getScriptLock();
+    if (!lock.tryLock(30000)) {
+      return jsonOut({ success: false, error: "We're getting a lot of registrations right now. Please wait a minute and try again." });
+    }
+    try {
+
+    // Seat limit. The register page sends the session's capacity and any seats
+    // already filled outside the form; a session with no capacity is unlimited.
+    const capacity = Number(data.sessionCapacity);
+    if (data.sessionType && data.sessionCapacity != null && data.sessionCapacity !== "" && isFinite(capacity)) {
+      const alreadyTaken = (Number(data.sessionPreEnrolled) || 0) +
+        (countRegistrationsBySession(sheet)[data.sessionType] || 0);
+      const spotsLeft = Math.max(0, capacity - alreadyTaken);
+      if (students.length > spotsLeft) {
+        return jsonOut({
+          success: false,
+          full: true,
+          spotsLeft: spotsLeft,
+          error: spotsLeft === 0
+            ? "Sorry, this session just filled up."
+            : "Sorry, only " + spotsLeft + " spot" + (spotsLeft === 1 ? " is" : "s are") + " left in this session."
+        });
+      }
+    }
+
     // Write one row per student (columns matched by header name)
     students.forEach(function(student) {
       appendMappedRow(sheet, {
@@ -292,6 +319,11 @@ function doPost(e) {
         "Future Contact Opt-In": data.futureContact ? "Yes" : "No"
       });
     });
+    SpreadsheetApp.flush(); // make the new rows visible to the next registration's count
+
+    } finally {
+      lock.releaseLock();
+    }
 
     // Shared email pieces
     const studentListHtml = students.map(function(st) {
@@ -2702,11 +2734,33 @@ function jsonOut(obj) {
   return ContentService.createTextOutput(JSON.stringify(obj)).setMimeType(ContentService.MimeType.JSON);
 }
 
-// GET handler — for testing that the script is deployed
-function doGet() {
+// GET handler.
+//   ...exec?action=enrollment  -> how many students are registered per session,
+//                                 e.g. {"spring-2027": 7}. The register page uses
+//                                 this to show spots left and mark sessions full.
+//                                 Counts only, never names or emails.
+//   ...exec                    -> a status check, to confirm which version is live.
+function doGet(e) {
+  if (e && e.parameter && e.parameter.action === "enrollment") {
+    const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Registrations");
+    return jsonOut(sheet ? countRegistrationsBySession(sheet) : {});
+  }
   return jsonOut({
     status: "ok",
     version: SCRIPT_VERSION,
     message: "Almaden Voices Registration Script is running."
   });
+}
+
+// One row per student, so this is the number of students per Session ID.
+function countRegistrationsBySession(sheet) {
+  const counts = {};
+  if (sheet.getLastRow() < 2) return counts;
+  const idCol = headerIndexMap(sheet)["Session ID"];
+  if (idCol == null) return counts;
+  sheet.getRange(2, idCol + 1, sheet.getLastRow() - 1, 1).getValues().forEach(function(row) {
+    const id = String(row[0] || "").trim();
+    if (id) counts[id] = (counts[id] || 0) + 1;
+  });
+  return counts;
 }

@@ -201,6 +201,14 @@ export const T = {
         en: "Failed to submit registration. Please try again.",
         es: "No se pudo enviar la inscripción. Por favor intente de nuevo.",
     },
+    errFull: {
+        en: "Sorry, this session just filled up. Nothing was submitted.",
+        es: "Lo sentimos, esta sesión se acaba de llenar. No se envió la inscripción.",
+    },
+    errFewSpots: {
+        en: "Sorry, only {n} spot(s) are left in this session. Please remove a student and try again.",
+        es: "Lo sentimos, solo quedan {n} lugar(es) en esta sesión. Quite a un estudiante e intente de nuevo.",
+    },
     errNetwork: {
         en: "Network error. Please check your connection and try again.",
         es: "Error de conexión. Por favor revise su conexión e intente de nuevo.",

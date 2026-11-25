@@ -78,6 +78,22 @@ export default function RegisterPage() {
     const [error, setError] = useState("");
     const [selectedSessionId, setSelectedSessionId] = useState("");
     const [enrollmentCounts, setEnrollmentCounts] = useState({});
+
+    // Students registered per session, counted from the registrations
+    // spreadsheet by the Apps Script (counts only, no names). Until a session
+    // is listed this isn't shown anywhere, and if Google can't be reached the
+    // page just falls back to each session's own `enrolled` number.
+    const loadEnrollmentCounts = () =>
+        fetch(`${APPS_SCRIPT_URL}?action=enrollment`)
+            .then(res => res.json())
+            .then(data => {
+                const counts = {};
+                Object.entries(data || {}).forEach(([id, n]) => {
+                    if (typeof n === "number") counts[id] = n;
+                });
+                setEnrollmentCounts(counts);
+            })
+            .catch(() => {});
     const [students, setStudents] = useState([emptyStudent()]);
     const [donationAmount, setDonationAmount] = useState(5);
     const [parentFirstName, setParentFirstName] = useState("");
@@ -113,10 +129,8 @@ export default function RegisterPage() {
     });
 
     useEffect(() => {
-        fetch("/api/sessions/enrollment")
-            .then(res => res.json())
-            .then(data => setEnrollmentCounts(data))
-            .catch(() => {});
+        loadEnrollmentCounts();
+        // eslint-disable-next-line react-hooks/exhaustive-deps -- load once on open
     }, []);
 
     // Open the matching chooser panel and scroll to it when the page is opened
@@ -218,6 +232,10 @@ export default function RegisterPage() {
             students: students,
             sessionType: formData.get("sessionType"),
             sessionLabel: sessionLabel,
+            // The Apps Script checks these against the spreadsheet and turns the
+            // registration away if the session is already full.
+            sessionCapacity: hasSeatLimit(selectedSession) ? selectedSession.capacity : null,
+            sessionPreEnrolled: selectedSession ? (upcomingSessions.find(x => x.id === selectedSession.id)?.enrolled || 0) : 0,
             country: formData.get("country"),
             schoolName: formData.get("schoolName"),
             streetAddress: formData.get("streetAddress"),
@@ -255,15 +273,18 @@ export default function RegisterPage() {
                 setParentFirstName("");
                 setParentLastName("");
                 // Refresh enrollment counts
-                fetch("/api/sessions/enrollment")
-                    .then(r => r.json())
-                    .then(data => setEnrollmentCounts(data))
-                    .catch(() => {});
+                loadEnrollmentCounts();
                 if (shouldDonate) {
                     setTimeout(() => {
                         window.location.href = `/donate?amount=${donateAmt}`;
                     }, 2500);
                 }
+            } else if (result && result.full) {
+                // Someone else took the last seat(s) while this form was open.
+                setError(result.spotsLeft > 0
+                    ? t(T.errFewSpots, lang).replace("{n}", result.spotsLeft)
+                    : t(T.errFull, lang));
+                loadEnrollmentCounts();
             } else {
                 setError((result && result.error) || t(T.errSubmit, lang));
             }
