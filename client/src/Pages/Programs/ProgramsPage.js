@@ -143,7 +143,7 @@ export default function ProgramsPage() {
                         </blockquote>
                         <p className={p.small}>
                             We last ran it in winter 2025.{" "}
-                            <Link to="/register" className={p.textLink}>Get told when it's back</Link>
+                            <a href="#footer-email" className={p.textLink}>Get told when it's back</a>
                         </p>
                     </div>
                 </div>
@@ -163,9 +163,9 @@ export default function ProgramsPage() {
                             It costs $25 online or $30 in person. It's the one thing we charge for, and the
                             money pays for our free workshops.
                         </p>
-                        <p>Book a slot on the registration page and we'll email you to set a time.</p>
+                        <p>Book a slot on our coaching page and we'll email you to set a time.</p>
                     </div>
-                    <Link to="/register" className={p.button}>Book coaching</Link>
+                    <Link to="/coaching" className={p.button}>Book coaching</Link>
                 </div>
             </section>
 

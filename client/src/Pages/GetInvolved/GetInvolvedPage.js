@@ -23,7 +23,7 @@ const WHAT_YOU_GET = [
     ["Training and someone to ask", "A walkthrough before your first workshop, regular check-ins, and help whenever a question comes up."],
     ["A curriculum that's been tested", "Our public speaking lesson plans for kindergarten through 9th grade, and the format we use for the final speeches."],
     ["Planning and outreach materials", "Templates for flyers, workshop slides, emails to families, surveys and more."],
-    ["Registration handled for you", "Families sign up through our website, so you don't need to build your own system."],
+    ["Registration handled for you", "Families register through AniSetu, the online platform we use for sign-ups, so you don't need to build your own system."],
 ];
 
 const STEPS = [
@@ -87,7 +87,7 @@ export default function GetInvolvedPage() {
                         <p>
                             A chapter is part of our 501(c)(3), set up at your school or in your community
                             and led by you. You organize free public speaking workshops for kids nearby,
-                            using our curriculum, resources and registration system.
+                            using our curriculum and resources, with registration through AniSetu.
                         </p>
                     </div>
                     <p className={s.commitment}>

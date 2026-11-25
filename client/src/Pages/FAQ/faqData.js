@@ -13,7 +13,7 @@ export const FAQS = [
     { id: "final", group: "program", q: "Is there a final speech?", a: "Yes. On the last day every student gives a speech, and families are welcome to come and watch." },
     { id: "coach", group: "program", q: "Who teaches?", a: "Trained student volunteers, with adult supervision, using the same curriculum in every session." },
     { id: "fees", group: "signup", q: "What does it cost?", a: "Workshops, the Debate Booster and interview prep are free. One-on-one coaching costs $25 online or $30 in person, and that money pays for the free workshops." },
-    { id: "enroll", group: "signup", q: "How do I sign up?", a: "Use the registration page. If no session is open, leave your email there and we'll tell you when the next one opens. We confirm the details by email." },
+    { id: "enroll", group: "signup", q: "How do I sign up?", a: "Go to the registration page, which lists our upcoming workshops. Registration itself happens on AniSetu, the online platform we use: each workshop links to its page there, and AniSetu emails you a confirmation. We email you the session details before it starts. If nothing is open, sign up for our monthly email at the bottom of any page and we'll tell you when the next one opens." },
     { id: "age", group: "signup", q: "Are kids grouped by age?", a: "Yes, by grade. We sometimes adjust groups to balance numbers and help everyone feel comfortable." },
     { id: "where", group: "logistics", q: "Where are sessions held?", a: "Mostly in San José, at the Almaden library and other community spaces. Some are online." },
     { id: "miss", group: "logistics", q: "What if we miss a class?", a: "We share catch-up notes, and if there's room we'll try to fit in a makeup." },

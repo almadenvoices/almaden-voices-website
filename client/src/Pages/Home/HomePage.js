@@ -280,8 +280,8 @@ export default function HomePage() {
                 <div className={s.narrow}>
                     <h2 id="closing-title" className={s.closingTitle}>Want your kid in the next one?</h2>
                     <p className={s.lede}>
-                        Sign-ups happen on our registration page. If nothing is open right now, leave
-                        your email there and we'll tell you when the next workshop opens.
+                        Upcoming workshops are listed on our registration page. If nothing is open
+                        right now, <a href="#footer-email">get our monthly email</a> and we'll tell you when the next one opens.
                     </p>
                     <Link to="/register" className={s.button}>Go to registration</Link>
                 </div>

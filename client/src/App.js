@@ -8,6 +8,7 @@ import ContactPage from "./Pages/Contact/ContactPage";
 import FAQPage from "./Pages/FAQ/FAQPage";
 import DonatePage from './Pages/Donate/DonatePage';
 import RegisterPage from './Pages/Register/RegisterPage';
+import CoachingPage from './Pages/Coaching/CoachingPage';
 import ProgramsPage from './Pages/Programs/ProgramsPage';
 import GetInvolvedPage from './Pages/GetInvolved/GetInvolvedPage';
 import StoriesPage from './Pages/Stories/StoriesPage';
@@ -41,6 +42,7 @@ export default function App() {
                         <Route path="/get-involved" element={<GetInvolvedPage />} />
                         <Route path="/stories" element={<StoriesPage />} />
                         <Route path="/register" element={<RegisterPage />} />
+                        <Route path="/coaching" element={<CoachingPage />} />
                         <Route path="/donate" element={<DonatePage />} />
                         <Route path="/faq" element={<FAQPage />} />
                         <Route path="/contact" element={<ContactPage />} />

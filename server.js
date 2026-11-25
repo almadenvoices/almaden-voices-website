@@ -12,7 +12,6 @@ const { initConfig } = require("./config");
 
 // Google Cloud Storage for persistent registration data
 const GCS_BUCKET = "almaden-voices-data";
-const GCS_FILE = "registrations.csv";
 const COACHING_GCS_FILE = "coaching-bookings.csv";
 const COACHING_WAITLIST_GCS_FILE = "coaching-waitlist.csv";
 const storage = new Storage();
@@ -45,7 +44,6 @@ function csvCell(value) {
 // Local paths for the two files we keep mirrored in GCS. The container disk is
 // wiped on every deploy, so these are downloaded at boot and re-uploaded on
 // every write.
-const registrationsPath = () => path.join(__dirname, 'registrations.csv');
 const coachingPath = () => path.join(__dirname, 'coaching-bookings.csv');
 const coachingWaitlistPath = () => path.join(__dirname, 'coaching-waitlist.csv');
 
@@ -69,14 +67,6 @@ async function uploadToGCS(localFile, gcsFile, label) {
     } catch (err) {
         console.error(`Error uploading ${label} to GCS:`, err.message);
     }
-}
-
-async function downloadRegistrationsFromGCS() {
-    await downloadFromGCS(GCS_FILE, registrationsPath(), "registrations");
-}
-
-async function uploadRegistrationsToGCS() {
-    await uploadToGCS(registrationsPath(), GCS_FILE, "registrations");
 }
 
 async function downloadCoachingFromGCS() {
@@ -109,9 +99,6 @@ async function refreshFromGCS(gcsFile, destination, label) {
         }
     }
 }
-
-const refreshRegistrationsFromGCS = () =>
-    refreshFromGCS(GCS_FILE, registrationsPath(), "registrations");
 
 const refreshCoachingFromGCS = () =>
     refreshFromGCS(COACHING_GCS_FILE, coachingPath(), "coaching bookings");
@@ -1012,265 +999,6 @@ app.post("/api/subscribe", async (req, res) => {
     }
 });
 
-// Session registration endpoint
-app.post("/api/register", async (req, res) => {
-    try {
-        const {
-            students,
-            parentFirstName,
-            parentLastName,
-            email,
-            phone,
-            sessionType,
-            streetAddress,
-            city,
-            state,
-            zipCode,
-            additionalInfo
-        } = req.body;
-
-        // Validate required fields
-        if (!students || !Array.isArray(students) || students.length === 0 || !parentFirstName || !parentLastName || !email || !phone || !sessionType) {
-            return res.status(400).json({ error: "Missing required fields" });
-        }
-
-        if (students.length > 5) {
-            return res.status(400).json({ error: "Maximum 5 children per registration" });
-        }
-
-        // Validate each student
-        for (const st of students) {
-            if (!st.firstName || !st.lastName || !st.gradeLevel) {
-                return res.status(400).json({ error: "Each child must have a first name, last name, and grade level" });
-            }
-        }
-
-        // Reject if parent name matches any student name (common data-entry mistake)
-        const normalizeName = (s) => (s || "").trim().toLowerCase().replace(/\s+/g, " ");
-        const parentFullName = `${normalizeName(parentFirstName)} ${normalizeName(parentLastName)}`;
-        const conflictingStudent = students.find(st =>
-            `${normalizeName(st.firstName)} ${normalizeName(st.lastName)}` === parentFullName
-        );
-        if (conflictingStudent) {
-            return res.status(400).json({ error: "Parent/guardian name cannot be the same as the child's name. Please enter the parent's actual name." });
-        }
-
-        // Pick up any rows another instance wrote since we booted, so both the
-        // duplicate check below and the append further down work off the
-        // current file rather than a stale copy.
-        await refreshRegistrationsFromGCS();
-
-        // Duplicate prevention: reject if this email already registered
-        // the same student(s) for the same session
-        const existingFile = path.join(__dirname, 'registrations.csv');
-        if (fs.existsSync(existingFile)) {
-            const existingContent = fs.readFileSync(existingFile, 'utf-8');
-            const existingLines = existingContent.split('\n').filter(l => l.trim()).slice(1);
-            const normalizedEmail = (email || '').trim().toLowerCase();
-            const parseCSV = (line) => {
-                const fields = [];
-                let cur = '', inQ = false;
-                for (let i = 0; i < line.length; i++) {
-                    const c = line[i];
-                    if (c === '"') inQ = !inQ;
-                    else if (c === ',' && !inQ) { fields.push(cur); cur = ''; }
-                    else cur += c;
-                }
-                fields.push(cur);
-                return fields;
-            };
-            for (const line of existingLines) {
-                const f = parseCSV(line);
-                // columns: Confirmation,FN,LN,Grade,PFN,PLN,Email,Phone,Session...
-                const existingEmail = (f[6] || '').trim().toLowerCase();
-                const existingSession = (f[8] || '').trim();
-                const existingFirst = (f[1] || '').trim().toLowerCase();
-                if (existingEmail === normalizedEmail && existingSession === sessionType) {
-                    for (const st of students) {
-                        if ((st.firstName || '').trim().toLowerCase() === existingFirst) {
-                            return res.status(409).json({
-                                error: `${st.firstName} is already registered for this workshop under this email. If you need to make changes, please contact us at almadenvoices@gmail.com.`
-                            });
-                        }
-                    }
-                }
-            }
-        }
-
-        // Generate confirmation number
-        const confirmationNumber = generateConfirmationNumber();
-        const timestamp = new Date().toISOString();
-
-        // Session type labels
-        const sessionLabels = {
-            'public-speaking': 'Public Speaking',
-            'debate': 'Debate',
-            'leadership': 'Leadership Workshop',
-            'storytelling': 'Storytelling',
-            'communication': 'Communication Skills',
-            'av-workshop-march24-2026': 'Free Public Speaking Workshop (March 24 & 25, 2026)',
-            'av-workshop-april8-2026': 'Free Public Speaking Workshop (April 8 & 9, 2026)',
-            'nj-workshop-aug-2026': 'New Jersey Public Speaking Workshop (August 29 & 30, 2026)'
-        };
-
-        const sessionLabel = sessionLabels[sessionType] || sessionType;
-
-        // Grade suffix helper
-        const gradeSuffix = (g) => {
-            const n = parseInt(g);
-            if (n === 1) return '1st';
-            if (n === 2) return '2nd';
-            if (n === 3) return '3rd';
-            return `${n}th`;
-        };
-
-        // Path to registrations file
-        const registrationsFile = path.join(__dirname, 'registrations.csv');
-
-        // Create CSV header if file doesn't exist
-        if (!fs.existsSync(registrationsFile)) {
-            const header = 'Confirmation,Student First Name,Student Last Name,Grade,Parent First Name,Parent Last Name,Email,Phone,Session Type,Street Address,City,State,ZIP,Additional Info,Registered At\n';
-            fs.writeFileSync(registrationsFile, header);
-        }
-
-        // Sanitize CSV fields (escape commas and quotes)
-        const sanitize = (str) => {
-            if (!str) return '';
-            str = str.toString().replace(/"/g, '""');
-            if (str.includes(',') || str.includes('"') || str.includes('\n')) {
-                return `"${str}"`;
-            }
-            return str;
-        };
-
-        // Add one CSV row per student (each counts as one seat)
-        for (const st of students) {
-            const row = [
-                sanitize(confirmationNumber),
-                sanitize(st.firstName),
-                sanitize(st.lastName),
-                sanitize(st.gradeLevel),
-                sanitize(parentFirstName),
-                sanitize(parentLastName),
-                sanitize(email),
-                sanitize(phone),
-                sanitize(sessionType),
-                sanitize(streetAddress || ''),
-                sanitize(city || ''),
-                sanitize(state || ''),
-                sanitize(zipCode || ''),
-                sanitize(additionalInfo || ''),
-                sanitize(timestamp)
-            ].join(',') + '\n';
-            fs.appendFileSync(registrationsFile, row);
-        }
-
-        // Persist to GCS so counts survive deploys
-        uploadRegistrationsToGCS().catch(err => console.error("GCS upload failed:", err.message));
-
-        // Build student list for emails
-        const studentListHtml = students.map(st =>
-            `<li><strong>${st.firstName} ${st.lastName}</strong> — ${gradeSuffix(st.gradeLevel)} Grade</li>`
-        ).join('');
-        const studentNames = students.map(st => `${st.firstName} ${st.lastName}`).join(', ');
-        const childWord = students.length === 1 ? 'child' : `${students.length} children`;
-
-        // Send notification email to admin
-        if (emailTransporter) {
-            const adminEmailHtml = `
-                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-                    <h2 style="color: #2563EB;">New Session Registration (${childWord})</h2>
-                    <p><strong>Confirmation Number:</strong> ${confirmationNumber}</p>
-                    <hr style="border: 1px solid #eee;" />
-
-                    <h3 style="color: #333;">Student${students.length > 1 ? 's' : ''} Registered</h3>
-                    <ul style="line-height: 1.8;">${studentListHtml}</ul>
-                    <p><strong>Session:</strong> ${sessionLabel}</p>
-
-                    <h3 style="color: #333;">Parent/Guardian Information</h3>
-                    <p><strong>Name:</strong> ${parentFirstName} ${parentLastName}</p>
-                    <p><strong>Email:</strong> ${email}</p>
-                    <p><strong>Phone:</strong> ${phone}</p>
-
-                    ${streetAddress ? `
-                    <h3 style="color: #333;">Mailing Address</h3>
-                    <p>${streetAddress}<br/>${city}, ${state} ${zipCode}</p>
-                    ` : ''}
-
-                    ${additionalInfo ? `
-                    <h3 style="color: #333;">Additional Information</h3>
-                    <p style="background: #f5f5f5; padding: 15px; border-radius: 5px;">${additionalInfo}</p>
-                    ` : ''}
-
-                    <hr style="border: 1px solid #eee;" />
-                    <p style="color: #666; font-size: 12px;">Registered: ${new Date().toLocaleString()}</p>
-                </div>
-            `;
-
-            await emailTransporter.sendMail({
-                from: `"Almaden Voices Registrations" <${EMAIL_USER}>`,
-                replyTo: `"${parentFirstName} ${parentLastName}" <${email}>`,
-                to: EMAIL_TO,
-                subject: `New Registration (${childWord}): ${studentNames} - ${sessionLabel} - ${confirmationNumber}`,
-                html: adminEmailHtml
-            });
-        }
-
-        // Send confirmation email to parent
-        if (emailTransporter) {
-            const parentEmailHtml = `
-                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-                    <h2 style="color: #2563EB;">Registration Confirmed!</h2>
-                    <p>Dear ${parentFirstName} ${parentLastName},</p>
-                    <p>Thank you for registering ${students.length === 1 ? students[0].firstName : 'your children'} for our <strong>${sessionLabel}</strong>! ${students.length === 1 ? 'Your spot is' : 'Your spots are'} confirmed.</p>
-
-                    <div style="background: #f0f9ff; padding: 20px; border-radius: 10px; margin: 20px 0;">
-                        <p style="margin: 0 0 10px;"><strong>Confirmation Number:</strong></p>
-                        <p style="font-size: 24px; font-family: monospace; color: #2563EB; font-weight: bold; letter-spacing: 2px; margin: 0;">${confirmationNumber}</p>
-                    </div>
-
-                    <h3 style="color: #333;">Registration Details</h3>
-                    <ul style="line-height: 1.8; color: #333;">
-                        ${studentListHtml}
-                    </ul>
-                    <p style="color: #333;"><strong>Program:</strong> ${sessionLabel}</p>
-
-                    <h3 style="color: #333;">Workshop Details</h3>
-                    <ul style="line-height: 1.8; color: #333;">
-                        <li><strong>When:</strong> Wednesday, April 8th & Thursday, April 9th, 2026</li>
-                        <li><strong>Time:</strong> 1:00 – 4:00 PM (3 hours each day)</li>
-                        <li><strong>Where:</strong> Almaden Library Community Center, 6445 Camden Ave, San Jose, CA 95120</li>
-                    </ul>
-                    <p style="color: #333;">Students are welcome to attend one or both sessions, but attending both is highly recommended for the best experience. At the end, your child will showcase their skills in a final speech!</p>
-
-                    <p>If you have any questions, feel free to reply to this email or contact us at <a href="mailto:almadenvoices@gmail.com" style="color: #2563EB;">almadenvoices@gmail.com</a>.</p>
-
-                    <hr style="border: 1px solid #eee;" />
-                    <p style="color: #666;">Best regards,<br/>Almaden Voices Team</p>
-                </div>
-            `;
-
-            await emailTransporter.sendMail({
-                from: `"Almaden Voices" <${EMAIL_USER}>`,
-                to: email,
-                subject: `Registration Confirmed: ${sessionLabel} - ${confirmationNumber}`,
-                html: parentEmailHtml
-            });
-        }
-
-        res.json({
-            success: true,
-            confirmationNumber,
-            studentCount: students.length,
-            message: "Registration submitted successfully!"
-        });
-
-    } catch (err) {
-        console.error("Registration error:", err);
-        res.status(500).json({ error: "Error processing registration. Please try again." });
-    }
-});
-
 // Unsubscribe endpoint
 app.get("/unsubscribe", async (req, res) => {
     try {
@@ -2047,8 +1775,7 @@ async function startServer() {
         // Initialize email transporter AFTER config is loaded
         initializeEmailTransporter();
 
-        // Download persistent registrations + coaching bookings from GCS
-        await downloadRegistrationsFromGCS();
+        // Download persistent coaching bookings from GCS
         await downloadCoachingFromGCS();
         await downloadCoachingWaitlistFromGCS();
 
