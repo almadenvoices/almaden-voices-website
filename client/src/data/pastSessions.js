@@ -52,7 +52,7 @@ export const pastSessions = [
         photos: [
             { src: "/images/s5-teaching-round-structure.jpg", caption: "How a debate round works", alt: "An instructor points to a slide titled Round Structure that lists the order of speeches in a debate." },
             { src: "/images/s5-peer-activities.jpg", caption: "Preparing with a partner", alt: "Students sit on chairs and a bench with papers on their laps, writing arguments for a practice debate." },
-            { src: "/images/s5-practice-debate.JPG", caption: "A practice round", alt: "Two teams of students sit around a table with laptops, preparing for a practice round." },
+            { src: "/images/s5-practice-debate.webp", caption: "A practice round", alt: "Two teams of students sit around a table with laptops, preparing for a practice round." },
             { src: "/images/s5-fun-kahoot.jpg", caption: "A Kahoot quiz break", alt: "Students play a Kahoot quiz on their laptops while the results show on the projector screen." },
             { src: "/images/s5-final-debate.jpg", caption: "The final debate", alt: "Students sit at folding tables in two teams during the final debate while an instructor stands at the back." },
             { src: "/images/s5-final-winners.jpg", caption: "The winners", alt: "Two students hold up their winners' certificates beside an instructor." },
@@ -67,7 +67,7 @@ export const pastSessions = [
         description:
             "Eight weeks for returning students. They practiced impromptu speaking and learned how to build an argument, then finished with a live debate in front of their families.",
         photos: [
-            { src: "/images/s4-teaching-and-peer-led-activities.jpg", caption: "A peer-led activity", alt: "Students sit on folding chairs and a mat in a ring while one student stands in the middle to speak." },
+            { src: "/images/s4-teaching-and-peer-led-activities.webp", caption: "A peer-led activity", alt: "Students sit on folding chairs and a mat in a ring while one student stands in the middle to speak." },
             { src: "/images/s4-showing-video.jpg", caption: "Watching an example speech", alt: "Students sitting on the floor watch a speech video on the projector while an instructor stands beside the screen." },
         ],
     },
@@ -80,14 +80,14 @@ export const pastSessions = [
         description:
             "Four weeks on body language and persuasive speaking. It ended with every student giving a speech to a garage full of families.",
         photos: [
-            { src: "/images/s3-final-showcase-crowd.jpg", caption: "Families watching on the last day", alt: "Parents and younger kids crowd a garage, watching two speakers at the front of the room." },
+            { src: "/images/s3-final-showcase-crowd.webp", caption: "Families watching on the last day", alt: "Parents and younger kids crowd a garage, watching two speakers at the front of the room." },
             { src: "/images/s3-final-presentation-raiya.jpg", caption: "Raiya giving her final speech", alt: "Raiya, standing beside the projector screen, gestures with both hands as she speaks to students sitting on the floor." },
-            { src: "/images/s3-warm-up-circle.JPG", caption: "Starting with a warm-up", alt: "Students sit in a big circle on the floor of the classroom for the opening warm-up." },
+            { src: "/images/s3-warm-up-circle.webp", caption: "Starting with a warm-up", alt: "Students sit in a big circle on the floor of the classroom for the opening warm-up." },
             { src: "/images/s3-final-goodluck-circle.jpg", caption: "The good luck huddle before the speeches", alt: "Students and instructors pack into a tight huddle before the final speeches." },
             { src: "/images/s3-high-five.jpg", caption: "A high five after a speech", alt: "A student at the front of the room gets a high five while classmates and parents watch from the floor and chairs." },
-            { src: "/images/s3-grading-papers.jpg", caption: "Writing feedback for each student", alt: "An instructor in a blazer leans over a table, writing feedback on students' papers." },
-            { src: "/images/s3-group-picture.jpg", caption: "The whole group on the last day", alt: "About twenty students and two instructors grin for a group photo under a slide that reads Awards." },
-            { src: "/images/s3-playing-with-hermes.jpg", caption: "A break outside with Hermes the dog", alt: "Kids run around on a front lawn at dusk during a break, with a small white dog in the middle of the game." },
+            { src: "/images/s3-grading-papers.webp", caption: "Writing feedback for each student", alt: "An instructor in a blazer leans over a table, writing feedback on students' papers." },
+            { src: "/images/s3-group-picture.webp", caption: "The whole group on the last day", alt: "About twenty students and two instructors grin for a group photo under a slide that reads Awards." },
+            { src: "/images/s3-playing-with-hermes.webp", caption: "A break outside with Hermes the dog", alt: "Kids run around on a front lawn at dusk during a break, with a small white dog in the middle of the game." },
         ],
     },
     {

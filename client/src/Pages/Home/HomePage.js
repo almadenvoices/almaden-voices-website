@@ -28,7 +28,7 @@ const heroConfig = {
     ],
     images: [
         {
-            src: "/images/s3-final-showcase-crowd.jpg",
+            src: "/images/s3-final-showcase-crowd.webp",
             alt: "Parents and younger kids crowd a garage for the last day of our July 2025 session, watching two speakers at the front of the room.",
         },
         {
@@ -36,7 +36,7 @@ const heroConfig = {
             alt: "Students sit in small groups on a tarp working on their speeches while an instructor points something out on the far wall.",
         },
         {
-            src: "/images/s3-group-picture.jpg",
+            src: "/images/s3-group-picture.webp",
             alt: "About twenty students and two instructors grin for a group photo under a slide that reads Awards, on the last day of the July 2025 session.",
         },
     ],

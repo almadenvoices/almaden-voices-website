@@ -15,7 +15,7 @@ const PRESS = [];
 const founder = {
     name: "Anjika Bansal",
     role: "Founder and CEO",
-    photo: "/images/anjika-bansal.png",
+    photo: "/images/anjika-bansal.webp",
     bio: [
         "Hi! I'm Anjika Bansal, founder of Almaden Voices. I want to help students grow into confident speakers.",
         "I've spent over 1,500 hours in public speaking through Leland Speech and Debate, ranked #1 in California and #5 in the nation. Across 32 tournaments I've reached elimination rounds at four nationally competitive ones, including Stanford, where I earned a bid to the Tournament of Champions, and I've been recognized with NSDA's Superior Distinction Award.",
@@ -29,13 +29,13 @@ const boardMembers = [
         name: "Amit Bansal",
         role: "Board director",
         intro: "Amit is a Staff Engineer at PayPal specializing in identity and access management. With nearly two decades of experience at companies like eBay, Oracle, and Cisco, he is passionate about crafting exceptional user experiences and frontend architecture. His belief in building confidence in young people through communication skills inspired him to join Almaden Voices.",
-        photo: "/images/amit-bansal.png",
+        photo: "/images/amit-bansal.webp",
     },
     {
         name: "Aditi Bansal",
         role: "Board director",
         intro: "Aditi Bansal is an expert Web Developer and Engineering Leader based in New York. With a B.Tech in IT and a Master's in Business Management, she blends technical expertise with strategic oversight to deliver scalable, user-centric applications. She also volunteers at her local fire station and is passionate about giving back, which brought her to Almaden Voices.",
-        photo: "/images/aditi-bansal.png",
+        photo: "/images/aditi-bansal.webp",
     },
     {
         name: "Deepti Agrawal",
@@ -64,7 +64,7 @@ const volunteers = [
         name: "Saesha Pal",
         role: "Funding Volunteer & District Outreach Volunteer",
         intro: "Hi! My name is Saesha, and I'm a junior at Leland High School. I joined Almaden Voices because I love public speaking and working with other students. I'm really looking forward to connecting with my community and being more involved! Fun fact: I love crocheting gifts for other people!",
-        photo: "/images/saesha-pal-volunteer-3.png",
+        photo: "/images/saesha-pal-volunteer-3.webp",
     },
     {
         name: "Tina Kaul",

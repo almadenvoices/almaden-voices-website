@@ -3,8 +3,12 @@
  * homepage numbers band and the "Where We've Worked" section on the Impact
  * page, so the two can't drift apart.
  *
- * ADDING A PHOTO: drop the file in client/public/images/ and add an entry to
- * that item's `photos` array — { src, alt, caption }. Photos are shown whole,
+ * ADDING A PHOTO: put the full-size original in /media-originals (which is not
+ * uploaded on deploy), save a WebP copy at most 1600px on its longest side in
+ * client/public/images/, and add an entry to that item's `photos` array —
+ * { src, alt, caption }. The build also shrinks oversized photos as a safety
+ * net (client/scripts/optimize-images.js), but a camera original left in
+ * public/images still slows every deploy upload. Photos are shown whole,
  * never cropped to fit a card, so nobody ends up with their head cut off.
  * Items with no photos render as a text-only card, so the layout never looks
  * broken while images are pending.
@@ -55,17 +59,17 @@ export const ourWork = [
         // endorsement, and we don't print titles we can't verify.
         photos: [
             {
-                src: "/images/nno-mayor-mahan-full.jpg",
+                src: "/images/nno-mayor-mahan-full.webp",
                 alt: "Anjika Bansal and San José Mayor Matt Mahan behind the Almaden Voices table at National Night Out",
                 caption: "With San José Mayor Matt Mahan",
             },
             {
-                src: "/images/nno-mahan-and-salcido-full.jpg",
+                src: "/images/nno-mahan-and-salcido-full.webp",
                 alt: "Anjika Bansal with Mayor Matt Mahan and Jose Salcido at the Almaden Voices table",
                 caption: "With Mayor Matt Mahan and Jose Salcido",
             },
             {
-                src: "/images/nno-with-emily-full.jpg",
+                src: "/images/nno-with-emily-full.webp",
                 alt: "Anjika Bansal with Emily at the Almaden Voices table at National Night Out",
                 caption: "With Emily at the Almaden Voices table",
             },
