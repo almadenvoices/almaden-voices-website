@@ -5,6 +5,9 @@ import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import GroupsIcon from "@mui/icons-material/Groups";
 import PlaceIcon from "@mui/icons-material/Place";
+import PersonIcon from "@mui/icons-material/Person";
+import LocalOfferIcon from "@mui/icons-material/LocalOffer";
+import EventSeatIcon from "@mui/icons-material/EventSeat";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import s from "./Register.module.css";
 import { T, t, Bi, LANG_STORAGE_KEY, DEFAULT_LANG } from "../../i18n/registerText";
@@ -106,6 +109,9 @@ export default function RegisterPage() {
                             {sessions.map((ses, i) => (
                                 <li key={ses.anisetuUrl || ses.title + i} className={s.session}>
                                     <h2 className={s.sessionTitle}><Bi entry={bi(ses.title, ses.titleEs)} lang={lang} block /></h2>
+                                    {ses.description && (
+                                        <p className={s.sessionDesc}><Bi entry={bi(ses.description, ses.descriptionEs)} lang={lang} block /></p>
+                                    )}
                                     <dl className={s.facts}>
                                         {ses.dates && <div className={s.fact}>
                                             <CalendarMonthIcon fontSize="small" aria-hidden="true" />
@@ -126,6 +132,21 @@ export default function RegisterPage() {
                                             <PlaceIcon fontSize="small" aria-hidden="true" />
                                             <dt className={s.visuallyHidden}>{t(T.where, lang)}</dt>
                                             <dd style={{ margin: 0 }}><Bi entry={bi(ses.location, ses.locationEs)} lang={lang} block /></dd>
+                                        </div>}
+                                        {ses.instructor && <div className={s.fact}>
+                                            <PersonIcon fontSize="small" aria-hidden="true" />
+                                            <dt className={s.visuallyHidden}>{t(T.instructor, lang)}</dt>
+                                            <dd style={{ margin: 0 }}><Bi entry={T.instructorPrefix} lang={lang} /> {ses.instructor}</dd>
+                                        </div>}
+                                        {ses.price && <div className={s.fact}>
+                                            <LocalOfferIcon fontSize="small" aria-hidden="true" />
+                                            <dt className={s.visuallyHidden}>{t(T.price, lang)}</dt>
+                                            <dd style={{ margin: 0 }}><Bi entry={bi(ses.price, ses.priceEs)} lang={lang} /></dd>
+                                        </div>}
+                                        {ses.spots && <div className={s.fact}>
+                                            <EventSeatIcon fontSize="small" aria-hidden="true" />
+                                            <dt className={s.visuallyHidden}>{t(T.spots, lang)}</dt>
+                                            <dd style={{ margin: 0 }}><Bi entry={bi(ses.spots, ses.spotsEs)} lang={lang} /></dd>
                                         </div>}
                                     </dl>
                                     {ses.anisetuUrl && (

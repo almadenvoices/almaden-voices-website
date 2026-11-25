@@ -41,6 +41,10 @@ export const T = {
     time: { en: "Time", es: "Horario" },
     ages: { en: "Ages", es: "Edades" },
     where: { en: "Location", es: "Lugar" },
+    instructor: { en: "Instructor", es: "Instructora o instructor" },
+    instructorPrefix: { en: "Taught by", es: "Imparte" },
+    price: { en: "Price", es: "Precio" },
+    spots: { en: "Spots", es: "Lugares" },
     registerBtn: { en: "Register on AniSetu", es: "Inscribirse en AniSetu" },
     newTab: { en: "(opens in a new tab)", es: "(se abre en una pestaña nueva)" },
 

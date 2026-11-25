@@ -17,7 +17,8 @@
  *
  * Sessions show in the order they're listed, so put the soonest first.
  * The Spanish lines (the ones ending in Es) are optional: leave one out and the
- * English shows in both languages.
+ * English shows in both languages. Every line except title is optional too:
+ * leave one out and the card just doesn't show it.
  */
 export const upcomingSessions = [
 
@@ -31,8 +32,29 @@ export const upcomingSessions = [
     //     ages: "Ages 8–12",
     //     agesEs: "De 8 a 12 años",
     //     location: "Almaden Branch Library, San José",
-    //     anisetuUrl: "https://anisetu.com/PASTE-THE-SESSION-LINK-HERE",
+    //     instructor: "Instructor's first name and last name",
+    //     price: "Free",
+    //     spots: "20 spots",
+    //     description: "One or two sentences about what students will do.",
+    //     anisetuUrl: "https://www.anisetu.com/courses?course=PASTE-THE-COURSE-CODE",
     // },
     // ===== ...to here =====
+
+    {
+        title: "The Art of Persuasion: Learning How to Use Rhetoric",
+        dates: "Wednesday, December 2, 2026",
+        datesEs: "Miércoles 2 de diciembre de 2026",
+        times: "5:30–6:30 PM PT",
+        ages: "Ages 6–10",
+        agesEs: "De 6 a 10 años",
+        location: "6392 Lillian Way, San José",
+        instructor: "Saesha Pal",
+        price: "Free",
+        priceEs: "Gratis",
+        spots: "20 spots",
+        spotsEs: "20 lugares",
+        description: "Students learn the three pillars of persuasion, how to build an argument from evidence, and how to adapt it to different audiences. Everyone finishes by giving a short persuasive speech.",
+        anisetuUrl: "https://www.anisetu.com/courses?course=jp69qfcvw4",
+    },
 
 ];

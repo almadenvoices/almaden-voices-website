@@ -178,6 +178,11 @@
     color: #111827;
 }
 
+.sessionDesc {
+    margin: -6px 0 0;
+    color: #374151;
+}
+
 .facts {
     display: grid;
     gap: 8px 24px;
