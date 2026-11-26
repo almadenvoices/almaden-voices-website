@@ -50,6 +50,9 @@ gcloud run deploy "$SERVICE" \
     --region "$REGION" \
     --project "$PROJECT" \
     --allow-unauthenticated \
+    --min-instances=0 \
+    --max-instances=3 \
+    --cpu-throttling \
     --set-env-vars="NODE_ENV=production,USE_GCP_SECRETS=true,GCP_PROJECT_ID=$PROJECT" \
     2>&1 | tee "$LOG"
 
