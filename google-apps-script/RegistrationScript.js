@@ -31,7 +31,7 @@ const BCC_EMAIL = ADMIN_EMAIL;
 // Bump this whenever this file changes, then check it shows up at the web app
 // URL after redeploying. If the URL still reports the old version, the new
 // code is pasted but not deployed.
-const SCRIPT_VERSION = "2026-11-25";
+const SCRIPT_VERSION = "2026-11-26";
 
 // Desired column order for the Registrations sheet. New columns are appended
 // automatically to existing sheets, so this is safe to extend over time.
@@ -181,16 +181,7 @@ const WORKSHOPS = {
         startUtc: "2026-08-05T22:00:00Z"
       }
     ],
-    // Webex Personal Room — no meeting password required.
-    // The same room hosts both days.
-    webex: {
-      link: "https://webex-link-removed",
-      meetingNumber: "REMOVED",
-      phone: "+1-650-479-3208",
-      phoneTapToJoin: "+1-650-479-3208,,REMOVED##",
-      videoDial: "almadenvoices.webex-link-removed@webex.com",
-      videoIp: "173.243.2.68"
-    }
+    // Join link and dial-in details: the "Meeting Links" tab of the spreadsheet.
   },
   "nj-workshop-aug-2026": {
     name: "Free New Jersey Public Speaking Workshop for Kids",
@@ -209,16 +200,7 @@ const WORKSHOPS = {
         startUtc: "2026-08-30T18:00:00Z"
       }
     ],
-    // Same Webex Personal Room as the other online workshops — no password,
-    // and it hosts both days.
-    webex: {
-      link: "https://webex-link-removed",
-      meetingNumber: "REMOVED",
-      phone: "+1-650-479-3208",
-      phoneTapToJoin: "+1-650-479-3208,,REMOVED##",
-      videoDial: "almadenvoices.webex-link-removed@webex.com",
-      videoIp: "173.243.2.68"
-    }
+    // Join link and dial-in details: the "Meeting Links" tab of the spreadsheet.
   }
 };
 
@@ -560,10 +542,57 @@ function scheduleBlockHtml(workshop) {
     '</table>';
 }
 
-// Full Webex join instructions — used in the join-link email and in reminders.
+// ============================================================
+// MEETING LINKS — kept in the spreadsheet, not in this file.
+//
+// The "Meeting Links" tab has one row per online workshop, with these headers
+// in row 1 (only the first two are required):
+//
+//   Workshop ID | Join Link | Meeting Number | Phone | Phone Tap To Join |
+//   Video Dial | Video IP | Password | Password (numeric)
+//
+// "Workshop ID" must match the workshop's key in WORKSHOPS above. Change a
+// link in the sheet and the next email uses it; there is nothing to redeploy.
+// ============================================================
+function meetingDetailsFor(workshop) {
+  const id = Object.keys(WORKSHOPS).filter(function(k) { return WORKSHOPS[k] === workshop; })[0];
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Meeting Links");
+  if (!id || !sheet || sheet.getLastRow() < 2) return null;
+
+  const idx = headerIndexMap(sheet);
+  if (idx["Workshop ID"] === undefined || idx["Join Link"] === undefined) return null;
+  const cell = function(row, header) {
+    return idx[header] === undefined ? "" : String(row[idx[header]] || "").trim();
+  };
+
+  const rows = sheet.getRange(2, 1, sheet.getLastRow() - 1, sheet.getLastColumn()).getValues();
+  for (let i = 0; i < rows.length; i++) {
+    if (cell(rows[i], "Workshop ID") !== id) continue;
+    const link = cell(rows[i], "Join Link");
+    if (!link) return null;
+    return {
+      link: link,
+      meetingNumber: cell(rows[i], "Meeting Number"),
+      phone: cell(rows[i], "Phone"),
+      phoneTapToJoin: cell(rows[i], "Phone Tap To Join"),
+      videoDial: cell(rows[i], "Video Dial"),
+      videoIp: cell(rows[i], "Video IP"),
+      password: cell(rows[i], "Password"),
+      passwordNumeric: cell(rows[i], "Password (numeric)")
+    };
+  }
+  return null;
+}
+
+// Full join instructions — used in the join-link email and in reminders.
+// Reads the workshop's row on the "Meeting Links" tab; with no row, the email
+// simply goes without join details (and the execution log says so).
 function joinDetailsHtml(workshop) {
-  const w = workshop.webex;
-  if (!w) return '';
+  const w = meetingDetailsFor(workshop);
+  if (!w) {
+    if (workshop && workshop.name) Logger.log("No Meeting Links row for \"" + workshop.name + "\" — email sent without join details.");
+    return '';
+  }
 
   const passwordLine = w.password
     ? '<br/>Meeting password: <strong style="color:' + C_TEXT + ';">' + w.password + '</strong>' +
@@ -590,16 +619,16 @@ function joinDetailsHtml(workshop) {
       '<tr><td style="padding:20px 22px 8px;">' +
         sectionTitle('Other ways to join') +
         '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">' +
-          detailRow('Join by meeting number',
-            'Meeting number (access code): <strong style="color:' + C_TEXT + ';">' + w.meetingNumber + '</strong>' + passwordLine) +
-          detailRow('Tap to join from a mobile device',
+          (w.meetingNumber ? detailRow('Join by meeting number',
+            'Meeting number (access code): <strong style="color:' + C_TEXT + ';">' + w.meetingNumber + '</strong>' + passwordLine) : '') +
+          (w.phoneTapToJoin ? detailRow('Tap to join from a mobile device',
             '<a href="tel:' + w.phoneTapToJoin.replace(/[^0-9+,#]/g, '') + '" style="color:' + C_ACCENT + ';">' + w.phoneTapToJoin + '</a> (United States Toll)',
-            'Some phones may ask you to enter the meeting number.') +
-          detailRow('Join by phone',
-            '<a href="tel:' + w.phone.replace(/[^0-9+]/g, '') + '" style="color:' + C_ACCENT + ';">' + w.phone + '</a> (United States Toll)') +
-          detailRow('Join from a video system',
+            'Some phones may ask you to enter the meeting number.') : '') +
+          (w.phone ? detailRow('Join by phone',
+            '<a href="tel:' + w.phone.replace(/[^0-9+]/g, '') + '" style="color:' + C_ACCENT + ';">' + w.phone + '</a> (United States Toll)') : '') +
+          (w.videoDial ? detailRow('Join from a video system',
             'Dial <strong style="color:' + C_TEXT + ';">' + w.videoDial + '</strong>',
-            'You can also dial ' + w.videoIp + ' and enter the meeting number above.') +
+            w.videoIp ? 'You can also dial ' + w.videoIp + ' and enter the meeting number above.' : '') : '') +
         '</table>' +
       '</td></tr>' +
       '<tr><td style="padding:0 22px 18px;font-family:' + FONT_BODY + ';font-size:12px;color:' + C_MUTED + ';">' +
@@ -859,8 +888,8 @@ function handleCoachingWaitlist(data) {
 // That tab is the durable list -- the server's own subscribers.csv lives on a
 // disk that is wiped every time the site is deployed.
 //
-// To mail everyone on the tab, copy the Email column into NEWSLETTER_TO in the
-// newsletter section further down this file.
+// Everyone on this tab who hasn't unsubscribed gets the newsletter
+// automatically, alongside the addresses on the "Newsletter" tab.
 // ============================================================
 
 // Find the row number (1-based, as the sheet counts them) for an email
@@ -939,7 +968,20 @@ function handleNewsletterUnsubscribe(data) {
   try {
     const sheet = getNewsletterSheet(SpreadsheetApp.getActiveSpreadsheet());
     const row = findNewsletterRow(sheet, data.email);
-    if (!row) return jsonOut({ success: true, notFound: true });
+    if (!row) {
+      // Someone from the "Newsletter" tab, who never signed up on the website.
+      // Record the unsubscribe here anyway, so newsletterRecipients() skips them.
+      const when = data.timestamp ? new Date(data.timestamp) : new Date();
+      appendMappedRow(sheet, {
+        "Timestamp": when,
+        "Email": String(data.email || "").trim().toLowerCase(),
+        "Signed Up For": "Newsletter",
+        "Status": "Unsubscribed",
+        "Unsubscribed On": when,
+        "Notes": "Unsubscribed by link; was not on this tab before"
+      });
+      return jsonOut({ success: true, addedAsUnsubscribed: true });
+    }
 
     setNewsletterCell(sheet, row, "Status", "Unsubscribed");
     setNewsletterCell(sheet, row, "Unsubscribed On", data.timestamp ? new Date(data.timestamp) : new Date());
@@ -2061,7 +2103,8 @@ function recordSent(logSheet, email, workshopId, reminderKey) {
 // HOW TO SEND ONE
 //
 //   1. Edit NEWSLETTER below — the subject, the issue line, the sections.
-//   2. Put the addresses in NEWSLETTER_TO, one per line.
+//   2. Check the "Newsletter" tab of the spreadsheet has everyone you want
+//      (one address per row, under the "Email" header).
 //   3. Change NEWSLETTER_ID to something new for this edition.
 //   4. Save (Cmd+S).
 //   5. Choose "sendTestNewsletter" from the function dropdown at the top of
@@ -2086,115 +2129,20 @@ function recordSent(logSheet, email, workshopId, reminderKey) {
 // that edition receives this one.
 const NEWSLETTER_ID = "2026-09-issue-1";
 
-// Who it goes to. One address per line, each in quotes with a comma after.
-const NEWSLETTER_TO = [
-  "family-email-removed",
-  "family-email-removed",
-  "family-email-removed",
-  "family-email-removed",
-  "family-email-removed",
-  "family-email-removed",
-  "family-email-removed",
-  "family-email-removed",
-  "family-email-removed",
-  "family-email-removed",
-  "family-email-removed",
-  "family-email-removed",
-  "family-email-removed",
-  "family-email-removed",
-  "family-email-removed",
-  "family-email-removed",
-  "family-email-removed",
-  "family-email-removed",
-  "family-email-removed",
-  "family-email-removed",
-  "family-email-removed",
-  "family-email-removed",
-  "family-email-removed",
-  "family-email-removed",
-  "family-email-removed",
-  "family-email-removed",
-  "family-email-removed",
-  "family-email-removed",
-  "family-email-removed",
-  "family-email-removed",
-  "family-email-removed",
-  "family-email-removed",
-  "family-email-removed",
-  "family-email-removed",
-  "family-email-removed",
-  "family-email-removed",
-  "family-email-removed",
-  "family-email-removed",
-  "family-email-removed",
-  "family-email-removed",
-  "family-email-removed",
-  "family-email-removed",
-  "family-email-removed",
-  "family-email-removed",
-  "family-email-removed",
-  "family-email-removed",
-  "family-email-removed",
-  "family-email-removed",
-  "family-email-removed",
-  "family-email-removed",
-  "family-email-removed",
-  "family-email-removed",
-  "family-email-removed",
-  "family-email-removed",
-  "family-email-removed",
-  "family-email-removed",
-  "family-email-removed",
-  "family-email-removed",
-  "family-email-removed",
-  "family-email-removed",
-  "family-email-removed",
-  "family-email-removed",
-  "family-email-removed",
-  "family-email-removed",
-  "family-email-removed",
-  "family-email-removed",
-  "family-email-removed",
-  "family-email-removed",
-  "family-email-removed",
-  "family-email-removed",
-  "family-email-removed",
-  "family-email-removed",
-  "family-email-removed",
-  "family-email-removed",
-  "family-email-removed",
-  "family-email-removed",
-  "family-email-removed",
-  "family-email-removed",
-  "family-email-removed",
-  "family-email-removed",
-  "family-email-removed",
-  "family-email-removed",
-  "family-email-removed",
-  "family-email-removed",
-  "family-email-removed",
-  "family-email-removed",
-  "family-email-removed",
-  "family-email-removed",
-  "family-email-removed",
-  "family-email-removed",
-  "family-email-removed",
-  "family-email-removed",
-  "family-email-removed",
-  "family-email-removed",
-  "family-email-removed",
-  "family-email-removed",
-  "family-email-removed",
-];
+// Who it goes to: the "Newsletter" tab of the spreadsheet, one address per row
+// under an "Email" header in row 1. Add or delete rows there to change the list;
+// nothing in this file needs editing. Everyone on the "Newsletter Subscribers"
+// tab (website sign-ups) is included too -- see below.
+const NEWSLETTER_LIST_TAB = "Newsletter";
 
 // Set to true to also send to every family in the Registrations tab. Leave it
-// false to mail only the addresses listed above.
+// false to mail only the Newsletter tab and the website sign-ups.
 const NEWSLETTER_INCLUDE_REGISTRANTS = false;
 
 // Also send to everyone on the "Newsletter Subscribers" tab -- the people who
 // joined the mailing list from the website. Rows marked Unsubscribed are
 // always left out. Leave this true so new sign-ups get the newsletter without
-// you having to copy their address into the list above.
+// you having to copy their address onto the Newsletter tab.
 const NEWSLETTER_INCLUDE_SUBSCRIBERS = true;
 
 // ---- The newsletter itself ----
@@ -2557,42 +2505,43 @@ function buildNewsletterHtml() {
 }
 
 // Every address this edition should go to, lowercased and de-duplicated so a
-// parent listed by hand who is also in Registrations only gets one copy.
+// parent on more than one list only gets one copy. Anyone marked Unsubscribed
+// on the "Newsletter Subscribers" tab is left out, whichever list they're on.
 function newsletterRecipients() {
-  const seen = {};
-  const out = [];
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const clean = function(email) { return String(email || "").trim().toLowerCase(); };
 
-  const add = function(email) {
-    const clean = String(email || "").trim().toLowerCase();
-    // Good enough to catch typos and stray blanks; Gmail rejects the rest.
-    if (!clean || clean.indexOf("@") < 1 || seen[clean]) return;
-    seen[clean] = true;
-    out.push(clean);
-  };
-
-  NEWSLETTER_TO.forEach(add);
-
-  // Everyone who signed up on the website, minus anyone who has unsubscribed.
-  if (NEWSLETTER_INCLUDE_SUBSCRIBERS) {
-    const subs = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Newsletter Subscribers");
-    if (subs && subs.getLastRow() > 1) {
-      const idx = headerIndexMap(subs);
-      const emailCol = idx["Email"];
-      const statusCol = idx["Status"];
-      if (emailCol !== undefined) {
-        subs.getRange(2, 1, subs.getLastRow() - 1, subs.getLastColumn())
-          .getValues()
-          .forEach(function(row) {
-            const status = statusCol === undefined ? "" : String(row[statusCol] || "").trim().toLowerCase();
-            if (status === "unsubscribed") return;
-            add(row[emailCol]);
-          });
-      }
+  // Who has unsubscribed (the unsubscribe link records it on this tab).
+  const unsubscribed = {};
+  const subs = ss.getSheetByName("Newsletter Subscribers");
+  const subRows = [];
+  if (subs && subs.getLastRow() > 1) {
+    const idx = headerIndexMap(subs);
+    if (idx["Email"] !== undefined) {
+      subs.getRange(2, 1, subs.getLastRow() - 1, subs.getLastColumn()).getValues().forEach(function(row) {
+        const email = clean(row[idx["Email"]]);
+        const status = idx["Status"] === undefined ? "" : String(row[idx["Status"]] || "").trim().toLowerCase();
+        if (status === "unsubscribed") unsubscribed[email] = true;
+        else subRows.push(email);
+      });
     }
   }
 
+  const seen = {};
+  const out = [];
+  const add = function(email) {
+    const e = clean(email);
+    // Good enough to catch typos and stray blanks; Gmail rejects the rest.
+    if (!e || e.indexOf("@") < 1 || seen[e] || unsubscribed[e]) return;
+    seen[e] = true;
+    out.push(e);
+  };
+
+  newsletterListAddresses().forEach(add);
+  if (NEWSLETTER_INCLUDE_SUBSCRIBERS) subRows.forEach(add);
+
   if (NEWSLETTER_INCLUDE_REGISTRANTS) {
-    const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Registrations");
+    const sheet = ss.getSheetByName("Registrations");
     if (sheet && sheet.getLastRow() > 1) {
       const idx = headerIndexMap(sheet);
       const emailCol = idx["Email"];
@@ -2607,38 +2556,16 @@ function newsletterRecipients() {
   return out;
 }
 
-// ONE-TIME: copies every address in NEWSLETTER_TO above onto the
-// "Newsletter Subscribers" tab, so the tab starts out holding the list you
-// already had. Choose it from the function dropdown in the editor and press
-// Run. Safe to run more than once -- anyone already on the tab is skipped, and
-// nobody's Status is changed.
-function backfillNewsletterSubscribersFromList() {
-  const sheet = getNewsletterSheet(SpreadsheetApp.getActiveSpreadsheet());
-  const now = new Date();
-  let added = 0, skipped = 0;
-
-  NEWSLETTER_TO.forEach(function(address) {
-    const email = String(address || "").trim().toLowerCase();
-    if (!email || email.indexOf("@") < 1) return;
-
-    if (findNewsletterRow(sheet, email)) {
-      skipped++;
-      return;
-    }
-
-    appendMappedRow(sheet, {
-      "Timestamp": now,
-      "Email": email,
-      "Signed Up For": "Newsletter",
-      "Status": "Subscribed",
-      "Last Signed Up": "",
-      "Unsubscribed On": "",
-      "Notes": "Imported from the NEWSLETTER_TO list"
-    });
-    added++;
-  });
-
-  Logger.log("Newsletter Subscribers tab: added " + added + ", already there " + skipped + ".");
+// The addresses on the "Newsletter" tab: the "Email" column if there is one,
+// otherwise column A. Blank rows are skipped.
+function newsletterListAddresses() {
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(NEWSLETTER_LIST_TAB);
+  if (!sheet || sheet.getLastRow() < 2) return [];
+  const idx = headerIndexMap(sheet);
+  const col = idx["Email"] === undefined ? 0 : idx["Email"];
+  return sheet.getRange(2, col + 1, sheet.getLastRow() - 1, 1).getValues()
+    .map(function(row) { return String(row[0] || "").trim(); })
+    .filter(function(e) { return e; });
 }
 
 // Sends one copy to yourself. Never touches the real list, and never writes to
@@ -2658,7 +2585,7 @@ function sendTestNewsletter() {
 function sendNewsletterToAll() {
   const recipients = newsletterRecipients();
   if (!recipients.length) {
-    Logger.log("No recipients. Add addresses to NEWSLETTER_TO (or set NEWSLETTER_INCLUDE_REGISTRANTS to true).");
+    Logger.log("No recipients. Add addresses to the \"" + NEWSLETTER_LIST_TAB + "\" tab (or set NEWSLETTER_INCLUDE_REGISTRANTS to true).");
     return;
   }
 
