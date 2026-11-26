@@ -255,7 +255,7 @@ export default function HomePage() {
                         <div className={s.videoFrame}>
                             <video
                                 ref={noahRef}
-                                src="/images/noah-testimonial.mov"
+                                src="/images/noah-testimonial.mp4"
                                 controls={noahPlaying}
                                 preload="metadata"
                                 playsInline
