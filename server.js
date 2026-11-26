@@ -2,6 +2,7 @@
 // server.js
 const express = require("express");
 const cors = require("cors");
+const compression = require("compression");
 const path = require("path");
 const fetch = require("node-fetch");
 const nodemailer = require("nodemailer");
@@ -385,6 +386,11 @@ const BASE_URL = process.env.BASE_URL || (process.env.NODE_ENV === 'production' 
 // ---------- middleware ----------
 
 app.use(cors());
+// Cloud Run does not compress responses for us, so without this the JS bundle,
+// CSS, index.html and API JSON all go out at full size. gzip cuts text roughly
+// 70%, which is both faster pages and less billed egress. Photos and videos are
+// already compressed formats and the default filter skips them.
+app.use(compression());
 // Volunteer resumes arrive base64-encoded in the JSON body, so the default
 // 100kb cap would reject them. The form itself stops anything over 4MB;
 // base64 inflates that by about a third, and 8mb leaves room around it.
